@@ -442,7 +442,6 @@
                 
                 // 既存データにDEMO管理会社が含まれていなければ先頭に追加（優先マッチ）
                 const mergedPartners = [];
-                });
                 partners.forEach(p => {
                     if (!mergedPartners.find(dp => dp.id === p.id || dp.loginId === p.loginId)) {
                         mergedPartners.push(p);
@@ -647,6 +646,7 @@
         } catch (e) {
             // エラーは無視
         }
+    }
     </script>
     <script>
     // PWA Service Worker登録
