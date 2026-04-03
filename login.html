@@ -227,61 +227,6 @@
     </style>
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
-    <script>
-            if (!user) return;
-
-            // 初回のみマスタデータをlocalStorageに投入
-
-            // セッション保存（前ユーザーのデモキャッシュをクリア）
-            sessionStorage.removeItem('demo.items');
-            sessionStorage.removeItem('demo.items.user');
-            const userInfo = {
-                companyCode: user.companyCode, companyName: user.companyName,
-                id: user.id, userId: user.id, password: user.password,
-                name: user.name, userName: user.name, role: user.role,
-                scope: user.scope || '', officeCode: user.officeCode || '',
-                officeName: user.officeName || '', isFirstLogin: false, isDemoMode: false,
-                partnerId: user.partnerId || '', partnerCode: user.partnerCode || '',
-                categories: user.categories || [],
-                assignedCompanies: user.assignedCompanies || []
-            };
-            sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
-            localStorage.setItem('currentAccount', JSON.stringify(userInfo));
-            localStorage.setItem('ONE_loggedIn', '1');
-            localStorage.setItem('ONE_userId', user.id);
-            localStorage.setItem('ONE_userName', user.name);
-
-            // DEMOユーザー（システム管理者以外）→ スナップショット保存（ログアウト時に復元用）
-            }
-
-            // 管理会社の場合はcontractor情報も保存
-            if (user.role === 'contractor') {
-                var partnerCompanies = [];
-                if (typeof getPartnerCompanies === 'function') {
-                    partnerCompanies = getPartnerCompanies(user.partnerId || user.partnerCode);
-                }
-                if (partnerCompanies.length === 0) {
-                    partnerCompanies = user.assignedCompanies || ['TAMJ'];
-                }
-                sessionStorage.setItem('currentContractor', JSON.stringify({
-                    id: user.partnerId, partnerId: user.partnerId,
-                    partnerCode: user.partnerCode, companyName: user.companyName,
-                    name: user.name, loginId: user.id, contactName: user.name,
-                    categories: user.categories, assignedCompanies: partnerCompanies,
-                    role: 'contractor'
-                }));
-                window.location.href = 'contractor-dashboard.html';
-            } else if (user.role === 'office_admin') {
-                window.location.href = 'master-top.html';
-            } else if (user.role === 'company_admin') {
-                window.location.href = 'master-top.html';
-            } else if (user.role === 'system_admin') {
-                window.location.href = 'system-admin.html';
-            } else {
-                window.location.href = 'report.html';
-            }
-        }
-    </script>
     <meta name="theme-color" content="#1e3a5f">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
@@ -413,7 +358,6 @@
             } catch (e) {
                 console.warn('監査ログの記録に失敗:', e);
             }
-        }
 
         // パスワード表示切り替え
         function togglePassword() {
@@ -460,10 +404,6 @@
                 localStorage.setItem('ONE_loggedIn', '1');
                 localStorage.setItem('ONE_userId', 'admin');
                 localStorage.setItem('ONE_userName', 'システム管理者');
-
-                // 初回のみデモデータ投入（既存変更は保持）
-                }
-                
                 logEvent('login', { userId: 'admin', role: 'system_admin' });
                 window.location.href = 'system-admin.html';
                 return;
@@ -502,7 +442,6 @@
                 
                 // 既存データにDEMO管理会社が含まれていなければ先頭に追加（優先マッチ）
                 const mergedPartners = [];
-                    mergedPartners.push(dp);
                 });
                 partners.forEach(p => {
                     if (!mergedPartners.find(dp => dp.id === p.id || dp.loginId === p.loginId)) {
