@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>インポートデータ確認 | ワンタッチ管理</title>
+  <script src="document-storage.js"></script>
+  <script src="plan-gate.js"></script>
+    <script src="error-handler.js"></script>
+    <script src="unified-header.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+      background: #fafafa;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 16px 120px;
+    }
+    h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ツールバー */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .toolbar .btn {
+      padding: 8px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .toolbar .btn:hover { background: #f5f5f5; border-color: #bbb; }
+    .warning-badge {
+      display: none;
+      margin-left: auto;
+      padding: 6px 12px;
+      background: #fff3e0;
+      color: #e65100;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* テーブル */
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: #f8f9fa;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 2px solid #e0e0e0;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.15s; }
+    tbody tr:hover { background: #fafafa; }
+    tbody td { padding: 6px 8px; vertical-align: middle; }
+    .row-num { color: #999; text-align: center; width: 30px; }
+
+    /* 編集可能なフィールド */
+    table input, table select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    table input:focus, table select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(229,57,53,0.1);
+    }
+    table input[type="number"] { text-align: right; }
+    .col-name input { min-width: 140px; font-weight: 600; }
+    .col-maker input { min-width: 100px; }
+    .col-model input { min-width: 100px; }
+    .col-qty input { width: 60px; }
+    .col-price input { width: 80px; }
+    .col-category select { min-width: 90px; }
+
+    /* 信頼度 */
+    .conf-cell { text-align: center; font-size: 12px; font-weight: 600; }
+    .conf-cell.high { color: #4caf50; }
+    .conf-cell.mid { color: #ff9800; }
+    .conf-cell.low { color: #f44336; }
+    tr.low-conf { background: #fff8e1; }
+
+    /* 削除ボタン */
+    .btn-del {
+      background: none; border: none; cursor: pointer;
+      color: #999; font-size: 16px; padding: 4px;
+      border-radius: 4px; transition: all 0.15s;
+    }
+    .btn-del:hover { color: #f44336; background: #ffebee; }
+
+    /* 下部バー */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+    }
+    .bottom-summary { font-size: 15px; color: #333; }
+    .bottom-summary strong { color: #2563eb; font-size: 20px; }
+    .bottom-actions { display: flex; gap: 8px; }
+    .btn-cancel {
+      padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px;
+      background: white; font-size: 14px; cursor: pointer;
+    }
+    .btn-cancel:hover { background: #f5f5f5; }
+    .btn-confirm {
+      padding: 10px 24px; border: none; border-radius: 6px;
+      background: #2563eb; color: white; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-confirm:hover { background: #1d4ed8; }
+    .btn-confirm:disabled { background: #ccc; cursor: not-allowed; }
+
+    /* 空状態 */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #999;
+    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      display: none; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .toast.success { background: #4caf50; color: white; display: block; }
+    .toast.error { background: #f44336; color: white; display: block; }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px 8px 120px; }
+      .bottom-bar { padding: 10px 16px; flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="unified-header-mount"></div>
+
+  <div class="container">
+    <h2>インポートデータ確認</h2>
+    <p style="color: #666; font-size: 13px; margin-bottom: 16px;" id="docInfo">
+      取り込んだデータを確認・修正してから商品マスタに登録します。
+    </p>
+
+    <!-- ツールバー -->
+    <div class="toolbar">
+      <button class="btn" onclick="autoCategory()">カテゴリ推定</button>
+      <button class="btn" onclick="normalizeAll()">全角→半角</button>
+      <button class="btn" onclick="selectAll()">全選択</button>
+      <span class="warning-badge" id="warningBadge">
+        <span id="warningCount">0</span>件の要確認
+      </span>
+    </div>
+
+    <!-- テーブル -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>商品名</th>
+            <th>メーカー</th>
+            <th>型番</th>
+            <th>数量</th>
+            <th>単価</th>
+            <th>カテゴリー</th>
+            <th>信頼度</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="9" class="empty-state"><div class="icon">⏳</div>読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 下部バー -->
+  <div class="bottom-bar">
+    <div class="bottom-summary">
+      <strong id="totalCount">0</strong>件の商品を登録します
+    </div>
+    <div class="bottom-actions">
+      <button class="btn-cancel" onclick="cancelAll()">キャンセル</button>
+      <button class="btn-confirm" id="confirmBtn" onclick="confirmAll()">確定して商品マスタに登録</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================
+    // ログインチェック & パラメータ取得
+    // ============================================
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) { window.location.href = 'login.html'; }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const docId = urlParams.get('docId') || urlParams.get('doc');
+
+    if (!docId) {
+      ErrorHandler.showWarning('書類IDが指定されていません');
+      window.location.href = 'import.html';
+    }
+
+    let lineItems = [];
+    const CATEGORIES = ["建物・外", "部屋・共用部", "介護医療備品", "厨房", "ネットワーク", "その他"];
+
+    // カテゴリ推定キーワード
+    const CATEGORY_KEYWORDS = {
+      "建物・外": ["建築", "内装", "外装", "修繕", "補修", "改修", "塗装", "防水", "シーリング", "クロス", "床材", "長尺シート", "タイル", "天井", "建具", "扉", "自動ドア", "シャッター", "フェンス", "外構", "門扉", "駐車場", "植栽", "ゴミ庫", "除草", "舗装", "駐輪", "エアコン", "換気", "換気扇", "空調", "室外機", "熱交換器", "水まわり", "エレベーター", "昇降機", "インターホン", "電気工事", "分電盤", "動力盤", "幹線ケーブル", "キュービクル", "コンセント", "EV充電", "電気保安", "照明", "LED", "非常灯", "非常用照明", "誘導灯", "外灯", "看板照明", "給湯器", "給湯配管", "給湯循環", "配管", "排水", "排水ポンプ", "排水配管", "汚水桝", "雨水桝", "給水配管", "給水ポンプ", "受水槽", "浄化槽", "手すり", "屋上", "外壁", "ブラインド", "カーテンレール", "収納固定棚", "制御盤", "保守回線", "トイレ", "蛇口"],
+      "部屋・共用部": ["ベッド", "マットレス", "エアマット", "床頭台", "チェスト", "タンス", "ロッカー", "テーブル", "机", "デスク", "椅子", "チェア", "ソファ", "スツール", "カーテン", "シーツ", "枕カバー", "防水シーツ", "タオルケット", "毛布", "タオル", "バスタオル", "ブラインド", "ミラー", "冷蔵庫", "洗濯機", "乾燥機", "アイロン", "テレビ", "電子レンジ", "掃除機", "クリーナー", "ドライヤー", "ポット", "ケトル", "ミキサー", "延長コード", "加湿器", "空気清浄機", "ゴミ箱", "ダストボックス", "掲示板", "シューズボックス", "傘立て", "玄関マット", "食器棚", "食堂テーブル", "食堂椅子", "ホワイトボード", "書庫", "金庫", "鍵管理", "ワゴン", "ラック", "台車", "ハンガーラック", "花台", "マガジンラック", "時計", "ランドリーカート", "リネンワゴン", "看板", "サイン", "清掃"],
+      "介護医療備品": ["浴槽", "大浴場", "循環装置", "ろ過装置", "レジオネラ", "ボイラー", "機械浴", "特殊浴槽", "浴室", "シャワーチェア", "シャワーキャリー", "浴室用椅子", "浴室用車椅子", "浴室手すり", "スロープ手すり", "シャワー", "滑り止めマット", "脱衣", "入浴", "吸引器", "血圧計", "体温計", "体重計", "酸素", "点滴", "ストレッチャー", "処置台", "医療ワゴン", "救急箱", "手指消毒", "消毒液", "ペーパータオルホルダー", "おむつ", "ガウン", "医療用空気清浄機", "パルスオキシメーター", "AED", "聴診器", "車椅子", "車いす", "歩行器", "杖", "リフト", "スライディング", "ポータブルトイレ", "介護用ベッド"],
+      "厨房": ["グリストラップ", "厨房床排水", "給排気ダクト", "防火ダンパー", "ガス元栓", "ガス配管", "業務用冷蔵庫", "業務用冷凍庫", "業務用冷凍冷蔵庫", "コールドテーブル", "ガスレンジ", "ガステーブル", "IH", "スチコン", "コンベクション", "オーブン", "炊飯器", "フライヤー", "製氷機", "食洗機", "食器洗浄機", "消毒保管庫", "殺菌庫", "軟水器", "シンク", "作業台", "調理台", "スープジャー", "配膳", "配膳車", "配膳カート", "厨房", "食器", "碗", "皿", "箸", "スプーン", "フォーク", "まな板", "包丁", "ボウル", "ザル", "寸胴", "フライパン", "フードプロセッサー", "HACCP", "自助具", "とろみ"],
+      "ネットワーク": ["防災", "消防", "スプリンクラー", "消火", "感知器", "受信盤", "発信機", "排煙", "防火扉", "防火ダンパー", "非常放送", "非常用発電機", "防犯カメラ", "レコーダー", "NVR", "DVR", "人感センサー", "電気錠", "複合機", "コピー機", "プリンター", "スキャナー", "パソコン", "ノートPC", "モニター", "サーバー", "UPS", "ナースコール", "緊急呼出", "ルーター", "ハブ", "LAN", "Wi-Fi", "WiFi", "アクセスポイント", "ネットワークスイッチ", "通信回線", "光回線", "タブレット", "電話", "ビジネスフォン", "IP電話", "シュレッダー", "ラミネーター"],
+    };
+
+    // ============================================
+    // 初期化
+    // ============================================
+    UnifiedHeader.init({
+      title: 'インポート確認',
+      icon: '',
+      backUrl: 'import.html'
+    });
+
+    loadData();
+
+    async function loadData() {
+      try {
+        // ドキュメント情報を表示
+        const doc = await DocumentStorage.getDocument(docId);
+        if (doc) {
+          const info = document.getElementById('docInfo');
+          info.textContent = `${doc.fileName || '不明'} からの取り込みデータを確認してください。`;
+        }
+
+        // LineItems取得
+        lineItems = await DocumentStorage.getLineItemsByDoc(docId);
+
+        if (lineItems.length === 0) {
+          document.getElementById('tableBody').innerHTML =
+            '<tr><td colspan="9" class="empty-state"><div class="icon"></div><p>データがありません</p></td></tr>';
+          document.getElementById('confirmBtn').disabled = true;
+          return;
+        }
+
+        renderTable();
+        updateCounts();
+      } catch (e) {
+        console.error('データ読み込みエラー:', e);
+        ErrorHandler.showError('データの読み込みに失敗しました');
+      }
+    }
+
+    // ============================================
+    // テーブル描画
+    // ============================================
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+
+      if (lineItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="icon"></div><p>データがありません</p></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = lineItems.map((item, idx) => {
+        const conf = item.confidence || 1;
+        const isLow = conf < 0.75;
+        const confClass = conf >= 0.85 ? 'high' : (conf >= 0.60 ? 'mid' : 'low');
+        return `
+        <tr data-line-id="${item.lineId}" class="${isLow ? 'low-conf' : ''}">
+          <td class="row-num">${idx + 1}</td>
+          <td class="col-name"><input type="text" value="${esc(item.name)}" data-field="name"></td>
+          <td class="col-maker"><input type="text" value="${esc(item.maker || '')}" data-field="maker"></td>
+          <td class="col-model"><input type="text" value="${esc(item.model || '')}" data-field="model"></td>
+          <td class="col-qty"><input type="number" value="${item.quantity || item.qty || ''}" data-field="quantity" style="width:60px;"></td>
+          <td class="col-price"><input type="number" value="${item.price || item.unitPrice || ''}" data-field="price" style="width:80px;"></td>
+          <td class="col-category">
+            <select data-field="category">
+              <option value="">未分類</option>
+              ${CATEGORIES.map(c => `<option value="${c}" ${item.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+          </td>
+          <td class="conf-cell ${confClass}">${Math.round(conf * 100)}%</td>
+          <td><button class="btn-del" onclick="deleteRow('${item.lineId}')" title="削除">✕</button></td>
+        </tr>`;
+      }).join('');
+
+      // 変更リスナー
+      tbody.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('change', handleFieldChange);
+      });
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ============================================
+    // フィールド変更
+    // ============================================
+    function handleFieldChange(e) {
+      const tr = e.target.closest('tr');
+      const lineId = tr.dataset.lineId;
+      const field = e.target.dataset.field;
+      let value = e.target.value;
+
+      const item = lineItems.find(i => i.lineId === lineId);
+      if (!item) return;
+
+      if (field === 'quantity' || field === 'price') {
+        value = parseFloat(value) || 0;
+      }
+      item[field] = value;
+      updateCounts();
+    }
+
+    // ============================================
+    // カウント更新
+    // ============================================
+    function updateCounts() {
+      const validCount = lineItems.filter(i => i.name && i.name.trim()).length;
+      document.getElementById('totalCount').textContent = validCount;
+      document.getElementById('confirmBtn').disabled = validCount === 0;
+
+      const warningCount = lineItems.filter(i => (i.confidence || 1) < 0.75).length;
+      const badge = document.getElementById('warningBadge');
+      if (warningCount > 0) {
+        badge.style.display = 'inline-flex';
+        document.getElementById('warningCount').textContent = warningCount;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // ============================================
+    // ツールバー機能
+    // ============================================
+    function deleteRow(lineId) {
+      lineItems = lineItems.filter(i => i.lineId !== lineId);
+      renderTable();
+      updateCounts();
+    }
+
+    function normalizeAll() {
+      lineItems.forEach(item => {
+        ['name', 'maker', 'model'].forEach(f => {
+          if (item[f]) {
+            item[f] = item[f]
+              .replace(/[\uff01-\uff5e]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+              .replace(/\u3000/g, ' ')
+              .trim();
+          }
+        });
+      });
+      renderTable();
+      updateCounts();
+      showToast('全角→半角に変換しました', 'success');
+    }
+
+    function autoCategory() {
+      let count = 0;
+      lineItems.forEach(item => {
+        if (item.category && item.category !== 'その他') return;
+        const text = ((item.name || '') + ' ' + (item.maker || '')).toLowerCase();
+        for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+          for (const kw of keywords) {
+            if (text.includes(kw.toLowerCase())) {
+              item.category = category;
+              count++;
+              return;
+            }
+          }
+        }
+        if (!item.category) item.category = 'その他';
+      });
+      renderTable();
+      updateCounts();
+      showToast(`${count}件のカテゴリを推定しました`, 'success');
+    }
+
+    function selectAll() {
+      document.querySelectorAll('#tableBody input[data-field="name"]').forEach(el => {
+        el.select();
+      });
+    }
+
+    // ============================================
+    // 確定 / キャンセル
+    // ============================================
+    async function confirmAll() {
+      const validCount = lineItems.filter(i => i.name && i.name.trim()).length;
+
+      if (validCount === 0) {
+        showToast('登録する商品がありません', 'error');
+        return;
+      }
+
+      if (!confirm(`${validCount}件の商品を商品マスタに登録します。よろしいですか？`)) return;
+
+      const btn = document.getElementById('confirmBtn');
+      btn.disabled = true;
+      btn.textContent = '登録中...';
+
+      try {
+        // 変更をLineItemsに保存してから確定
+        for (const item of lineItems) {
+          await DocumentStorage.updateLineItem(item);
+        }
+
+        // LineItems → 商品マスタに登録
+        const newItems = await DocumentStorage.confirmLineItems(docId);
+
+        showToast(`${newItems.length}件を商品マスタに登録しました！`, 'success');
+
+        setTimeout(() => {
+          window.location.href = 'items.html';
+        }, 1500);
+
+      } catch (e) {
+        console.error('登録エラー:', e);
+        showToast('登録に失敗しました: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '確定して商品マスタに登録';
+      }
+    }
+
+    function cancelAll() {
+      if (confirm('変更を破棄してインポート画面に戻りますか？')) {
+        window.location.href = 'import.html';
+      }
+    }
+
+    // ============================================
+    // Toast
+    // ============================================
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + type;
+      setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+  </script>
+</body>
+</html>

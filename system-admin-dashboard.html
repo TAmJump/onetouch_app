@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>システム管理者ダッシュボード | ワンタッチ管理</title>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 24px; }
+
+        /* ヘッダーカード */
+        .header {
+            background: #fff; border-radius: 14px; padding: 24px 28px; margin-bottom: 24px;
+            border: 1px solid #e8e8e8; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-badge {
+            background: #1e3a5f; color: #fff; padding: 10px 20px; border-radius: 10px;
+            font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px;
+        }
+        .header-title h1 { font-size: 22px; color: #1e293b; margin-bottom: 2px; font-weight: 700; }
+        .header-title p { font-size: 13px; color: #888; }
+        .header-right { display: flex; gap: 10px; align-items: center; }
+        .btn-back {
+            background: #f5f5f5; color: #666; border: none; padding: 10px 20px; border-radius: 8px;
+            cursor: pointer; font-weight: 600; transition: all 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-back:hover { background: #eee; }
+        .btn-logout { background: #1e3a5f; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .btn-logout:hover { background: #2d4a7a; }
+
+        /* 統計カード */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card {
+            background: #fff; border-radius: 14px; padding: 24px;
+            border: 1px solid #e8e8e8; box-shadow: 0 1px 3px rgba(0,0,0,0.03); transition: all 0.2s;
+        }
+        .stat-card:hover { border-color: #ccc; }
+        .stat-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .stat-card-icon { width: 28px; height: 28px; color: #888; }
+        .stat-card-label { font-size: 13px; color: #888; font-weight: 600; }
+        .stat-card-value { font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+        .stat-card-detail { font-size: 12px; color: #aaa; }
+
+        /* セクション */
+        .section {
+            background: #fff; border-radius: 14px; padding: 28px; margin-bottom: 20px;
+            border: 1px solid #e8e8e8; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #eee; }
+        .section-title { font-size: 17px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+        .section-icon { width: 20px; height: 20px; color: #888; }
+
+        /* テーブル */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #fafafa; }
+        th { text-align: left; padding: 10px 14px; font-weight: 600; color: #888; font-size: 12px; border-bottom: 1px solid #eee; }
+        td { padding: 14px; border-bottom: 1px solid #f5f5f5; color: #1e293b; font-size: 13px; }
+        tr:hover { background: #fafafa; }
+
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+        .status-active { background: #ecfdf5; color: #065f46; }
+        .status-inactive { background: #fef2f2; color: #991b1b; }
+        .btn-toggle { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+        .btn-enable { background: #1e3a5f; color: #fff; }
+        .btn-enable:hover { background: #2d4a7a; }
+        .btn-disable { background: #dc2626; color: #fff; }
+        .btn-disable:hover { background: #b91c1c; }
+
+        /* フォーム */
+        .export-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 13px; font-weight: 600; color: #1e293b; }
+        .form-select, .form-input { padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: #fff; }
+        .form-select:focus, .form-input:focus { outline: none; border-color: #999; box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
+        .btn-export { background: #1e3a5f; color: #fff; border: none; padding: 12px 28px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-export:hover { background: #2d4a7a; }
+
+        /* ランキング */
+        .ranking-list { display: flex; flex-direction: column; gap: 10px; }
+        .ranking-item { display: flex; align-items: center; gap: 14px; padding: 14px; background: #fafafa; border-radius: 10px; border: 1px solid #f0f0f0; }
+        .ranking-item:hover { background: #f5f5f5; }
+        .ranking-number { font-size: 20px; font-weight: 700; color: #1e293b; min-width: 36px; text-align: center; }
+        .ranking-info { flex: 1; }
+        .ranking-name { font-weight: 600; color: #1e293b; margin-bottom: 2px; font-size: 14px; }
+        .ranking-detail { font-size: 12px; color: #888; }
+        .ranking-value { font-size: 18px; font-weight: 700; color: #1e293b; }
+
+        @media (max-width: 768px) {
+            .header { flex-direction: column; gap: 16px; }
+            .header-left { flex-direction: column; width: 100%; }
+            .header-right { width: 100%; justify-content: space-between; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .export-form { grid-template-columns: 1fr; }
+        }
+    </style>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+    <div class="container">
+        <!-- 全体統計 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-label">総会社数</div>
+                    <div class="stat-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
+                </div>
+                <div class="stat-card-value" id="totalCompanies">0</div>
+                <div class="stat-card-detail">登録済み企業</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-label">総ユーザー数</div>
+                    <div class="stat-card-icon"></div>
+                </div>
+                <div class="stat-card-value" id="totalUsers">0</div>
+                <div class="stat-card-detail">アクティブアカウント</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-label">総通報数</div>
+                    <div class="stat-card-icon"></div>
+                </div>
+                <div class="stat-card-value" id="totalReports">0</div>
+                <div class="stat-card-detail">累計通報件数</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div class="stat-card-label">データ使用量</div>
+                    <div class="stat-card-icon"></div>
+                </div>
+                <div class="stat-card-value" id="totalStorage">0</div>
+                <div class="stat-card-detail">KB / 10MB</div>
+            </div>
+        </div>
+
+        <!-- 会社別アクティビティランキング -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon"></span>
+                    会社別アクティビティランキング（通報数）
+                </div>
+            </div>
+            <div class="ranking-list" id="rankingList">
+                <!-- JavaScriptで動的生成 -->
+            </div>
+        </div>
+
+        <!-- 全会社管理 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="15" y2="10"/></svg></span>
+                    全会社一覧・管理
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="companiesTable">
+                    <thead>
+                        <tr>
+                            <th>会社コード</th>
+                            <th>会社名</th>
+                            <th>ユーザー数</th>
+                            <th>事業所数</th>
+                            <th>通報数</th>
+                            <th>ステータス</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companiesTableBody">
+                        <!-- JavaScriptで動的生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- グローバルデータエクスポート -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon"></span>
+                    グローバルデータエクスポート
+                </div>
+            </div>
+            <div class="export-form">
+                <div class="form-group">
+                    <label class="form-label">データ形式</label>
+                    <select class="form-select" id="exportFormat">
+                        <option value="csv">CSV形式</option>
+                        <option value="json">JSON形式</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">データ種別</label>
+                    <select class="form-select" id="exportType">
+                        <option value="all">すべてのデータ</option>
+                        <option value="companies">会社情報</option>
+                        <option value="offices">事業所情報</option>
+                        <option value="accounts">アカウント情報</option>
+                        <option value="reports">通報データ</option>
+                        <option value="partners">管理会社情報</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">期間（開始）</label>
+                    <input type="date" class="form-input" id="exportStartDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">期間（終了）</label>
+                    <input type="date" class="form-input" id="exportEndDate">
+                </div>
+            </div>
+            <button class="btn-export" onclick="exportGlobalData()">エクスポート実行</button>
+        </div>
+
+        <!-- メンテナンスモード -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-icon"></span>
+                    メンテナンスモード
+                </div>
+            </div>
+            <div style="background: #fff8e1; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f59e0b;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #f59e0b;">注意</div>
+                <div style="font-size: 14px; color: #666;">
+                    メンテナンスモードを有効にすると、システム管理者以外の全ユーザーがアクセスできなくなります。<br>
+                    全会社の全ユーザーに影響します。
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 16px;">
+                <div>
+                    <div style="font-weight: 600; margin-bottom: 4px; font-size: 16px;">メンテナンスモード</div>
+                    <div style="font-size: 13px; color: #666;">システム全体をメンテナンスモードに切り替え</div>
+                </div>
+                <label style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                    <input type="checkbox" id="maintenanceMode" onchange="toggleMaintenanceMode()" style="opacity: 0; width: 0; height: 0;">
+                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                    <span style="position: absolute; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                </label>
+            </div>
+            <div id="maintenanceMessage" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">メンテナンス中のメッセージ</label>
+                    <input type="text" class="form-input" id="maintenanceText" placeholder="メンテナンス中のメッセージ" value="現在システムメンテナンス中です。しばらくお待ちください。">
+                </div>
+            </div>
+        </div>
+
+    <!-- データバックアップ・リストア -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-icon"></span>
+                データバックアップ・リストア
+            </div>
+        </div>
+
+        <!-- 最終バックアップ情報 -->
+        <div style="background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">最終バックアップ</div>
+            <div id="lastBackupInfo" style="font-size: 14px; color: #333; font-weight: 600;">まだバックアップがありません</div>
+            <div id="backupWarning" style="display: none; margin-top: 8px; color: #dc2626; font-size: 13px;">
+                30日以上バックアップされていません！早めにバックアップを取ってください。
+            </div>
+        </div>
+
+        <!-- エクスポート -->
+        <div style="margin-bottom: 24px;">
+            <div style="font-weight: 600; margin-bottom: 12px; font-size: 15px;">データエクスポート（バックアップ）</div>
+            <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                <div style="font-size: 13px; color: #666; margin-bottom: 8px;">エクスポートされるデータ:</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 13px;">
+                    <div>✓ 会社マスタ</div>
+                    <div>✓ 事業所マスタ</div>
+                    <div>✓ アカウントマスタ</div>
+                    <div>✓ 管理会社マスタ</div>
+                    <div>✓ 通報データ</div>
+                    <div>✓ 商品マスタ</div>
+                    <div>✓ 監査ログ</div>
+                    <div>✓ システム設定</div>
+                </div>
+            </div>
+            <button onclick="exportAllData()" style="background: #2563eb; color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; width: 100%; transition: all 0.2s;">
+                全データをエクスポート（JSON形式）
+            </button>
+        </div>
+
+        <!-- インポート -->
+        <div>
+            <div style="font-weight: 600; margin-bottom: 12px; font-size: 15px;">データインポート（復元）</div>
+            <div style="background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                <div style="color: #856404; font-size: 13px;">
+                    注意: インポートすると現在のデータが上書きされます。事前にバックアップを取ることを推奨します。
+                </div>
+            </div>
+            <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importAllData(event)">
+            <button onclick="document.getElementById('importFileInput').click()" style="background: #757575; color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; width: 100%; transition: all 0.2s;">
+                バックアップファイルを選択して復元
+            </button>
+        </div>
+    </div>
+
+    <!-- 監査ログ -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+                監査ログ
+            </div>
+        </div>
+        <div style="font-size: 13px; color: #475569; margin-bottom: 16px;">全ユーザーの操作履歴を確認・ダウンロードできます。</div>
+        <a href="audit-log.html" style="display:inline-block;background:#2563eb;color:white;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;text-decoration:none;transition:all 0.2s;">監査ログを開く</a>
+    </div>
+
+    <!-- 全データ初期化 -->
+    <div class="section" style="border: 2px solid #2563eb;">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.3"/></svg></span>
+                デモデータリセット
+            </div>
+        </div>
+        <div style="background: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <div style="color: #1e40af; font-size: 14px; font-weight: 600; margin-bottom: 8px;">デモデータを初期状態に戻します</div>
+            <div style="color: #1e40af; font-size: 13px; line-height: 1.6;">
+                会社・事業所・アカウント・管理会社・契約・商品（600件）・通報履歴（108件）を<br>
+                初期のデモデータで上書きします。カスタマイズした内容はリセットされます。
+            </div>
+        </div>
+        <button onclick="resetDemoData()" style="background: #2563eb; color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; width: 100%; transition: all 0.2s;">
+            デモデータをリセットする
+        </button>
+    </div>
+
+    <!-- 全データ初期化 -->
+    <div class="section" style="border: 2px solid #dc2626;">
+        <div class="section-header">
+            <div class="section-title">
+                <span class="section-icon"></span>
+                全データ初期化
+            </div>
+        </div>
+        <div style="background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <div style="color: #991b1b; font-size: 14px; font-weight: 600; margin-bottom: 8px;">この操作は取り消せません</div>
+            <div style="color: #991b1b; font-size: 13px; line-height: 1.6;">
+                全てのデータ（会社・事業所・アカウント・管理会社・通報・商品・監査ログ・システム設定）を削除します。<br>
+                DEMOアカウント（ハードコード）のみ残ります。<br>
+                本番運用前のテストデータクリアに使用してください。
+            </div>
+        </div>
+        <button onclick="clearAllData()" style="background: #dc2626; color: white; border: none; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; width: 100%; transition: all 0.2s;">
+             全データを初期化する
+        </button>
+    </div>
+
+    </div><!-- /.container -->
+
+    <script>
+        // ログインチェック
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.role !== 'system_admin') {
+            ErrorHandler.showWarning('システム管理者としてログインしてください');
+            window.location.href = 'login.html';
+        }
+
+        // 初期化
+        function init() {
+            loadGlobalStats();
+            loadCompaniesTable();
+            loadActivityRanking();
+        }
+
+        // ストレージからデータを取得（session+localStorage両方マージ）
+        function getMergedData(key) {
+            let fromSession = [];
+            let fromLocal = [];
+            try { fromSession = JSON.parse(sessionStorage.getItem(key) || '[]'); } catch(e) {}
+            try { fromLocal = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+            // 重複排除マージ（idベース）
+            const merged = [...fromSession];
+            fromLocal.forEach(r => {
+                const idField = r.id || r.code || r.itemId || r.userId || JSON.stringify(r);
+                if (!merged.find(m => (m.id || m.code || m.itemId || m.userId || JSON.stringify(m)) === idField)) {
+                    merged.push(r);
+                }
+            });
+            return merged;
+        }
+
+        // 全体統計読み込み
+        function loadGlobalStats() {
+            try {
+                // 会社数
+                const companies = getMergedData('companies').filter(c => c.code !== 'SYSTEM');
+                document.getElementById('totalCompanies').textContent = companies.length;
+
+                // ユーザー数
+                const accounts = getMergedData('accounts');
+                document.getElementById('totalUsers').textContent = accounts.length;
+
+                // 通報数
+                const reports = getMergedData('onetouch.reports');
+                document.getElementById('totalReports').textContent = reports.length;
+
+                // データ使用量
+                let totalSize = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        totalSize += localStorage.getItem(key).length + key.length;
+                    }
+                }
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    if (key && (key.startsWith('onetouch.') || key.startsWith('demo.'))) {
+                        totalSize += sessionStorage.getItem(key).length + key.length;
+                    }
+                }
+                const sizeKB = (totalSize / 1024).toFixed(2);
+                document.getElementById('totalStorage').textContent = sizeKB;
+            } catch (e) {
+                console.error('統計読み込みエラー:', e);
+            }
+        }
+
+        // 会社別アクティビティランキング
+        function loadActivityRanking() {
+            try {
+                const companies = getMergedData('companies').filter(c => c.code !== 'SYSTEM');
+                const reports = getMergedData('onetouch.reports');
+                const companyReportCounts = {};
+                companies.forEach(company => {
+                    const count = reports.filter(r => r.companyCode === company.code).length;
+                    companyReportCounts[company.code] = {
+                        name: company.name,
+                        count: count
+                    };
+                });
+
+                // ソート
+                const ranking = Object.entries(companyReportCounts)
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .slice(0, 5);
+
+                // 表示
+                const rankingList = document.getElementById('rankingList');
+                if (ranking.length === 0) {
+                    rankingList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">データがありません</div>';
+                    return;
+                }
+
+                rankingList.innerHTML = ranking.map((item, index) => `
+                    <div class="ranking-item">
+                        <div class="ranking-number">${index + 1}</div>
+                        <div class="ranking-info">
+                            <div class="ranking-name">${item[1].name}</div>
+                            <div class="ranking-detail">会社コード: ${item[0]}</div>
+                        </div>
+                        <div class="ranking-value">${item[1].count} 件</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('ランキング読み込みエラー:', e);
+            }
+        }
+
+        // 全会社テーブル読み込み
+        function loadCompaniesTable() {
+            try {
+                const companies = getMergedData('companies').filter(c => c.code !== 'SYSTEM');
+                const offices = getMergedData('offices');
+                const accounts = getMergedData('accounts');
+                const reports = getMergedData('onetouch.reports');
+
+                const tbody = document.getElementById('companiesTableBody');
+
+                if (companies.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">会社が登録されていません</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = companies.map(company => {
+                    const userCount = accounts.filter(a => a.companyCode === company.code).length;
+                    const officeCount = offices.filter(o => o.companyCode === company.code).length;
+                    const reportCount = reports.filter(r => r.companyCode === company.code).length;
+                    const isActive = company.status !== 'inactive';
+
+                    return `
+                        <tr>
+                            <td><strong>${company.code}</strong></td>
+                            <td>${company.name}</td>
+                            <td>${userCount} 人</td>
+                            <td>${officeCount} 拠点</td>
+                            <td>${reportCount} 件</td>
+                            <td>
+                                <span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">
+                                    ${isActive ? '有効' : '無効'}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn-toggle ${isActive ? 'btn-disable' : 'btn-enable'}" 
+                                        onclick="toggleCompanyStatus('${company.code}', ${isActive})">
+                                    ${isActive ? '無効化' : '有効化'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('会社テーブル読み込みエラー:', e);
+            }
+        }
+
+        // 会社の有効化/無効化
+        function toggleCompanyStatus(companyCode, currentlyActive) {
+            const action = currentlyActive ? '無効化' : '有効化';
+            if (!confirm(`会社「${companyCode}」を${action}しますか？\n\n${currentlyActive ? 'この会社のユーザーはログインできなくなります。' : 'この会社のユーザーがログインできるようになります。'}`)) {
+                return;
+            }
+
+            try {
+                const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+                const index = companies.findIndex(c => c.code === companyCode);
+                
+                if (index !== -1) {
+                    companies[index].status = currentlyActive ? 'inactive' : 'active';
+                    localStorage.setItem('companies', JSON.stringify(companies));
+                    ErrorHandler.showSuccess(`会社を${action}しました`);
+                    loadCompaniesTable();
+                    loadGlobalStats();
+                }
+            } catch (e) {
+                console.error('ステータス更新エラー:', e);
+                ErrorHandler.showError('エラーが発生しました');
+            }
+        }
+
+        // グローバルデータエクスポート
+        function exportGlobalData() {
+            const format = document.getElementById('exportFormat').value;
+            const type = document.getElementById('exportType').value;
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
+
+            try {
+                let data = {};
+                
+                if (type === 'all' || type === 'companies') {
+                    data.companies = JSON.parse(localStorage.getItem('companies') || '[]');
+                }
+                if (type === 'all' || type === 'offices') {
+                    data.offices = JSON.parse(localStorage.getItem('offices') || '[]');
+                }
+                if (type === 'all' || type === 'accounts') {
+                    data.accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+                }
+                if (type === 'all' || type === 'reports') {
+                    let reports = JSON.parse(localStorage.getItem('onetouch.reports') || '[]');
+                    
+                    // 期間フィルタ
+                    if (startDate || endDate) {
+                        reports = reports.filter(r => {
+                            const reportDate = new Date(r.timestamp);
+                            if (startDate && reportDate < new Date(startDate)) return false;
+                            if (endDate && reportDate > new Date(endDate + 'T23:59:59')) return false;
+                            return true;
+                        });
+                    }
+                    
+                    data.reports = reports;
+                }
+                if (type === 'all' || type === 'partners') {
+                    data.partners = JSON.parse(localStorage.getItem('partners') || '[]');
+                }
+
+                // エクスポート
+                let content, filename, mimeType;
+
+                if (format === 'json') {
+                    content = JSON.stringify(data, null, 2);
+                    filename = `global-export-${new Date().toISOString().split('T')[0]}.json`;
+                    mimeType = 'application/json';
+                } else {
+                    // CSV変換（簡易版）
+                    let csv = '';
+                    for (let key in data) {
+                        if (data[key] && data[key].length > 0) {
+                            csv += `\n${key}\n`;
+                            const headers = Object.keys(data[key][0]);
+                            csv += headers.join(',') + '\n';
+                            data[key].forEach(item => {
+                                csv += headers.map(h => JSON.stringify(item[h] || '')).join(',') + '\n';
+                            });
+                        }
+                    }
+                    content = csv;
+                    filename = `global-export-${new Date().toISOString().split('T')[0]}.csv`;
+                    mimeType = 'text/csv';
+                }
+
+                // ダウンロード
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                ErrorHandler.showSuccess('エクスポートが完了しました');
+            } catch (e) {
+                console.error('エクスポートエラー:', e);
+                ErrorHandler.showError('エクスポートに失敗しました');
+            }
+        }
+
+        // メンテナンスモード切り替え
+        function toggleMaintenanceMode() {
+            const checkbox = document.getElementById('maintenanceMode');
+            const messageDiv = document.getElementById('maintenanceMessage');
+            
+            if (checkbox.checked) {
+                if (!confirm('システム全体をメンテナンスモードにします。\n\nシステム管理者以外の全ユーザーがアクセスできなくなります。\n本当に実行しますか？')) {
+                    checkbox.checked = false;
+                    return;
+                }
+                messageDiv.style.display = 'block';
+                localStorage.setItem('maintenanceMode', 'true');
+                ErrorHandler.showError('メンテナンスモードを有効にしました。\n\nシステム管理者以外はアクセスできません。');
+            } else {
+                messageDiv.style.display = 'none';
+                localStorage.removeItem('maintenanceMode');
+                ErrorHandler.showSuccess('メンテナンスモードを無効にしました。\n\n全ユーザーがアクセスできます。');
+            }
+            
+            // メッセージを保存
+            const text = document.getElementById('maintenanceText').value;
+            localStorage.setItem('maintenanceMessage', text);
+        }
+
+        // メンテナンスモードの読み込み
+        function loadMaintenanceMode() {
+            const isMaintenanceMode = localStorage.getItem('maintenanceMode') === 'true';
+            const checkbox = document.getElementById('maintenanceMode');
+            const messageDiv = document.getElementById('maintenanceMessage');
+            
+            if (isMaintenanceMode) {
+                checkbox.checked = true;
+                messageDiv.style.display = 'block';
+            }
+            
+            const message = localStorage.getItem('maintenanceMessage');
+            if (message) {
+                document.getElementById('maintenanceText').value = message;
+            }
+        }
+
+        // ログアウト
+        function logout() {
+            if (confirm('ログアウトしますか？')) {
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 全データエクスポート
+        function exportAllData() {
+            try {
+                const backupData = {
+                    exportDate: new Date().toISOString(),
+                    exportedBy: currentUser.userId,
+                    version: '1.0',
+                    data: {
+                        companies: JSON.parse(localStorage.getItem('companies') || '[]'),
+                        offices: JSON.parse(localStorage.getItem('offices') || '[]'),
+                        accounts: JSON.parse(localStorage.getItem('accounts') || '[]'),
+                        partners: JSON.parse(localStorage.getItem('partners') || '[]'),
+                        reports: JSON.parse(localStorage.getItem('onetouch.reports') || '[]'),
+                        items: JSON.parse(localStorage.getItem('onetouch.items') || localStorage.getItem('items') || '[]'),
+                        auditLogs: JSON.parse(localStorage.getItem('audit.logs') || '[]'),
+                        maintenanceMode: localStorage.getItem('maintenanceMode'),
+                        maintenanceMessage: localStorage.getItem('maintenanceMessage')
+                    }
+                };
+
+                // JSONファイルとしてダウンロード
+                const jsonStr = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                a.href = url;
+                a.download = `onetouch-backup-${timestamp}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                // 最終バックアップ日時を保存
+                localStorage.setItem('lastBackupDate', new Date().toISOString());
+                updateLastBackupInfo();
+
+                ErrorHandler.showSuccess('バックアップが完了しました！\n\nファイルがダウンロードされました。');
+            } catch (e) {
+                console.error('バックアップエラー:', e);
+                ErrorHandler.showWarning('バックアップに失敗しました。\n\nエラー: ' + e.message);
+            }
+        }
+
+        // データインポート
+        function importAllData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!confirm('注意: データをインポートすると、現在のデータが上書きされます。\n\n本当に実行しますか？')) {
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const backupData = JSON.parse(e.target.result);
+
+                    // バリデーション
+                    if (!backupData.data) {
+                        throw new Error('無効なバックアップファイルです');
+                    }
+
+                    // 確認ダイアログ
+                    const exportDate = new Date(backupData.exportDate).toLocaleString('ja-JP');
+                    const dataCount = {
+                        companies: backupData.data.companies?.length || 0,
+                        offices: backupData.data.offices?.length || 0,
+                        accounts: backupData.data.accounts?.length || 0,
+                        partners: backupData.data.partners?.length || 0,
+                        reports: backupData.data.reports?.length || 0,
+                        items: backupData.data.items?.length || 0,
+                        auditLogs: backupData.data.auditLogs?.length || 0
+                    };
+
+                    const confirmMessage = `バックアップ情報:\n\n` +
+                        `エクスポート日時: ${exportDate}\n` +
+                        `会社: ${dataCount.companies}件\n` +
+                        `事業所: ${dataCount.offices}件\n` +
+                        `アカウント: ${dataCount.accounts}件\n` +
+                        `管理会社: ${dataCount.partners}件\n` +
+                        `通報: ${dataCount.reports}件\n` +
+                        `商品: ${dataCount.items}件\n` +
+                        `監査ログ: ${dataCount.auditLogs}件\n\n` +
+                        `このデータで復元しますか？`;
+
+                    if (!confirm(confirmMessage)) {
+                        event.target.value = '';
+                        return;
+                    }
+
+                    // データ復元
+                    if (backupData.data.companies) localStorage.setItem('companies', JSON.stringify(backupData.data.companies));
+                    if (backupData.data.offices) localStorage.setItem('offices', JSON.stringify(backupData.data.offices));
+                    if (backupData.data.accounts) localStorage.setItem('accounts', JSON.stringify(backupData.data.accounts));
+                    if (backupData.data.partners) localStorage.setItem('partners', JSON.stringify(backupData.data.partners));
+                    if (backupData.data.reports) localStorage.setItem('onetouch.reports', JSON.stringify(backupData.data.reports));
+                    if (backupData.data.items) localStorage.setItem('onetouch.items', JSON.stringify(backupData.data.items));
+                    if (backupData.data.auditLogs) localStorage.setItem('audit.logs', JSON.stringify(backupData.data.auditLogs));
+                    if (backupData.data.maintenanceMode) localStorage.setItem('maintenanceMode', backupData.data.maintenanceMode);
+                    if (backupData.data.maintenanceMessage) localStorage.setItem('maintenanceMessage', backupData.data.maintenanceMessage);
+
+                    ErrorHandler.showSuccess('データの復元が完了しました！\n\nページをリロードします。');
+                    location.reload();
+                } catch (e) {
+                    console.error('インポートエラー:', e);
+                    ErrorHandler.showWarning('データの復元に失敗しました。\n\nエラー: ' + e.message);
+                }
+            };
+
+            reader.onerror = function() {
+                ErrorHandler.showError('ファイルの読み込みに失敗しました。');
+            };
+
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // 最終バックアップ情報を更新
+        function updateLastBackupInfo() {
+            const lastBackupDate = localStorage.getItem('lastBackupDate');
+            const infoElement = document.getElementById('lastBackupInfo');
+            const warningElement = document.getElementById('backupWarning');
+
+            if (!lastBackupDate) {
+                infoElement.textContent = 'まだバックアップがありません';
+                infoElement.style.color = '#dc2626';
+                warningElement.style.display = 'none';
+                return;
+            }
+
+            const lastDate = new Date(lastBackupDate);
+            const now = new Date();
+            const daysDiff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+
+            const formattedDate = lastDate.toLocaleString('ja-JP');
+            infoElement.textContent = `${formattedDate} (${daysDiff}日前)`;
+
+            if (daysDiff > 30) {
+                infoElement.style.color = '#dc2626';
+                warningElement.style.display = 'block';
+            } else if (daysDiff > 7) {
+                infoElement.style.color = '#f59e0b';
+                warningElement.style.display = 'none';
+            } else {
+                infoElement.style.color = '#15803d';
+                warningElement.style.display = 'none';
+            }
+        }
+
+        // 全データ初期化
+        function resetDemoData() {
+            if (!confirm('デモデータを初期状態にリセットします。\n\nカスタマイズした内容（会社名変更、カテゴリ変更等）は全てリセットされます。\n\n実行しますか？')) return;
+            localStorage.removeItem('demo_initialized');
+            if (typeof initDemoData === 'function') {
+                initDemoData();
+            }
+            ErrorHandler.showSuccess('デモデータをリセットしました。\n\n会社2社・事業所6件・アカウント36名・管理会社15社・商品600件・通報108件が初期状態に戻りました。');
+            window.location.reload();
+        }
+
+        function clearAllData() {
+            if (!confirm('全データを初期化します。\n\n以下が全て削除されます：\n・会社/事業所/アカウント/管理会社マスタ\n・通報データ\n・商品マスタ\n・監査ログ\n・システム設定\n\nDEMOアカウントのみ残ります。\n\n本当に実行しますか？')) return;
+            if (!confirm('最終確認：この操作は取り消せません。\n\n実行しますか？')) return;
+
+            try {
+                // localStorageから業務データ + 設定を削除
+                const keysToRemove = [
+                    'companies', 'offices', 'accounts', 'partners',
+                    'onetouch.reports', 'onetouch.items', 'onetouch.contracts',
+                    'items', 'audit.logs',
+                    'lastBackupDate', 'maintenanceMode', 'maintenanceMessage',
+                    'error.logs', 'upload.limits', 'demo_initialized',
+                    'onetouch.stagnationDays'
+                ];
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                // sessionStorageからDEMOデータも削除
+                const sessionKeysToRemove = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    if (key && (key.startsWith('onetouch.') || key.startsWith('demo.') || key === 'items' || key === 'partners' || key === 'accounts' || key === 'companies' || key === 'offices' || key === 'audit.logs')) {
+                        sessionKeysToRemove.push(key);
+                    }
+                }
+                sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+
+                ErrorHandler.showSuccess('全データの初期化が完了しました。\n\nページをリロードします。');
+                location.reload();
+            } catch (e) {
+                console.error('初期化エラー:', e);
+                ErrorHandler.showWarning('初期化に失敗しました。\n\nエラー: ' + e.message);
+            }
+        }
+
+        // 初期化実行
+        function init() {
+            loadGlobalStats();
+            loadCompaniesTable();
+            loadActivityRanking();
+            loadMaintenanceMode();
+            updateLastBackupInfo();
+        }
+
+        init();
+    </script>
+
+    <script>
+    // 統一ヘッダー初期化
+    UnifiedHeader.init({
+        icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+        title: 'システム管理ダッシュボード',
+        backButton: true,
+        onBack: function() {
+            window.location.href = 'system-admin.html';
+        }
+    });
+    </script>
+</body>
+</html>

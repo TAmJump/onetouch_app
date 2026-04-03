@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>監査ログ | ワンタッチ管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 16px auto;
+            padding: 0 24px;
+        }
+        .filters {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #999;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background: #1e3a5f;
+            color: #fff;
+        }
+        .btn-primary:hover { background: #2d4a7a; }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-secondary:hover { background: #e5e5e5; }
+        .log-table {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #fafafa; }
+        th {
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #888;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+            color: #1e293b;
+        }
+        tbody tr:hover { background: #fafafa; }
+        .type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .type-login { background: #e3f2fd; color: #1565c0; }
+        .type-logout { background: #f3e5f5; color: #7b1fa2; }
+        .type-add { background: #ecfdf5; color: #065f46; }
+        .type-update { background: #fef3c7; color: #92400e; }
+        .type-delete { background: #fef2f2; color: #991b1b; }
+        .type-report { background: #fef3c7; color: #92400e; }
+        .type-view { background: #f0f0f0; color: #666; }
+        .type-other { background: #f5f5f5; color: #666; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+        .empty-icon { margin-bottom: 12px; color: #ccc; }
+        .log-count { font-size: 12px; color: #aaa; padding: 12px 16px; text-align: right; }
+        #validationError {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            color: #991b1b;
+            font-size: 13px;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 0 16px; }
+            .filters-row { grid-template-columns: 1fr; }
+            table { font-size: 12px; }
+            th, td { padding: 10px 8px; }
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <div id="unified-header-mount"></div>
+    <div class="container">
+        <div class="filters">
+            <!-- ロール別フィルタ行（system_admin: 会社・事業所・管理会社、company_admin: 事業所） -->
+            <div class="filters-row" id="scopeFilterRow" style="display:none;">
+                <div class="form-group" id="companyFilterGroup" style="display:none;">
+                    <label>会社</label>
+                    <select id="companyFilter" onchange="onCompanyFilterChange()">
+                        <option value="">全会社</option>
+                    </select>
+                </div>
+                <div class="form-group" id="officeFilterGroup" style="display:none;">
+                    <label>事業所</label>
+                    <select id="officeFilter">
+                        <option value="">全事業所</option>
+                    </select>
+                </div>
+                <div class="form-group" id="partnerFilterGroup" style="display:none;">
+                    <label>管理会社</label>
+                    <select id="partnerFilter">
+                        <option value="">全管理会社</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filters-row">
+                <div class="form-group">
+                    <label>開始日</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label>終了日</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div class="form-group">
+                    <label>操作種別</label>
+                    <select id="typeFilter">
+                        <option value="">すべて</option>
+                        <option value="login">ログイン</option>
+                        <option value="logout">ログアウト</option>
+                        <option value="report">通報</option>
+                        <option value="add">登録</option>
+                        <option value="update">更新</option>
+                        <option value="delete">削除</option>
+                        <option value="view">閲覧</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ユーザー</label>
+                    <input type="text" id="userFilter" placeholder="ユーザー名で検索">
+                </div>
+            </div>
+            <div id="validationError"></div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">クリア</button>
+                <button class="btn btn-primary" onclick="applyFilters()">検索</button>
+                <button class="btn btn-secondary" onclick="exportCSV()">CSV出力</button>
+            </div>
+        </div>
+
+        <div class="log-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>日時</th>
+                        <th>操作種別</th>
+                        <th>画面</th>
+                        <th>ユーザー</th>
+                        <th>会社コード</th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody">
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div>
+                                <div>ログデータがありません</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="alPagination"></div>
+            <div class="log-count" id="logCount"></div>
+        </div>
+    </div>
+
+    <script>
+        function renderPagination(containerId, currentPage, totalPages, totalItems, onPageChange) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            if (totalPages <= 1) { container.innerHTML = totalItems > 0 ? '<div style="text-align:center;padding:12px;font-size:13px;color:#999;">全 ' + totalItems + ' 件</div>' : ''; return; }
+            var html = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;flex-wrap:wrap;">';
+            html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
+            var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
+            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
+            container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
+        }
+
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        } else if (currentUser.role !== 'system_admin' && currentUser.role !== 'company_admin' && currentUser.role !== 'office_admin') {
+            ErrorHandler.showWarning('この画面は管理者のみアクセスできます。');
+            window.location.href = 'master-top.html';
+        }
+
+        var allLogs = [];
+        var filteredLogs = [];
+
+        // ========== 操作種別の日本語マッピング ==========
+        var typeNames = {
+            'login': 'ログイン',
+            'logout': 'ログアウト',
+            'password_change': 'パスワード変更',
+            'report_submit': '通報投稿',
+            'status_change': 'ステータス変更',
+            'add_comment': 'コメント追加',
+            'add_company': '会社登録',
+            'update_company': '会社更新',
+            'delete_company': '会社削除',
+            'add_office': '事業所登録',
+            'update_office': '事業所更新',
+            'delete_office': '事業所削除',
+            'add_account': 'アカウント登録',
+            'update_account': 'アカウント更新',
+            'delete_account': 'アカウント削除',
+            'add_partner': '取引先登録',
+            'update_partner': '取引先更新',
+            'delete_partner': '取引先削除',
+            'add_item': '商品登録',
+            'update_item': '商品更新',
+            'delete_item': '商品削除',
+            'view_items': '商品マスタ閲覧',
+            'import': 'インポート',
+            'export': 'エクスポート',
+            'backup': 'バックアップ',
+            'restore': 'データ復元',
+            'maintenance_on': 'メンテナンス開始',
+            'maintenance_off': 'メンテナンス解除',
+            'data_reset': 'データ初期化',
+            'update_setting': '設定変更'
+        };
+
+        // ========== 画面名の日本語マッピング ==========
+        var screenNames = {
+            'login': 'ログイン', 'login.html': 'ログイン',
+            'report': '通報', 'report.html': '通報',
+            'contractor-dashboard': '管理会社画面', 'contractor-dashboard.html': '管理会社画面',
+            'master-top': '管理メニュー', 'master-top.html': '管理メニュー',
+            'account-master': 'ユーザー管理', 'account-master.html': 'ユーザー管理',
+            'partner-master': '取引先マスタ', 'partner-master.html': '取引先マスタ',
+            'office-master': '事業所マスタ', 'office-master.html': '事業所マスタ',
+            'company-master': '会社マスタ', 'company-master.html': '会社マスタ',
+            'items': '商品マスタ', 'items.html': '商品マスタ',
+            'import': 'インポート', 'import.html': 'インポート',
+            'report-history': '通報履歴', 'report-history.html': '通報履歴',
+            'audit-log': '監査ログ', 'audit-log.html': '監査ログ',
+            'system-admin': 'システム管理', 'system-admin.html': 'システム管理',
+            'system-admin-dashboard': 'システム管理', 'system-admin-dashboard.html': 'システム管理',
+            'system-settings': 'システム設定', 'system-settings.html': 'システム設定',
+            'unified-header': '-',
+            'change-password': 'パスワード変更'
+        };
+
+        // ========== ユーザー名を取得 ==========
+        function getUserName(log) {
+            if (log.user && log.user !== 'undefined' && log.user !== '') return log.user;
+            if (log.detail && typeof log.detail === 'object' && log.detail.userName) return log.detail.userName;
+            if (log.details && typeof log.details === 'string') {
+                try { var p = JSON.parse(log.details); if (p.userName) return p.userName; } catch(e) {}
+            }
+            return log.userId || '-';
+        }
+
+        // ========== 会社コードを取得 ==========
+        function getCompanyCode(log) {
+            if (log.companyCode && log.companyCode !== '') return log.companyCode;
+            if (log.detail && typeof log.detail === 'object' && log.detail.companyCode) return log.detail.companyCode;
+            if (log.details && typeof log.details === 'string') {
+                try { var p = JSON.parse(log.details); if (p.companyCode) return p.companyCode; } catch(e) {}
+            }
+            return '-';
+        }
+
+        // ========== 事業所コードを取得 ==========
+        function getOfficeCode(log) {
+            if (log.officeCode && log.officeCode !== '') return log.officeCode;
+            if (log.detail && typeof log.detail === 'object' && log.detail.officeCode) return log.detail.officeCode;
+            if (log.details && typeof log.details === 'string') {
+                try { var p = JSON.parse(log.details); if (p.officeCode) return p.officeCode; } catch(e) {}
+            }
+            // フォールバック: ユーザーIDからアカウントマスタで事業所を補完
+            var uid = log.userId || log.user || '';
+            if (uid && !_officeCodeCache) {
+                _officeCodeCache = {};
+                try {
+                    var accs = JSON.parse(localStorage.getItem('accounts') || '[]');
+                    accs.forEach(function(a) { if (a.id && a.officeCode) _officeCodeCache[a.id] = a.officeCode; });
+                } catch(e) {}
+                // DEMOアカウントからも補完
+                if (typeof DEMO_ACCOUNTS !== 'undefined') {
+                    Object.keys(DEMO_ACCOUNTS).forEach(function(k) {
+                        var a = DEMO_ACCOUNTS[k];
+                        if (a.id && a.officeCode) _officeCodeCache[a.id] = a.officeCode;
+                    });
+                }
+            }
+            if (uid && _officeCodeCache && _officeCodeCache[uid]) return _officeCodeCache[uid];
+            return '';
+        }
+        var _officeCodeCache = null;
+
+        // ========== 画面名を取得 ==========
+        function getScreenName(log) {
+            var raw = log.screen || log.page || '';
+            return screenNames[raw] || screenNames[raw.replace('.html', '')] || raw || '-';
+        }
+
+        // ========== 操作種別の表示 ==========
+        function getTypeName(type) { return typeNames[type] || type; }
+        function getTypeClass(type) {
+            if (type.includes('login')) return 'type-login';
+            if (type.includes('logout')) return 'type-logout';
+            if (type.includes('report') || type.includes('status') || type.includes('comment')) return 'type-report';
+            if (type.includes('add')) return 'type-add';
+            if (type.includes('update') || type.includes('password')) return 'type-update';
+            if (type.includes('delete') || type.includes('reset')) return 'type-delete';
+            if (type.includes('view')) return 'type-view';
+            return 'type-other';
+        }
+
+        // ========== 詳細情報をフォーマット ==========
+        function formatDetail(log) {
+            var detail = log.detail;
+            var details = log.details;
+            if (detail && typeof detail === 'object') {
+                var parts = [];
+                if (log.type === 'login' && detail.role) {
+                    var rn = {'staff':'スタッフ','office_admin':'事業所管理者','company_admin':'本社管理者','system_admin':'システム管理者','contractor':'管理会社'};
+                    parts.push(rn[detail.role] || detail.role);
+                }
+                if (detail.reportType) parts.push(detail.reportType);
+                if (detail.category) parts.push(detail.category);
+                if (detail.title) parts.push(detail.title);
+                if (detail.newStatus) parts.push(detail.newStatus);
+                if (detail.setting) parts.push(detail.setting);
+                if (detail.companyName) parts.push(detail.companyName);
+                if (detail.officeName) parts.push(detail.officeName);
+                if (detail.partnerName) parts.push(detail.partnerName);
+                if (detail.userName) parts.push(detail.userName);
+                // before/after表示
+                if (detail.before && detail.after) {
+                    var changes = [];
+                    for (var key in detail.after) {
+                        if (detail.before[key] !== undefined && detail.before[key] !== detail.after[key]) {
+                            changes.push(key + ': ' + detail.before[key] + ' → ' + detail.after[key]);
+                        }
+                    }
+                    if (changes.length > 0) parts.push('変更: ' + changes.join(', '));
+                }
+                if (parts.length > 0) return parts.join(' / ');
+            }
+            if (details && typeof details === 'string' && details !== '{}') {
+                try {
+                    var parsed = JSON.parse(details);
+                    if (typeof parsed === 'object') {
+                        var p2 = [];
+                        if (parsed.reportId) p2.push(parsed.reportId);
+                        if (parsed.newStatus) p2.push(parsed.newStatus);
+                        if (parsed.handler) p2.push(parsed.handler);
+                        // before/after表示（stringified detailsの場合）
+                        if (parsed.before && parsed.after) {
+                            var ch = [];
+                            for (var k in parsed.after) {
+                                if (parsed.before[k] !== undefined && parsed.before[k] !== parsed.after[k]) {
+                                    ch.push(k + ': ' + parsed.before[k] + ' → ' + parsed.after[k]);
+                                }
+                            }
+                            if (ch.length > 0) p2.push('変更: ' + ch.join(', '));
+                        }
+                        if (p2.length > 0) return p2.join(' / ');
+                    }
+                } catch(e) { return details; }
+            }
+            return '-';
+        }
+
+        function escHtml(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+        // ========== ログを読み込み ==========
+        function loadLogs() {
+            try {
+                var logsS = [], logsL = [];
+                try { logsS = JSON.parse(sessionStorage.getItem('audit.logs') || '[]'); } catch(e) {}
+                try { logsL = JSON.parse(localStorage.getItem('audit.logs') || '[]'); } catch(e) {}
+                allLogs = [].concat(logsS);
+                logsL.forEach(function(r) {
+                    if (!allLogs.find(function(m) { return m.timestamp === r.timestamp && (m.userId === r.userId || m.user === r.user) && m.type === r.type; }))
+                        allLogs.push(r);
+                });
+                allLogs.sort(function(a, b) { return (b.timestamp||'').localeCompare(a.timestamp||''); });
+                if (currentUser.role === 'company_admin') {
+                    allLogs = allLogs.filter(function(l) { return getCompanyCode(l) === currentUser.companyCode; });
+                } else if (currentUser.role === 'office_admin') {
+                    // 事業所管理者は自事業所のログのみ（officeCode未設定のログは除外）
+                    allLogs = allLogs.filter(function(l) {
+                        var oc = getOfficeCode(l);
+                        return getCompanyCode(l) === currentUser.companyCode && oc === currentUser.officeCode;
+                    });
+                }
+                filteredLogs = allLogs;
+                initScopeFilters();
+                renderLogs();
+            } catch(e) { console.error('ログ読み込み失敗:', e); }
+        }
+
+        // ========== スコープフィルタの初期化 ==========
+        function initScopeFilters() {
+            var scopeRow = document.getElementById('scopeFilterRow');
+            
+            if (currentUser.role === 'system_admin') {
+                scopeRow.style.display = '';
+                // 会社フィルタ
+                var compGrp = document.getElementById('companyFilterGroup');
+                compGrp.style.display = '';
+                var compSel = document.getElementById('companyFilter');
+                var companies = [];
+                try { companies = JSON.parse(localStorage.getItem('companies') || '[]'); } catch(e) {}
+                companies.forEach(function(c) {
+                    if (c.code === 'SYSTEM') return;
+                    var opt = document.createElement('option');
+                    opt.value = c.code; opt.textContent = c.name || c.code;
+                    compSel.appendChild(opt);
+                });
+                // 事業所フィルタ
+                document.getElementById('officeFilterGroup').style.display = '';
+                // 管理会社フィルタ
+                var partGrp = document.getElementById('partnerFilterGroup');
+                partGrp.style.display = '';
+                var partSel = document.getElementById('partnerFilter');
+                var partners = [];
+                try { partners = JSON.parse(localStorage.getItem('partners') || '[]'); } catch(e) {}
+                if (partners.length === 0 && typeof DEMO_PARTNERS !== 'undefined') partners = DEMO_PARTNERS;
+                partners.forEach(function(p) {
+                    var opt = document.createElement('option');
+                    opt.value = p.id || p.partnerCode; opt.textContent = p.name;
+                    partSel.appendChild(opt);
+                });
+                onCompanyFilterChange();
+            } else if (currentUser.role === 'company_admin') {
+                scopeRow.style.display = '';
+                // 事業所フィルタのみ
+                var offGrp = document.getElementById('officeFilterGroup');
+                offGrp.style.display = '';
+                var offSel = document.getElementById('officeFilter');
+                var offices = [];
+                try { offices = JSON.parse(localStorage.getItem('offices') || '[]'); } catch(e) {}
+                var myOffices = offices.filter(function(o) { return o.companyCode === currentUser.companyCode; });
+                // DEMOフォールバック: officesが空の場合、商品データからユニークな事業所を抽出
+                if (myOffices.length === 0) {
+                    try {
+                        var items = JSON.parse(localStorage.getItem('onetouch.items') || '[]');
+                        var seen = {};
+                        items.filter(function(i) { return i.companyCode === currentUser.companyCode; }).forEach(function(i) {
+                            if (i.officeCode && !seen[i.officeCode]) {
+                                seen[i.officeCode] = true;
+                                myOffices.push({code: i.officeCode, name: i.officeName || i.officeCode});
+                            }
+                        });
+                    } catch(e) {}
+                }
+                myOffices.forEach(function(o) {
+                    var opt = document.createElement('option');
+                    opt.value = o.code; opt.textContent = o.name;
+                    offSel.appendChild(opt);
+                });
+            }
+            // office_adminはスコープフィルタ不要（自事業所のみ）
+        }
+
+        // 会社選択変更時に事業所リストを更新
+        function onCompanyFilterChange() {
+            var compVal = document.getElementById('companyFilter').value;
+            var offSel = document.getElementById('officeFilter');
+            offSel.innerHTML = '<option value="">全事業所</option>';
+            var offices = [];
+            try { offices = JSON.parse(localStorage.getItem('offices') || '[]'); } catch(e) {}
+            offices.filter(function(o) {
+                return !compVal || o.companyCode === compVal;
+            }).forEach(function(o) {
+                var opt = document.createElement('option');
+                opt.value = o.code; opt.textContent = o.name;
+                offSel.appendChild(opt);
+            });
+        }
+
+        // 管理会社IDを取得
+        function getPartnerId(log) {
+            if (log.partnerId && log.partnerId !== '') return log.partnerId;
+            if (log.detail && typeof log.detail === 'object' && log.detail.partnerId) return log.detail.partnerId;
+            if (log.details && typeof log.details === 'string') {
+                try { var p = JSON.parse(log.details); if (p.partnerId) return p.partnerId; } catch(e) {}
+            }
+            // contractorのログはcompanyCodeがPN系
+            if (log.companyCode && log.companyCode.startsWith('PN')) return log.companyCode;
+            return '';
+        }
+
+        var al_currentPage = 1;
+        var al_pageSize = 50;
+
+        // ========== ログを表示 ==========
+        function renderLogs() {
+            var tbody = document.getElementById('logTableBody');
+            var countEl = document.getElementById('logCount');
+            if (filteredLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><div>該当するログがありません</div></div></td></tr>';
+                countEl.textContent = '';
+                if (document.getElementById('alPagination')) document.getElementById('alPagination').innerHTML = '';
+                return;
+            }
+            var totalPages = Math.ceil(filteredLogs.length / al_pageSize);
+            if (al_currentPage > totalPages) al_currentPage = totalPages;
+            var start = (al_currentPage - 1) * al_pageSize;
+            var pageLogs = filteredLogs.slice(start, start + al_pageSize);
+
+            tbody.innerHTML = pageLogs.map(function(log) {
+                var d = new Date(log.timestamp);
+                var ts = isNaN(d.getTime()) ? '-' : d.toLocaleString('ja-JP');
+                return '<tr>'
+                    + '<td style="white-space:nowrap;">' + ts + '</td>'
+                    + '<td><span class="type-badge ' + getTypeClass(log.type) + '">' + getTypeName(log.type) + '</span></td>'
+                    + '<td>' + getScreenName(log) + '</td>'
+                    + '<td>' + escHtml(getUserName(log)) + '</td>'
+                    + '<td>' + escHtml(getCompanyCode(log)) + '</td>'
+                    + '<td>' + escHtml(formatDetail(log)) + '</td>'
+                    + '</tr>';
+            }).join('');
+            countEl.textContent = '';
+            renderPagination('alPagination', al_currentPage, totalPages, filteredLogs.length, function(page) {
+                al_currentPage = page;
+                renderLogs();
+            });
+        }
+
+        // ========== フィルター ==========
+        function applyFilters() {
+            al_currentPage = 1;
+            var startDate = document.getElementById('startDate').value;
+            var endDate = document.getElementById('endDate').value;
+            var typeFilter = document.getElementById('typeFilter').value;
+            var userFilter = document.getElementById('userFilter').value.toLowerCase();
+            var companyVal = document.getElementById('companyFilter') ? document.getElementById('companyFilter').value : '';
+            var officeVal = document.getElementById('officeFilter') ? document.getElementById('officeFilter').value : '';
+            var partnerVal = document.getElementById('partnerFilter') ? document.getElementById('partnerFilter').value : '';
+            if (startDate && endDate && startDate > endDate) {
+                showValidationError('開始日は終了日より前の日付を指定してください。');
+                return;
+            }
+            clearValidationError();
+            filteredLogs = allLogs.filter(function(log) {
+                if (startDate && log.timestamp < startDate) return false;
+                if (endDate && log.timestamp > endDate + 'T23:59:59') return false;
+                if (typeFilter && !log.type.includes(typeFilter)) return false;
+                if (userFilter) {
+                    var n = getUserName(log).toLowerCase();
+                    var u = (log.userId || '').toLowerCase();
+                    if (!n.includes(userFilter) && !u.includes(userFilter)) return false;
+                }
+                if (companyVal && getCompanyCode(log) !== companyVal) return false;
+                if (officeVal && getOfficeCode(log) !== officeVal) return false;
+                if (partnerVal && getPartnerId(log) !== partnerVal) return false;
+                return true;
+            });
+            renderLogs();
+        }
+        function showValidationError(msg) { var el = document.getElementById('validationError'); el.textContent = msg; el.style.display = 'block'; }
+        function clearValidationError() { document.getElementById('validationError').style.display = 'none'; }
+        function clearFilters() {
+            al_currentPage = 1;
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('userFilter').value = '';
+            if (document.getElementById('companyFilter')) document.getElementById('companyFilter').value = '';
+            if (document.getElementById('officeFilter')) { document.getElementById('officeFilter').value = ''; onCompanyFilterChange(); }
+            if (document.getElementById('partnerFilter')) document.getElementById('partnerFilter').value = '';
+            clearValidationError();
+            filteredLogs = allLogs;
+            renderLogs();
+        }
+
+        // ========== CSVエクスポート ==========
+        function exportCSV() {
+            if (filteredLogs.length === 0) { ErrorHandler.showWarning('エクスポートするログがありません。'); return; }
+            var bom = '\uFEFF';
+            var csv = bom + '日時,操作種別,画面,ユーザー,会社コード,詳細\n';
+            filteredLogs.forEach(function(log) {
+                var d = new Date(log.timestamp);
+                var ts = isNaN(d.getTime()) ? '-' : d.toLocaleString('ja-JP');
+                csv += ['"'+ts+'"','"'+getTypeName(log.type)+'"','"'+getScreenName(log)+'"','"'+getUserName(log)+'"','"'+getCompanyCode(log)+'"','"'+formatDetail(log).replace(/"/g,'""')+'"'].join(',') + '\n';
+            });
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'audit-log-' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        loadLogs();
+    </script>
+
+    <script>
+    UnifiedHeader.init({
+        icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        title: '監査ログ',
+        backButton: true
+    });
+    </script>
+</body>
+</html>

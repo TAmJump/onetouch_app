@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理会社ヘルプ | ワンタッチ管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .step:last-child { margin-bottom: 0; }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .step-content { flex: 1; }
+        .step-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .step-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .faq-item {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .faq-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .faq-q {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .faq-q-badge {
+            background: #2563eb;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .faq-a {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            padding-left: 30px;
+        }
+        .tip-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #1e40af;
+            line-height: 1.6;
+        }
+        .status-explain {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px 12px;
+            align-items: center;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .s-new { background: #fff3e0; color: #f57c00; }
+        .s-progress { background: #e3f2fd; color: #1976d2; }
+        .s-complete { background: #e8f5e9; color: #2e7d32; }
+        .s-unavailable { background: #ffebee; color: #c62828; }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+</head>
+<body>
+    <div id="unified-header-mount"></div>
+    <div class="container">
+
+        <div class="section">
+            <div class="section-title">通報への対応手順</div>
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="step-title">対応依頼一覧を確認する</div>
+                    <div class="step-desc">ログインすると対応依頼一覧が表示されます。「新規」タブに未対応の通報が表示されます。</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="step-title">通報の詳細を確認する</div>
+                    <div class="step-desc">通報をタップすると、設備名・状況説明・写真・施設の連絡先が確認できます。</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="step-title">ステータスを「対応中」に変更する</div>
+                    <div class="step-desc">対応を開始したら「対応中」に変更してください。施設側に「対応しています」と表示されます。</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                    <div class="step-title">対応完了後に「完了」にする</div>
+                    <div class="step-desc">対応が完了したら「完了」に変更してください。必要に応じてコメントを追加できます。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">ステータスの意味</div>
+            <div class="status-explain">
+                <span class="status-badge s-new">新規</span>
+                <span style="font-size:13px;color:#666;">施設から通報が届きました。確認してください。</span>
+                <span class="status-badge s-progress">対応中</span>
+                <span style="font-size:13px;color:#666;">対応を進めています。施設側には「対応しています」と表示されます。</span>
+                <span class="status-badge s-complete">完了</span>
+                <span style="font-size:13px;color:#666;">対応完了。施設側には「解決しました」と表示されます。</span>
+                <span class="status-badge s-unavailable">対応不可</span>
+                <span style="font-size:13px;color:#666;">対応できない場合に設定します。施設の管理者に通知されます。</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">商品マスタについて</div>
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="step-title">商品マスタとは</div>
+                    <div class="step-desc">施設に納品した設備・機器の一覧です。スタッフはここに登録された商品を選んで通報します。</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="step-title">商品の登録・編集</div>
+                    <div class="step-desc">メニューの「商品マスタ」から、納品した商品を登録・編集できます。商品番号は自動で採番されます。</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="step-title">一括インポート</div>
+                    <div class="step-desc">「商品インポート」からExcel・CSV・PDFファイルで商品を一括登録できます。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">よくある質問</div>
+            <div class="faq-item">
+                <div class="faq-q"><span class="faq-q-badge">Q</span> 対応できない通報はどうすればいい？</div>
+                <div class="faq-a">ステータスを「対応不可」に変更してください。コメント欄に理由を記入すると施設側に伝わります。施設の管理者に通知が行き、別の対応が検討されます。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span class="faq-q-badge">Q</span> 複数の施設を担当している場合は？</div>
+                <div class="faq-a">契約している施設からの通報がすべて対応依頼一覧に表示されます。通報ごとに施設名が表示されるので、どの施設の案件かは一目でわかります。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span class="faq-q-badge">Q</span> 商品マスタに登録した商品はどこに表示される？</div>
+                <div class="faq-a">施設のスタッフが通報する際に、設備の選択リストに表示されます。正しいカテゴリで登録しておくと、通報時に自動で御社に振り分けられます。</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q"><span class="faq-q-badge">Q</span> パスワードを忘れました</div>
+                <div class="faq-a">システム管理者にパスワードリセットを依頼してください。</div>
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <strong>ポイント</strong>：通報を受けたらなるべく早く「対応中」に変更してください。施設側で対応状況が確認できるため安心してもらえます。
+        </div>
+
+    </div>
+    <script>
+    UnifiedHeader.init({
+        icon: '',
+        title: '管理会社ヘルプ',
+        backButton: true,
+        onBack: function() { window.location.href = 'contractor-dashboard.html'; }
+    });
+    </script>
+</body>
+</html>

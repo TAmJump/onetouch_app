@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>会社登録 | ワンタッチ管理</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e3a5f">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans','Noto Sans CJK JP',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;}
+.top-bar{background:#1e3a5f;padding:16px 24px;display:flex;align-items:center;gap:12px;}
+.top-bar img{width:32px;height:32px;border-radius:6px;}
+.top-bar span{color:#fff;font-size:16px;font-weight:700;letter-spacing:.01em;}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 16px;}
+.card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:40px 36px;width:100%;max-width:520px;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
+.card-title{font-size:22px;font-weight:700;color:#1e293b;margin-bottom:6px;}
+.card-sub{font-size:14px;color:#64748b;margin-bottom:32px;}
+.step-row{display:flex;gap:0;margin-bottom:32px;}
+.step{flex:1;text-align:center;position:relative;}
+.step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0;}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#94a3b8;position:relative;z-index:1;}
+.step.active .step-dot{border-color:#1e3a5f;color:#1e3a5f;}
+.step.done .step-dot{background:#1e3a5f;border-color:#1e3a5f;color:#fff;}
+.step-label{font-size:11px;color:#94a3b8;margin-top:4px;}
+.step.active .step-label{color:#1e3a5f;font-weight:600;}
+.section{display:none;}
+.section.active{display:block;}
+.field{margin-bottom:18px;}
+.label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;}
+.label .req{color:#ef4444;margin-left:3px;}
+input,select{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;color:#1e293b;background:#fff;outline:none;transition:border .15s;}
+input:focus,select:focus{border-color:#1e3a5f;}
+.hint{font-size:12px;color:#94a3b8;margin-top:4px;}
+.plan-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.plan-card{border:2px solid #e2e8f0;border-radius:10px;padding:16px 14px;cursor:pointer;transition:border .15s;}
+.plan-card.selected{border-color:#1e3a5f;background:#f0f4ff;}
+.plan-card input{display:none;}
+.plan-name{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px;}
+.plan-price{font-size:22px;font-weight:800;color:#1e3a5f;margin-bottom:8px;}
+.plan-price span{font-size:13px;font-weight:400;color:#64748b;}
+.plan-feat{font-size:12px;color:#64748b;line-height:1.7;}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+.btn{padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:#1e3a5f;color:#fff;}
+.btn-primary:not(:disabled):hover{opacity:.88;}
+.btn-outline{background:#fff;color:#475569;border:1px solid #e2e8f0;}
+.btn-outline:hover{background:#f8fafc;}
+.msg{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+.msg.error{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;}
+.msg.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.divider{text-align:center;color:#94a3b8;font-size:13px;margin:20px 0;position:relative;}
+.divider::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:#e2e8f0;}
+.divider span{background:#fff;padding:0 12px;position:relative;}
+.login-link{text-align:center;font-size:14px;color:#64748b;}
+.login-link a{color:#1e3a5f;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <img src="icon-192.png" alt="">
+  <span>ワンタッチ管理</span>
+</div>
+<div class="wrap">
+<div class="card">
+  <div class="card-title">会社登録</div>
+  <div class="card-sub">施設・事業者情報を登録して利用を開始します</div>
+
+  <div class="step-row">
+    <div class="step active" id="s1"><div class="step-dot">1</div><div class="step-label">会社情報</div></div>
+    <div class="step" id="s2"><div class="step-dot">2</div><div class="step-label">プラン選択</div></div>
+    <div class="step" id="s3"><div class="step-dot">3</div><div class="step-label">管理者設定</div></div>
+  </div>
+
+  <div id="msg" class="msg"></div>
+
+  <!-- Step 1: 会社情報 -->
+  <div class="section active" id="sec1">
+    <div class="field">
+      <label class="label">会社名（施設法人名）<span class="req">*</span></label>
+      <input type="text" id="companyName" placeholder="例：タムジ株式会社">
+    </div>
+    <div class="field">
+      <label class="label">会社コード（4文字・半角英数大文字）<span class="req">*</span></label>
+      <input type="text" id="companyCode" placeholder="例：TAMJ" maxlength="4" style="text-transform:uppercase;">
+      <div class="hint">ログイン時に使用します。後から変更できません。</div>
+    </div>
+    <div class="field">
+      <label class="label">代表者名</label>
+      <input type="text" id="repName" placeholder="例：田中 太郎">
+    </div>
+    <div class="field">
+      <label class="label">メールアドレス<span class="req">*</span></label>
+      <input type="email" id="email" placeholder="例：info@example.com">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">次へ →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: プラン選択 -->
+  <div class="section" id="sec2">
+    <div class="plan-row">
+      <label class="plan-card selected" id="planFreeCard">
+        <input type="radio" name="plan" value="free" checked onchange="selectPlan('free')">
+        <div class="plan-name">無料プラン</div>
+        <div class="plan-price">¥0<span>/月</span></div>
+        <div class="plan-feat">
+          ・事業所 1か所まで<br>
+          ・アカウント 5名まで<br>
+          ・商品マスタ 100件まで<br>
+          ・通報・写真添付<br>
+          ・CSV/Excelインポート
+        </div>
+      </label>
+      <label class="plan-card" id="planProCard">
+        <input type="radio" name="plan" value="pro" onchange="selectPlan('pro')">
+        <div class="plan-name">Proプラン</div>
+        <div class="plan-price" style="color:#059669;">要相談<span>/月</span></div>
+        <div class="plan-feat">
+          ・事業所 無制限<br>
+          ・アカウント 無制限<br>
+          ・商品マスタ 無制限<br>
+          ・PDF/画像インポート<br>
+          ・CSV出力・監査ログ<br>
+          ・バックアップ・LINE通知
+        </div>
+      </label>
+    </div>
+    <div id="proNote" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;font-size:13px;color:#166534;margin-bottom:16px;">
+      Proプランは登録後に担当者よりご連絡いたします。まず無料プランで開始し、アップグレードも可能です。
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep(1)">← 戻る</button>
+      <button class="btn btn-primary" onclick="goStep(3)">次へ →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: 管理者アカウント -->
+  <div class="section" id="sec3">
+    <div class="field">
+      <label class="label">管理者名<span class="req">*</span></label>
+      <input type="text" id="adminName" placeholder="例：田中 太郎">
+    </div>
+    <div class="field">
+      <label class="label">ログイン名（半角英数・ドット・ハイフン可）<span class="req">*</span></label>
+      <input type="text" id="adminLogin" placeholder="例：tanaka">
+      <div class="hint">ログインIDは「会社コード-ログイン名」になります</div>
+    </div>
+    <div class="field">
+      <label class="label">パスワード<span class="req">*</span></label>
+      <input type="password" id="adminPass" placeholder="8文字以上・英字+数字">
+    </div>
+    <div class="field">
+      <label class="label">パスワード（確認）<span class="req">*</span></label>
+      <input type="password" id="adminPass2" placeholder="同じパスワードを再入力">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep(2)">← 戻る</button>
+      <button class="btn btn-primary" id="btnSubmit" onclick="doRegister()">登録して開始</button>
+    </div>
+  </div>
+
+  <div class="divider"><span>または</span></div>
+  <div class="login-link">すでにアカウントをお持ちの方は<a href="login.html">ログイン</a></div>
+</div>
+</div>
+
+<script>
+var currentStep = 1;
+var selectedPlan = 'free';
+
+function selectPlan(p) {
+  selectedPlan = p;
+  document.getElementById('planFreeCard').classList.toggle('selected', p==='free');
+  document.getElementById('planProCard').classList.toggle('selected', p==='pro');
+  document.getElementById('proNote').style.display = p==='pro' ? 'block' : 'none';
+}
+
+function showMsg(type, text) {
+  var el = document.getElementById('msg');
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+function hideMsg() {
+  document.getElementById('msg').style.display = 'none';
+}
+
+function goStep(n) {
+  hideMsg();
+  if (n === 2 && !validateStep1()) return;
+  if (n === 3 && !validateStep2()) return;
+
+  document.getElementById('sec'+currentStep).classList.remove('active');
+  document.getElementById('s'+currentStep).classList.remove('active');
+  document.getElementById('s'+currentStep).classList.add('done');
+
+  currentStep = n;
+  document.getElementById('sec'+n).classList.add('active');
+  document.getElementById('s'+n).classList.remove('done');
+  document.getElementById('s'+n).classList.add('active');
+}
+
+function validateStep1() {
+  var name = document.getElementById('companyName').value.trim();
+  var code = document.getElementById('companyCode').value.trim().toUpperCase();
+  var email = document.getElementById('email').value.trim();
+  if (!name) { showMsg('error', '会社名を入力してください'); return false; }
+  if (!code || !/^[A-Z0-9]{2,4}$/.test(code)) { showMsg('error', '会社コードは2〜4文字の半角英大文字・数字で入力してください'); return false; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('error', 'メールアドレスを正しく入力してください'); return false; }
+  document.getElementById('companyCode').value = code;
+
+  // 既存コードと重複チェック
+  var companies = JSON.parse(localStorage.getItem('companies') || '[]');
+  if (companies.some(function(c){ return c.companyCode === code; })) {
+    showMsg('error', 'この会社コードはすでに使われています。別のコードを選んでください。');
+    return false;
+  }
+  return true;
+}
+
+function validateStep2() { return true; }
+
+function doRegister() {
+  hideMsg();
+  var adminName  = document.getElementById('adminName').value.trim();
+  var adminLogin = document.getElementById('adminLogin').value.trim();
+  var adminPass  = document.getElementById('adminPass').value;
+  var adminPass2 = document.getElementById('adminPass2').value;
+
+  if (!adminName) { showMsg('error', '管理者名を入力してください'); return; }
+  if (!adminLogin || !/^[a-zA-Z0-9._-]+$/.test(adminLogin)) {
+    showMsg('error', 'ログイン名は半角英数字・ドット・ハイフン・アンダーバーのみです'); return;
+  }
+  if (adminPass.length < 8) { showMsg('error', 'パスワードは8文字以上で設定してください'); return; }
+  if (!/[a-zA-Z]/.test(adminPass)) { showMsg('error', 'パスワードに英字を含めてください'); return; }
+  if (!/[0-9]/.test(adminPass)) { showMsg('error', 'パスワードに数字を含めてください'); return; }
+  if (adminPass !== adminPass2) { showMsg('error', 'パスワードが一致しません'); return; }
+
+  var companyCode = document.getElementById('companyCode').value.trim().toUpperCase();
+  var companyName = document.getElementById('companyName').value.trim();
+  var repName     = document.getElementById('repName').value.trim();
+  var email       = document.getElementById('email').value.trim();
+  var loginId     = companyCode + '-' + adminLogin;
+
+  // 会社を登録
+  var companies = JSON.parse(localStorage.getItem('companies') || '[]');
+  var company = {
+    id: 'C-' + companyCode,
+    companyCode: companyCode,
+    name: companyName,
+    repName: repName,
+    email: email,
+    plan: selectedPlan,
+    status: 'active',
+    createdAt: new Date().toISOString()
+  };
+  companies.push(company);
+  localStorage.setItem('companies', JSON.stringify(companies));
+
+  // 管理者アカウントを登録
+  var accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+  var admin = {
+    id: loginId,
+    loginName: adminLogin,
+    companyCode: companyCode,
+    companyName: companyName,
+    name: adminName,
+    email: email,
+    password: adminPass,
+    role: 'company_admin',
+    scope: 'company',
+    officeCode: companyCode + '-H001',
+    officeName: '本社',
+    status: 'active',
+    isFirstLogin: false,
+    plan: selectedPlan,
+    createdAt: new Date().toISOString()
+  };
+  accounts.push(admin);
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+
+  // 自動ログイン
+  sessionStorage.setItem('currentUser', JSON.stringify({
+    id: loginId,
+    loginName: adminLogin,
+    companyCode: companyCode,
+    companyName: companyName,
+    name: adminName,
+    role: 'company_admin',
+    scope: 'company',
+    officeCode: companyCode + '-H001',
+    officeName: '本社',
+    status: 'active',
+    plan: selectedPlan,
+    isFirstLogin: true
+  }));
+
+  // セットアップウィザードへ
+  window.location.href = 'setup-wizard.html';
+}
+
+// 会社コードを大文字に自動変換
+document.getElementById('companyCode').addEventListener('input', function(){
+  this.value = this.value.toUpperCase();
+});
+</script>
+</body>
+</html>

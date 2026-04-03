@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アカウントマスタ管理 | ワンタッチ管理</title>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { overflow-x: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+
+        .main-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* 旧ヘッダーCSS削除済み - unified-header.jsが担当 */
+
+        .search-panel {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            padding: 24px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .search-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        select.search-input {
+            cursor: pointer;
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-search {
+            background: #1e3a5f;
+            color: white;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #2d4a7a;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-clear {
+            background: #9e9e9e;
+            color: white;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-clear:hover {
+            background: #757575;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(158, 158, 158, 0.4);
+        }
+
+        .result-header {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            padding: 12px 20px;
+            border-radius: 14px 8px 0 0;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #1e3a5f;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .table-container {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow-x: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead {
+            background: #fafafa;
+        }
+
+        th {
+            padding: 8px 10px; font-size: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 1px solid #e0e0e0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td {
+            padding: 8px 10px; font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .btn-edit {
+            padding: 6px 16px;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+
+        .btn-edit:hover {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .btn-close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .required {
+            color: #f44336;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        select {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 50px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #999;
+            font-size: 20px;
+        }
+
+        .toggle-password:hover {
+            color: #1e293b;
+        }
+
+        .password-requirements {
+            margin-top: 12px;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 14px;
+            font-size: 13px;
+        }
+
+        .password-requirements .requirement-title {
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            color: #999;
+        }
+
+        .requirement-item.valid {
+            color: #4caf50;
+        }
+
+        .requirement-item .check-icon {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .allowed-chars {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .role-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .role-option.hidden {
+            display: none !important;
+        }
+
+        .role-option:hover {
+            border-color: #1e3a5f;
+            background: #f5f5f5;
+        }
+
+        .role-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #1e293b;
+        }
+
+        .role-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .role-option input[type="radio"]:checked + label {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2d4a7a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-staff { background: #e3f2fd; color: #1976d2; }
+        .role-office_admin { background: #fff8e1; color: #f57c00; }
+        .role-company_admin { background: #ffebee; color: #c62828; }
+        .role-system_admin { background: #f3e5f5; color: #7b1fa2; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active { background: #c8e6c9; color: #2e7d32; }
+        .status-retired { background: #e0e0e0; color: #757575; }
+
+        @media (max-width: 768px) {
+            .main-container { padding: 16px; }
+            .search-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            th, td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            .btn-edit {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .role-badge {
+                font-size: 11px;
+                padding: 3px 8px;
+            }
+        }
+    </style>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+
+    <div class="main-container">
+    <!-- 操作バー -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <button style="background: #1e3a5f; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" onclick="openModal()" onmouseover="this.style.background='#2d4a7a'" onmouseout="this.style.background='#1e3a5f'">新規追加</button>
+    </div>
+
+    <!-- 検索パネル -->
+    <div class="search-panel">
+        <div class="search-row">
+            <div class="search-label">ID</div>
+            <input type="text" class="search-input" id="searchId" placeholder="IDを入力">
+        </div>
+        <div class="search-row">
+            <div class="search-label">名前</div>
+            <input type="text" class="search-input" id="searchName" placeholder="名前を入力">
+        </div>
+        <div class="search-row" id="searchOfficeRow">
+            <div class="search-label">所属事業所</div>
+            <select class="search-input" id="searchOffice">
+                <option value="">すべて</option>
+            </select>
+        </div>
+        <div class="search-row">
+            <div class="search-label">身分</div>
+            <select class="search-input" id="searchRole">
+                <option value="">すべて</option>
+                <option value="staff">スタッフ</option>
+                <option value="office_admin">事業所管理者</option>
+            </select>
+        </div>
+
+        <div class="search-row">
+            <div class="search-label">在籍状況</div>
+            <select class="search-input" id="searchStatus">
+                <option value="">すべて</option>
+                <option value="active" selected>在籍中のみ</option>
+                <option value="retired">退職済みのみ</option>
+            </select>
+        </div>
+        <div class="search-buttons">
+            <button class="btn-clear" onclick="clearSearch()">検索条件をクリア</button>
+            <button class="btn-search" onclick="searchAccounts()">検索</button>
+        </div>
+    </div>
+
+    <!-- 検索結果 -->
+    <div class="results-section" id="resultsSection">
+    <div class="result-header" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>アカウント一覧 < 全<span id="totalCount">0</span>件中1～<span id="displayCount">0</span>件 ></span>
+        <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:16%;">ID</th>
+                    <th style="width:15%;">名前</th>
+                    <th style="width:12%;">所属事業所</th>
+                    <th style="width:12%;">身分</th>
+                    <th style="width:10%;">在籍状況</th>
+                    <th style="width:12%;">登録日</th>
+                    <th style="width:23%;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="accountList">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                        アカウントがありません。新規追加ボタンから登録してください。
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="amPagination"></div>
+    </div>
+    </div>
+    <!-- End of results section -->
+
+    <!-- モーダル（新規追加画面） -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">アカウント設定</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="accountForm">
+                <input type="hidden" id="editIndex" value="">
+                <div class="form-group">
+                    <label for="userName">表示名<span class="required">*</span></label>
+                    <input type="text" id="userName" name="userName" required placeholder="例：田中 太郎">
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">システム上に表示される名前</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginName">ログイン名<span class="required">*</span></label>
+                    <input type="text" id="loginName" name="loginName" required placeholder="例：tanaka" pattern="[a-zA-Z0-9._-]+" title="半角英数字・ドット・ハイフン・アンダーバーが使えます" autocomplete="off">
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">半角英数字のみ。ログイン時に使用します → ID: <strong id="previewId">（会社コード）-（ログイン名）</strong></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="officeSelect">所属事業所</label>
+                    <select id="officeSelect" name="officeSelect">
+                        <option value="">事業所を選択してください</option>
+                    </select>
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">※事業所マスタで登録された事業所から選択できます</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">パスワード<span class="required">*</span></label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <button type="button" class="btn-secondary" id="resetPasswordBtn" style="display: none;" onclick="resetPasswordToInitial()">
+                            初期パスワードにリセット
+                        </button>
+                        <small style="display: block; color: #666; margin-top: 4px;" id="passwordResetNote"></small>
+                    </div>
+                    <div class="password-requirements">
+                        <div class="requirement-title">パスワードは半角最低8桁で入力してください。</div>
+                        <div class="requirement-title">これらの文字を含めて下さい: 半角英字、半角数字。</div>
+                        <div class="requirement-item" id="req-length">
+                            <span class="check-icon">✓</span>
+                            <span>8文字以上</span>
+                        </div>
+                        <div class="requirement-item" id="req-alpha">
+                            <span class="check-icon">✓</span>
+                            <span>英字</span>
+                        </div>
+                        <div class="requirement-item" id="req-number">
+                            <span class="check-icon">✓</span>
+                            <span>数字</span>
+                        </div>
+                        <div class="allowed-chars">
+                            使用できる記号: 「!"#$%&'()*+,-./:;<=>?@[\]^_`{|}」
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>身分</label>
+                    <div class="role-options">
+                        <div class="role-option">
+                            <input type="radio" id="role-staff" name="role" value="staff" required checked>
+                            <label for="role-staff">スタッフ</label>
+                        </div>
+                        <div class="role-option">
+                            <input type="radio" id="role-office_admin" name="role" value="office_admin">
+                            <label for="role-office_admin">事業所管理者</label>
+                        </div>
+                        <div class="role-option hidden" id="role-option-company_admin">
+                            <input type="radio" id="role-company_admin" name="role" value="company_admin">
+                            <label for="role-company_admin">本社管理者</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>在籍状況 <span class="required">*</span></label>
+                    <div class="role-options">
+                        <div class="role-option">
+                            <input type="radio" id="status-active" name="status" value="active" required checked onchange="toggleRetiredDate()">
+                            <label for="status-active">在籍中</label>
+                        </div>
+                        <div class="role-option">
+                            <input type="radio" id="status-retired" name="status" value="retired" onchange="toggleRetiredDate()">
+                            <label for="status-retired">退職済み</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="retiredDateGroup" style="display: none;">
+                    <label>退職日</label>
+                    <input type="date" id="retiredDate">
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">※退職済みの場合は退職日を入力してください</small>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 共通ページネーション描画
+        function renderPagination(containerId, currentPage, totalPages, totalItems, onPageChange) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            if (totalPages <= 1) { container.innerHTML = totalItems > 0 ? '<div style="text-align:center;padding:12px;font-size:13px;color:#999;">全 ' + totalItems + ' 件</div>' : ''; return; }
+            var html = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;flex-wrap:wrap;">';
+            html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
+            var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
+            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
+            container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
+        }
+
+        // ログインチェックと権限確認
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        } else if (currentUser.role !== 'system_admin' && currentUser.role !== 'company_admin' && currentUser.role !== 'office_admin') {
+            ErrorHandler.showWarning('この画面は管理者のみアクセスできます。');
+            window.location.href = 'login.html';
+        }
+        
+        // ユーザー情報を表示（統一ヘッダー）
+        UnifiedHeader.init({
+            icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            title: 'アカウントマスタ',
+            backButton: true
+        });
+
+        // アカウントデータをLocalStorageから読み込み + フィルタリング
+        let allAccounts = JSON.parse(demoGetFromLocalStorage('accounts')) || [];
+        let accounts = filterAccountsByScope(allAccounts);
+        let accountCounter = parseInt(demoGetFromLocalStorage('accountCounter')) || 1;
+
+        // スコープに応じてアカウントをフィルタリング
+        function filterAccountsByScope(accountList) {
+            // 本社管理者・システム管理者はアカウントマスタの管理対象外
+            var filtered = accountList.filter(a => a.role !== 'company_admin' && a.role !== 'system_admin');
+            
+            if (currentUser.role === 'system_admin') {
+                return filtered;
+            } else if (currentUser.scope === 'company' || currentUser.role === 'company_admin') {
+                return filtered.filter(a => a.companyCode === currentUser.companyCode);
+            } else if (currentUser.scope === 'office' || currentUser.role === 'office_admin' || currentUser.role === 'staff') {
+                return filtered.filter(a => a.officeCode === currentUser.officeCode);
+            }
+            return [];
+        }
+
+        // LocalStorageに保存
+        function saveToLocalStorage() {
+            demoSaveToLocalStorage('accounts', JSON.stringify(accounts));
+            demoSaveToLocalStorage('accountCounter', accountCounter.toString());
+        }
+
+        // 監査ログ記録関数
+        function logEvent(type, detail = {}) {
+            try {
+                const logs = JSON.parse(demoGetFromLocalStorage('audit.logs') || '[]');
+                const logEntry = {
+                    timestamp: new Date().toISOString(),
+                    type: type,
+                    screen: 'account-master',
+                    user: currentUser.name || currentUser.id,
+                    userId: currentUser.id,
+                    companyCode: currentUser.companyCode,
+                    detail: detail
+                };
+                logs.push(logEntry);
+                demoSaveToLocalStorage('audit.logs', JSON.stringify(logs));
+            } catch (e) {
+                console.error('監査ログの記録に失敗:', e);
+            }
+        }
+
+        // ユーザーIDを自動生成
+        function generateUserId() {
+            const id = 'USER' + String(accountCounter).padStart(4, '0');
+            accountCounter++;
+            return id;
+        }
+
+        // 事業所データをLocalStorageから読み込み + フィルタリング
+        let allOffices = JSON.parse(demoGetFromLocalStorage('offices')) || [];
+        let offices = filterOfficesByScope(allOffices);
+
+        // スコープに応じて事業所をフィルタリング
+        function filterOfficesByScope(officeList) {
+            if (currentUser.role === 'system_admin') {
+                return officeList;
+            } else if (currentUser.scope === 'company' || currentUser.role === 'company_admin') {
+                return officeList.filter(o => o.companyCode === currentUser.companyCode);
+            } else if (currentUser.scope === 'office' || currentUser.role === 'office_admin' || currentUser.role === 'staff') {
+                return officeList.filter(o => o.code === currentUser.officeCode);
+            }
+            return [];
+        }
+
+        // 身分のラベル
+        const roleLabels = {
+            staff: 'スタッフ',
+            office_admin: '事業所管理者',
+            company_admin: '本社管理者',
+            system_admin: 'システム管理者'
+        };
+
+        // 事業所プルダウンを更新
+        function updateOfficeSelect() {
+            // モーダル内のプルダウン
+            const officeSelect = document.getElementById('officeSelect');
+            officeSelect.innerHTML = '<option value="">事業所を選択してください</option>';
+            
+            offices.forEach(office => {
+                const option = document.createElement('option');
+                option.value = office.code;
+                option.textContent = `${office.code} - ${office.name}`;
+                officeSelect.appendChild(option);
+            });
+        }
+
+        // 検索用事業所プルダウンを更新
+        function updateSearchOfficeSelect() {
+            const searchOfficeSelect = document.getElementById('searchOffice');
+            searchOfficeSelect.innerHTML = '<option value="">すべて</option>';
+            
+            offices.forEach(office => {
+                const option = document.createElement('option');
+                option.value = office.code;
+                option.textContent = `${office.code} - ${office.name}`;
+                searchOfficeSelect.appendChild(option);
+            });
+        }
+
+        // ページ読み込み時に事業所プルダウンを初期化とアカウント表示
+        window.addEventListener('DOMContentLoaded', function() {
+            updateOfficeSelect();
+            updateSearchOfficeSelect();
+
+            // 事業所管理者: 検索の事業所フィルタは不要（自事業所のみ）
+            if (currentUser.role === 'office_admin' || currentUser.role === 'staff') {
+                var officeRow = document.getElementById('searchOfficeRow');
+                if (officeRow) officeRow.style.display = 'none';
+                // モーダルの事業所選択も非表示（自事業所が自動適用）
+                var officeGroup = document.getElementById('officeSelect');
+                if (officeGroup && officeGroup.parentElement) officeGroup.parentElement.style.display = 'none';
+            }
+
+            // アカウントがある場合は表示
+            if (accounts.length > 0) {
+                document.getElementById('resultsSection').classList.add('visible');
+                renderAccounts();
+            }
+        });
+
+        // 退職日フィールドの表示切り替え
+        function toggleRetiredDate() {
+            const retiredRadio = document.getElementById('status-retired');
+            const retiredDateGroup = document.getElementById('retiredDateGroup');
+            
+            if (retiredRadio.checked) {
+                retiredDateGroup.style.display = 'block';
+            } else {
+                retiredDateGroup.style.display = 'none';
+                document.getElementById('retiredDate').value = '';
+            }
+        }
+
+        // モーダル開閉
+        function openModal() {
+            document.body._scrollY = window.scrollY;
+            document.body.style.top = (-window.scrollY) + 'px';
+            document.body.classList.add('modal-open');
+            document.getElementById('modalTitle').textContent = 'アカウント設定';
+            document.getElementById('accountModal').classList.add('active');
+            document.getElementById('accountForm').reset();
+            document.getElementById('editIndex').value = '';
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginName').readOnly = false;
+            document.getElementById('previewId').textContent = (currentUser.companyCode || 'DEMO') + '-（ログイン名）';
+            document.querySelectorAll('.requirement-item').forEach(item => {
+                item.classList.remove('valid');
+            });
+            // 退職日フィールドを非表示
+            document.getElementById('retiredDateGroup').style.display = 'none';
+            
+            // リセットボタンを非表示（新規作成時）
+            document.getElementById('resetPasswordBtn').style.display = 'none';
+            document.getElementById('passwordResetNote').textContent = '';
+            
+            // 事業所リストを最新に更新
+            offices = JSON.parse(demoGetFromLocalStorage('offices')) || [];
+            updateOfficeSelect();
+            
+            // ロール制限を適用
+            applyRoleRestrictions();
+        }
+        
+        // ロール制限を適用
+        function applyRoleRestrictions() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const companyAdminOption = document.getElementById('role-option-company_admin');
+            
+            if (currentUser.role === 'company_admin' || currentUser.role === 'system_admin') {
+                // 本社管理者・システム管理者は「本社管理者」を作成可能
+                companyAdminOption.classList.remove('hidden');
+            } else {
+                // 事業所管理者は「本社管理者」を作成できない
+                companyAdminOption.classList.add('hidden');
+            }
+        }
+
+        function openEditModal(index) {
+            document.body._scrollY = window.scrollY;
+            document.body.style.top = (-window.scrollY) + 'px';
+            document.body.classList.add('modal-open');
+            const account = accounts[index];
+            document.getElementById('modalTitle').textContent = 'アカウント編集';
+            document.getElementById('accountModal').classList.add('active');
+            document.getElementById('editIndex').value = index;
+            
+            // ロール制限を適用
+            applyRoleRestrictions();
+            
+            // 事業所リストを最新に更新
+            offices = JSON.parse(demoGetFromLocalStorage('offices')) || [];
+            updateOfficeSelect();
+            
+            // フォームにデータを設定
+            // IDから会社コード部分を除いてログイン名を取得
+            var loginName = account.id || '';
+            var prefix = (account.companyCode || currentUser.companyCode || '') + '-';
+            if (loginName.startsWith(prefix)) {
+                loginName = loginName.substring(prefix.length);
+            }
+            document.getElementById('loginName').value = loginName;
+            document.getElementById('loginName').readOnly = true; // 編集時はログイン名変更不可
+            document.getElementById('previewId').textContent = account.id;
+            document.getElementById('userName').value = account.name;
+            document.getElementById('officeSelect').value = account.officeCode || '';
+            
+            // パスワードは●●●で表示（セキュリティのため）
+            document.getElementById('password').value = '●●●●●●●●';
+            document.getElementById('password').setAttribute('data-original-password', account.password);
+            document.getElementById('password').setAttribute('data-initial-password', account.initialPassword || account.password);
+            
+            // リセットボタンを表示
+            document.getElementById('resetPasswordBtn').style.display = 'inline-block';
+            document.getElementById('passwordResetNote').textContent = '※ パスワードを変更しない場合は、そのまま保存してください。';
+            
+            // 身分を選択
+            document.getElementById('role-' + account.role).checked = true;
+            
+            // 在籍状況を選択
+            const status = account.status || 'active';
+            document.getElementById('status-' + status).checked = true;
+            
+            // 退職日を設定
+            if (account.retiredDate) {
+                document.getElementById('retiredDate').value = account.retiredDate;
+            }
+            
+            // 退職日フィールドの表示切り替え
+            toggleRetiredDate();
+            
+            // パスワード検証を実行
+            const event = new Event('input', { bubbles: true });
+            document.getElementById('password').dispatchEvent(event);
+        }
+
+        function closeModal() {
+            document.body.classList.remove('modal-open');
+            document.body.style.top = '';
+            window.scrollTo(0, document.body._scrollY || 0);
+            document.getElementById('accountModal').classList.remove('active');
+        }
+        
+        // 初期パスワードにリセット
+        function resetPasswordToInitial() {
+            const initialPassword = document.getElementById('password').getAttribute('data-initial-password');
+            const editIndex = document.getElementById('editIndex').value;
+            
+            if (confirm('このアカウントのパスワードを初期パスワードにリセットしますか？\n\n※ ユーザーに初期パスワードをお伝えください。\n※ 次回ログイン時にパスワード変更を推奨するメッセージが表示されます。')) {
+                document.getElementById('password').value = initialPassword;
+                document.getElementById('passwordResetNote').textContent = '初期パスワードにリセットされました';
+                document.getElementById('passwordResetNote').style.color = '#2e7d32';
+                
+                // isFirstLoginをtrueにする
+                if (editIndex !== '') {
+                    accounts[editIndex].isFirstLogin = true;
+                }
+                
+                // パスワード検証を実行
+                const event = new Event('input', { bubbles: true });
+                document.getElementById('password').dispatchEvent(event);
+            }
+        }
+
+        // パスワード表示切り替え
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.toggle-password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+            }
+        }
+
+        // パスワードのリアルタイム検証
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            
+            const lengthReq = document.getElementById('req-length');
+            if (password.length >= 8) {
+                lengthReq.classList.add('valid');
+            } else {
+                lengthReq.classList.remove('valid');
+            }
+            
+            const alphaReq = document.getElementById('req-alpha');
+            if (/[a-zA-Z]/.test(password)) {
+                alphaReq.classList.add('valid');
+            } else {
+                alphaReq.classList.remove('valid');
+            }
+            
+            const numberReq = document.getElementById('req-number');
+            if (/[0-9]/.test(password)) {
+                numberReq.classList.add('valid');
+            } else {
+                numberReq.classList.remove('valid');
+            }
+        });
+
+        // フォーム送信
+        document.getElementById('accountForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let password = document.getElementById('password').value;
+            
+            // 編集モードで●●●の場合は元のパスワードを使用
+            if (password === '●●●●●●●●') {
+                password = document.getElementById('password').getAttribute('data-original-password');
+            }
+            
+            // パスワードの検証
+            if (password.length < 8) {
+                ErrorHandler.showWarning('パスワードは8文字以上で設定してください');
+                return;
+            }
+
+            if (!/[a-zA-Z]/.test(password)) {
+                ErrorHandler.showWarning('パスワードに英字を含めてください');
+                return;
+            }
+
+            if (!/[0-9]/.test(password)) {
+                ErrorHandler.showWarning('パスワードに数字を含めてください');
+                return;
+            }
+
+            const selectedOfficeCode = document.getElementById('officeSelect').value || 
+                ((currentUser.role === 'office_admin' || currentUser.role === 'staff') ? currentUser.officeCode : '');
+            const selectedOffice = offices.find(o => o.code === selectedOfficeCode) || 
+                ((currentUser.role === 'office_admin' || currentUser.role === 'staff') ? {code: currentUser.officeCode, name: currentUser.officeName, companyCode: currentUser.companyCode} : null);
+            
+            const status = document.querySelector('input[name="status"]:checked').value;
+            const retiredDate = status === 'retired' ? document.getElementById('retiredDate').value : null;
+            
+            const editIndex = document.getElementById('editIndex').value;
+            
+            // ID生成: 編集時は既存ID、新規時は会社コード-ログイン名
+            var accountId;
+            if (editIndex !== '') {
+                accountId = accounts[editIndex].id;
+            } else {
+                var loginName = document.getElementById('loginName').value.trim();
+                if (!loginName) { ErrorHandler.showWarning('ログイン名を入力してください'); return; }
+                if (!/^[a-zA-Z0-9._-]+$/.test(loginName)) { ErrorHandler.showWarning('ログイン名は半角英数字・ドット・ハイフン・アンダーバーのみです'); return; }
+                accountId = (currentUser.companyCode || 'DEMO') + '-' + loginName;
+            }
+
+            const accountData = {
+                id: accountId,
+                userId: accountId,
+                loginName: document.getElementById('loginName').value.trim(),
+                companyCode: currentUser.companyCode,  // 追加：ログイン中のユーザーの会社コード
+                companyName: currentUser.companyName,  // 追加：会社名も
+                name: document.getElementById('userName').value,
+                officeCode: selectedOfficeCode,
+                officeName: selectedOffice ? selectedOffice.name : '',
+                password: password,
+                initialPassword: editIndex !== '' ? (accounts[editIndex].initialPassword || accounts[editIndex].password) : password, // 初期パスワードを保持
+                isFirstLogin: editIndex !== '' ? accounts[editIndex].isFirstLogin : true,  // 新規作成時はtrue
+                role: document.querySelector('input[name="role"]:checked').value,
+                scope: currentUser.scope || 'office',  // 追加：スコープも
+                status: status,
+                retiredDate: retiredDate,
+                createdAt: editIndex !== '' ? accounts[editIndex].createdAt : new Date().toLocaleDateString('ja-JP'),
+                passwordChangedAt: editIndex !== '' && password !== accounts[editIndex].password ? new Date().toISOString() : (accounts[editIndex]?.passwordChangedAt || null)
+            };
+            
+            if (editIndex !== '') {
+                // 編集モード - before/after記録
+                var beforeData = JSON.parse(JSON.stringify(accounts[editIndex]));
+                accounts[editIndex] = accountData;
+                logEvent('update_account', { userId: accountData.id, userName: accountData.name, before: { name: beforeData.name, role: beforeData.role, officeCode: beforeData.officeCode, status: beforeData.status }, after: { name: accountData.name, role: accountData.role, officeCode: accountData.officeCode, status: accountData.status } });
+                ErrorHandler.showSuccess('アカウント情報を更新しました');
+            } else {
+                // 新規登録モード
+                // ID重複チェック
+                const duplicateAccount = accounts.find(a => a.id === accountData.id);
+                if (duplicateAccount) {
+                    ErrorHandler.showWarning('ログイン名「' + accountData.loginName + '」は既に使用されています。別のログイン名を指定してください。');
+                    return;
+                }
+                accounts.push(accountData);
+                logEvent('add_account', { userId: accountData.id, userName: accountData.name });
+                showRegistrationModal(accountData);
+            }
+
+            // LocalStorageに保存
+            saveToLocalStorage();
+
+            // 検索結果を表示
+            document.getElementById('resultsSection').classList.add('visible');
+            renderAccounts();
+            closeModal();
+        });
+
+        // アカウント一覧を表示
+        var am_currentPage = 1;
+        var am_pageSize = 30;
+        var am_lastFiltered = null;
+
+        function renderAccounts(filteredAccounts = null) {
+            const accountList = document.getElementById('accountList');
+            const displayAccounts = filteredAccounts || accounts;
+            am_lastFiltered = filteredAccounts;
+            
+            if (displayAccounts.length === 0) {
+                accountList.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                            ${filteredAccounts ? '該当するアカウントがありません' : 'アカウントがありません。新規追加ボタンから登録してください。'}
+                        </td>
+                    </tr>
+                `;
+                if (document.getElementById('amPagination')) document.getElementById('amPagination').innerHTML = '';
+            } else {
+                var totalPages = Math.ceil(displayAccounts.length / am_pageSize);
+                if (am_currentPage > totalPages) am_currentPage = totalPages;
+                var start = (am_currentPage - 1) * am_pageSize;
+                var pageAccounts = displayAccounts.slice(start, start + am_pageSize);
+
+                accountList.innerHTML = pageAccounts.map((account, index) => {
+                    // フィルタリングされている場合、元の配列のインデックスを取得
+                    const originalIndex = accounts.indexOf(account);
+                    const status = account.status || 'active';
+                    const statusLabel = status === 'active' ? '在籍中' : '退職済み';
+                    const statusDisplay = account.retiredDate && status === 'retired' 
+                        ? `${statusLabel}<br><small style="font-size:10px;">${account.retiredDate}</small>`
+                        : statusLabel;
+                    
+                    return `
+                    <tr style="${status === 'retired' ? 'opacity: 0.6;' : ''}">
+                        <td>${account.id}</td>
+                        <td>${account.name}</td>
+                        <td>${account.officeName || '-'}</td>
+                        <td><span class="role-badge role-${account.role}">${roleLabels[account.role]}</span></td>
+                        <td><span class="status-badge status-${status}">${statusDisplay}</span></td>
+                        <td>${account.createdAt}</td>
+                        <td><button class="btn-edit" onclick="openEditModal(${originalIndex})">編集</button>${account.role === 'staff' ? ' <button class="btn-edit" style="background:#2563eb;color:#fff;border-color:#2563eb;" onclick="showQRForAccount(' + originalIndex + ')">QR</button>' : ''}</td>
+                    </tr>
+                `;
+                }).join('');
+
+                renderPagination('amPagination', am_currentPage, totalPages, displayAccounts.length, function(page) {
+                    am_currentPage = page;
+                    renderAccounts(am_lastFiltered);
+                });
+            }
+            
+            document.getElementById('totalCount').textContent = accounts.length;
+            document.getElementById('displayCount').textContent = displayAccounts.length;
+        }
+
+        // 検索
+        function searchAccounts() {
+            am_currentPage = 1;
+            const searchId = document.getElementById('searchId').value.toLowerCase();
+            const searchName = document.getElementById('searchName').value.toLowerCase();
+            const searchOffice = document.getElementById('searchOffice').value;
+            const searchRole = document.getElementById('searchRole').value;
+            const searchStatus = document.getElementById('searchStatus').value;
+
+            // どれか1つでも入力があれば検索実行（空欄のものはスキップ）
+            const filtered = accounts.filter(account => {
+                const matchId = !searchId || account.id.toLowerCase().includes(searchId);
+                const matchName = !searchName || account.name.toLowerCase().includes(searchName);
+                const matchOffice = !searchOffice || account.officeCode === searchOffice;
+                const matchRole = !searchRole || account.role === searchRole;
+                const status = account.status || 'active';
+                const matchStatus = !searchStatus || status === searchStatus;
+                return matchId && matchName && matchOffice && matchRole && matchStatus;
+            });
+
+            // 検索結果セクションを表示
+            document.getElementById('resultsSection').classList.add('visible');
+            renderAccounts(filtered);
+        }
+
+        // CSVダウンロード
+        function downloadCSV() {
+            const roleLabelsCSV = { staff: 'スタッフ', office_admin: '事業所管理者', company_admin: '会社管理者', system_admin: 'システム管理者' };
+            const data = am_lastFiltered || accounts;
+            if (data.length === 0) { ErrorHandler.showWarning('ダウンロードするデータがありません'); return; }
+
+            const bom = '\uFEFF';
+            const headers = ['ID','名前','所属事業所','身分','在籍状況','登録日'];
+            const rows = data.map(function(a) {
+                return [
+                    a.id,
+                    a.name,
+                    a.officeName || '-',
+                    roleLabelsCSV[a.role] || a.role,
+                    (a.status || 'active') === 'active' ? '在籍中' : '退職済み',
+                    a.createdAt || ''
+                ].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+            });
+            
+            var csv = bom + headers.join(',') + '\n' + rows.join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            var d = new Date();
+            link.download = 'アカウント一覧_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // 検索条件クリア
+        function clearSearch() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchOffice').value = '';
+            document.getElementById('searchRole').value = '';
+            document.getElementById('searchStatus').value = 'active';
+            document.getElementById('resultsSection').classList.remove('visible');
+        }
+
+        // 初期化処理
+        window.addEventListener('DOMContentLoaded', function() {
+            // ロール制限を適用（ページ読み込み時）
+            applyRoleRestrictions();
+            
+            // ログイン名入力時にIDプレビュー更新
+            document.getElementById('loginName').addEventListener('input', function() {
+                var val = this.value.trim();
+                var prefix = (currentUser.companyCode || 'DEMO') + '-';
+                document.getElementById('previewId').textContent = val ? prefix + val : prefix + '（ログイン名）';
+            });
+        });
+
+        // ===== QRログイン登録完了モーダル =====
+        function showRegistrationModal(account) {
+            var companyCode = account.companyCode || currentUser.companyCode || 'DEMO';
+            var password = account.password || '';
+            var roleName = {'staff':'スタッフ','office_admin':'事業所管理者','company_admin':'本社管理者'}[account.role] || account.role;
+            
+            // ログイン情報テキスト
+            var infoText = '━━━━━━━━━━━━━━━━━━━━\n'
+                + '【ワンタッチ管理】ログイン情報\n'
+                + '━━━━━━━━━━━━━━━━━━━━\n'
+                + '氏名: ' + (account.name || '') + '\n'
+                + '身分: ' + roleName + '\n'
+                + 'ログインID: ' + account.id + '\n'
+                + 'パスワード: ' + password + '\n'
+                + '━━━━━━━━━━━━━━━━━━━━\n'
+                + '※ 初回ログイン後にパスワードを変更してください\n'
+                + '※ ID・パスワードは大文字小文字を区別します';
+            
+            // QRログインURL（スタッフのみ）
+            var qrSection = '';
+            if (account.role === 'staff') {
+                var loginName = account.loginName || account.id;
+                var token = btoa(companyCode + ':' + loginName).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+                var baseUrl = window.location.origin + window.location.pathname.replace('account-master.html', 'login.html');
+                var qrUrl = baseUrl + '?qr=' + companyCode + ':' + loginName + ':' + token;
+                var qrImageUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=160x160&chl=' + encodeURIComponent(qrUrl);
+                qrSection = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;text-align:center;margin-bottom:16px;">'
+                    + '<div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:8px;">📱 スタッフ用QRログイン</div>'
+                    + '<img src="' + qrImageUrl + '" alt="QRコード" style="width:160px;height:160px;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;" onerror="this.style.display=\'none\'">'
+                    + '<div style="font-size:11px;color:#1e293b;word-break:break-all;background:white;padding:8px;border-radius:4px;border:1px solid #e2e8f0;text-align:left;">' + qrUrl + '</div>'
+                    + '</div>';
+            }
+            
+            var ov = document.createElement('div');
+            ov.id = 'regOverlay';
+            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            ov.onclick = function(e) { if (e.target === ov) closeRegModal(); };
+            ov._infoText = infoText;
+            ov.innerHTML = '<div style="background:#fff;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center;max-height:90vh;overflow-y:auto;">'
+                + '<div style="font-size:32px;margin-bottom:12px;">✓</div>'
+                + '<div style="font-size:18px;font-weight:700;margin-bottom:4px;">アカウントを登録しました</div>'
+                + '<div style="font-size:14px;color:#64748b;margin-bottom:16px;">' + account.id + ' / ' + account.name + '</div>'
+                + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;text-align:left;margin-bottom:16px;">'
+                + '<div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:8px;">🔑 ログイン情報</div>'
+                + '<div style="font-size:13px;color:#1e293b;background:white;padding:12px;border-radius:4px;border:1px solid #e2e8f0;text-align:left;line-height:1.8;">'
+                + '<div><span style="color:#64748b;">氏名:</span> <strong>' + (account.name || '') + '</strong></div>'
+                + '<div><span style="color:#64748b;">身分:</span> ' + roleName + '</div>'
+                + '<div><span style="color:#64748b;">ログインID:</span> <strong>' + account.id + '</strong></div>'
+                + '<div><span style="color:#64748b;">パスワード:</span> <strong>' + password + '</strong></div>'
+                + '</div>'
+                + '</div>'
+                + qrSection
+                + '<div style="display:flex;gap:8px;">'
+                + '<button onclick="copyRegInfo()" id="regCopyBtn" style="flex:1;padding:12px;background:#1e3a5f;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">ログイン情報をコピー</button>'
+                + '<button onclick="closeRegModal()" style="flex:1;padding:12px;background:#f1f5f9;color:#334155;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">閉じる</button>'
+                + '</div></div>';
+            document.body.appendChild(ov);
+        }
+
+        function copyRegInfo() {
+            var ov = document.getElementById('regOverlay');
+            if (!ov) return;
+            navigator.clipboard.writeText(ov._infoText).then(function() {
+                var btn = document.getElementById('regCopyBtn');
+                btn.textContent = 'コピーしました';
+                btn.style.background = '#22c55e';
+                setTimeout(function() { btn.textContent = 'ログイン情報をコピー'; btn.style.background = '#1e3a5f'; }, 2000);
+            });
+        }
+
+        function closeRegModal() {
+            var ov = document.getElementById('regOverlay');
+            if (ov) ov.remove();
+        }
+
+        // QRモーダル（既存アカウントからのQR発行用）
+        function showQRModal(account) {
+            var companyCode = account.companyCode || currentUser.companyCode || 'DEMO';
+            var loginName = account.loginName || account.id;
+            var token = btoa(companyCode + ':' + loginName).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+            var baseUrl = window.location.origin + window.location.pathname.replace('account-master.html', 'login.html');
+            var qrUrl = baseUrl + '?qr=' + companyCode + ':' + loginName + ':' + token;
+            
+            // QRコード画像をGoogle Chart APIで生成
+            var qrImageUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=' + encodeURIComponent(qrUrl);
+            
+            var ov = document.createElement('div');
+            ov.id = 'qrOverlay';
+            ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            ov.onclick = function(e) { if (e.target === ov) closeQRModal(); };
+            ov.innerHTML = '<div style="background:#fff;border-radius:16px;padding:32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center;">'
+                + '<div style="font-size:18px;font-weight:700;margin-bottom:4px;">QRログイン</div>'
+                + '<div style="font-size:14px;color:#64748b;margin-bottom:16px;">' + (account.name || account.id) + '</div>'
+                + '<div style="margin-bottom:16px;"><img src="' + qrImageUrl + '" alt="QRコード" style="width:200px;height:200px;border:1px solid #e2e8f0;border-radius:8px;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';"><div style="display:none;padding:12px;background:#fef2f2;border-radius:8px;font-size:13px;color:#dc2626;">QRコード画像を生成できませんでした</div></div>'
+                + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:left;margin-bottom:16px;">'
+                + '<div style="font-size:11px;color:#64748b;margin-bottom:6px;">QRログインURL</div>'
+                + '<div id="qrUrlText" style="font-size:11px;color:#1e293b;word-break:break-all;background:white;padding:8px;border-radius:4px;border:1px solid #e2e8f0;">' + qrUrl + '</div>'
+                + '</div>'
+                + '<div style="display:flex;gap:8px;">'
+                + '<button onclick="copyQRUrl()" id="qrCopyBtn" style="flex:1;padding:12px;background:#2563eb;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">URLをコピー</button>'
+                + '<button onclick="closeQRModal()" style="flex:1;padding:12px;background:#f1f5f9;color:#334155;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">閉じる</button>'
+                + '</div></div>';
+            document.body.appendChild(ov);
+            // URLを保持
+            ov._qrUrl = qrUrl;
+        }
+
+        function copyQRUrl() {
+            var ov = document.getElementById('qrOverlay');
+            if (!ov) return;
+            navigator.clipboard.writeText(ov._qrUrl).then(function() {
+                var btn = document.getElementById('qrCopyBtn');
+                btn.textContent = 'コピーしました';
+                btn.style.background = '#22c55e';
+                setTimeout(function() { btn.textContent = 'URLをコピー'; btn.style.background = '#2563eb'; }, 2000);
+            });
+        }
+
+        function closeQRModal() {
+            var ov = document.getElementById('qrOverlay');
+            if (ov) ov.remove();
+        }
+
+        // 一覧からQR発行
+        function showQRForAccount(index) {
+            var account = accounts[index];
+            if (account.role !== 'staff') {
+                ErrorHandler.showWarning('QRログインはスタッフアカウントのみ利用できます。');
+                return;
+            }
+            showQRModal(account);
+        }
+
+        // 初期表示は検索結果非表示
+    </script>
+    </div>
+    <!-- End of main container -->
+</body>
+</html>

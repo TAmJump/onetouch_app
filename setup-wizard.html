@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会社セットアップ | ワンタッチ管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ステップバー */
+        .step-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 28px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8e8e8;
+        }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        .step-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .step-dot.done { background: #16a34a; color: #fff; }
+        .step-dot.current { background: #2563eb; color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
+        .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .step-label { font-size: 11px; color: #999; font-weight: 500; white-space: nowrap; }
+        .step-item.done .step-label { color: #16a34a; }
+        .step-item.current .step-label { color: #2563eb; font-weight: 700; }
+        .step-connector {
+            width: 40px;
+            height: 2px;
+            background: #e5e7eb;
+            flex-shrink: 0;
+        }
+        .step-connector.done { background: #16a34a; }
+        @media (max-width: 480px) {
+            .step-connector { width: 10px; }
+            .step-dot { width: 28px; height: 28px; font-size: 11px; }
+            .step-label { font-size: 9px; }
+        }
+
+        /* カード */
+        .wizard-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 28px 24px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            margin-bottom: 16px;
+        }
+        .wizard-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+        .wizard-card-sub {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+
+        /* フォーム */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .form-label .required {
+            color: #dc2626;
+            margin-left: 4px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            color: #1e293b;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+        .form-input::placeholder { color: #bbb; }
+        .form-hint {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .form-input.error { border-color: #dc2626; }
+        .form-error {
+            font-size: 13px;
+            color: #dc2626;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* 自動生成プレビュー */
+        .auto-preview {
+            margin-top: 6px;
+            padding: 10px 14px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #0369a1;
+        }
+        .auto-preview-label {
+            font-size: 12px;
+            color: #0369a1;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        /* ボタン */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            min-height: 50px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #1e3a5f;
+            color: #fff;
+            flex: 1;
+        }
+        .btn-primary:hover { background: #2a4a73; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+        .btn-secondary:hover { background: #e5e5e5; }
+        .btn-save {
+            background: #fff;
+            color: #2563eb;
+            border: 1px solid #2563eb;
+        }
+        .btn-save:hover { background: #eff6ff; }
+
+        /* トースト */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e3a5f;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0,0,0,.2);
+            opacity: 0;
+            transition: all .4s;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* 完了ステップの表示 */
+        .step-done-summary {
+            padding: 16px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        .step-done-summary .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 8px;
+        }
+        .step-done-summary .detail {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div id="unified-header-mount"></div>
+    <div class="container">
+
+        <!-- ステップバー -->
+        <div class="step-bar">
+            <div class="step-indicator">
+                <div class="step-item" id="item1">
+                    <div class="step-dot" id="dot1">1</div>
+                    <div class="step-label">管理会社登録</div>
+                </div>
+                <div class="step-connector" id="conn1"></div>
+                <div class="step-item" id="item2">
+                    <div class="step-dot" id="dot2">2</div>
+                    <div class="step-label">会社</div>
+                </div>
+                <div class="step-connector" id="conn2"></div>
+                <div class="step-item" id="item3">
+                    <div class="step-dot" id="dot3">3</div>
+                    <div class="step-label">事業所</div>
+                </div>
+                <div class="step-connector" id="conn3"></div>
+                <div class="step-item" id="item4">
+                    <div class="step-dot" id="dot4">4</div>
+                    <div class="step-label">契約設定</div>
+                </div>
+                <div class="step-connector" id="conn4"></div>
+                <div class="step-item" id="item5">
+                    <div class="step-dot" id="dot5">5</div>
+                    <div class="step-label">アカウント</div>
+                </div>
+                <div class="step-connector" id="conn5"></div>
+                <div class="step-item" id="item6">
+                    <div class="step-dot" id="dot6">6</div>
+                    <div class="step-label">商品</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ステップ内容（JSで切り替え） -->
+        <div id="wizardContent"></div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ========== 認証 ==========
+        var currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.role !== 'system_admin') {
+            window.location.href = 'login.html';
+        }
+
+        // ========== セットアップデータ管理 ==========
+        var setupId = new URLSearchParams(window.location.search).get('id');
+        var setupData = null;
+
+        function loadSetups() {
+            var setups = [];
+            try { setups = JSON.parse(localStorage.getItem('onetouch.setups') || '[]'); } catch(e) {}
+            if (setups.length === 0) {
+                try { setups = JSON.parse(sessionStorage.getItem('onetouch.setups') || '[]'); } catch(e) {}
+            }
+            return setups;
+        }
+
+        function saveSetups(setups) {
+            localStorage.setItem('onetouch.setups', JSON.stringify(setups));
+            sessionStorage.setItem('onetouch.setups', JSON.stringify(setups));
+        }
+
+        function loadOrCreateSetup() {
+            var setups = loadSetups();
+            if (setupId) {
+                setupData = setups.find(function(s) { return s.id === setupId; });
+            }
+            if (!setupData) {
+                setupData = {
+                    id: 'setup-' + Date.now(),
+                    currentStep: 1,
+                    createdAt: new Date().toISOString(),
+                    // ステップ1: 管理会社選択
+                    partnerId: '',
+                    partnerName: '',
+                    partnerIsNew: false,
+                    newPartner: null,
+                    // ステップ2: 会社
+                    companyCode: '',
+                    companyName: '',
+                    representative: '',
+                    phone: '',
+                    address: '',
+                    // ステップ3: 事業所（配列）
+                    offices: [],
+                    // ステップ4: 契約設定（配列）
+                    contracts: [],
+                    // ステップ5: アカウント（配列）
+                    accounts: [],
+                    // ステップ6: 商品（配列）
+                    items: []
+                };
+                setups.push(setupData);
+                saveSetups(setups);
+                // URLにIDを付与
+                history.replaceState(null, '', 'setup-wizard.html?id=' + setupData.id);
+                setupId = setupData.id;
+            }
+            // 既存データの不足プロパティを補完
+            if (!setupData.offices) setupData.offices = [];
+            if (!setupData.contracts) setupData.contracts = [];
+            if (!setupData.accounts) setupData.accounts = [];
+            if (!setupData.items) setupData.items = [];
+            if (!setupData.partners) setupData.partners = [];
+        }
+
+        function saveCurrentSetup() {
+            var setups = loadSetups();
+            var idx = setups.findIndex(function(s) { return s.id === setupData.id; });
+            if (idx >= 0) {
+                setups[idx] = setupData;
+            } else {
+                setups.push(setupData);
+            }
+            saveSetups(setups);
+        }
+
+        // ========== ステップバー更新 ==========
+        function updateStepBar() {
+            var current = Math.min(setupData.currentStep, 7);
+            for (var i = 1; i <= 6; i++) {
+                var dot = document.getElementById('dot' + i);
+                var conn = document.getElementById('conn' + i);
+                var item = document.getElementById('item' + i);
+                dot.className = 'step-dot';
+                if (item) item.className = 'step-item';
+                if (i < current) {
+                    dot.className = 'step-dot done';
+                    dot.textContent = '✓';
+                    if (item) item.className = 'step-item done';
+                    if (conn) conn.className = 'step-connector done';
+                } else if (i === current && current <= 6) {
+                    dot.className = 'step-dot current';
+                    dot.textContent = i;
+                    if (item) item.className = 'step-item current';
+                    if (conn) conn.className = 'step-connector';
+                } else if (current > 6) {
+                    dot.className = 'step-dot done';
+                    dot.textContent = '✓';
+                    if (item) item.className = 'step-item done';
+                    if (conn) conn.className = 'step-connector done';
+                } else {
+                    dot.textContent = i;
+                    if (conn) conn.className = 'step-connector';
+                }
+            }
+        }
+
+        // ========== ステップ1: 管理会社登録 ==========
+        function renderStepPartner() {
+            var content = document.getElementById('wizardContent');
+
+            var np = setupData.newPartner || {};
+            var html = '<div class="wizard-card">'
+                + '<div class="wizard-card-title">ステップ 1：管理会社登録</div>'
+                + '<div class="wizard-card-sub">この案件の管理会社情報を入力してください</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">管理会社名（会社名）<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="npName" placeholder="例：東京設備工業株式会社" value="' + esc(np.name || '') + '">'
+                + '  <div class="form-error" id="npNameError">管理会社名を入力してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">担当者名<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="npContact" placeholder="例：山田太郎" value="' + esc(np.contactName || '') + '">'
+                + '  <div class="form-error" id="npContactError">担当者名を入力してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">担当者ローマ字<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="npRomaji" placeholder="例：yamada" value="' + esc(np.loginId || '') + '">'
+                + '  <div class="form-hint">半角英字。ログインIDになります</div>'
+                + '  <div class="form-error" id="npRomajiError"></div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">電話番号</label>'
+                + '  <input type="tel" class="form-input" id="npPhone" placeholder="例：03-1234-5678" value="' + esc(np.phone || '') + '">'
+                + '</div>'
+                + '<div class="btn-row">'
+                + '<button class="btn btn-secondary" onclick="goBack()">戻る</button>'
+                + '<button class="btn btn-primary" onclick="completeStepPartner()">次へ</button>'
+                + '</div>'
+                + '</div>';
+
+            content.innerHTML = html;
+        }
+
+        function completeStepPartner() {
+            // 新規登録バリデーション
+            var name = document.getElementById('npName').value.trim();
+            var contact = document.getElementById('npContact').value.trim();
+            var romaji = document.getElementById('npRomaji').value.trim().toLowerCase();
+            var valid = true;
+
+            if (!name) { document.getElementById('npName').classList.add('error'); document.getElementById('npNameError').style.display = 'block'; valid = false; }
+            else { document.getElementById('npName').classList.remove('error'); document.getElementById('npNameError').style.display = 'none'; }
+            if (!contact) { document.getElementById('npContact').classList.add('error'); document.getElementById('npContactError').style.display = 'block'; valid = false; }
+            else { document.getElementById('npContact').classList.remove('error'); document.getElementById('npContactError').style.display = 'none'; }
+            if (!romaji || !/^[a-zA-Z]+$/.test(romaji)) {
+                document.getElementById('npRomaji').classList.add('error');
+                document.getElementById('npRomajiError').textContent = !romaji ? '担当者ローマ字を入力してください' : '半角英字のみ';
+                document.getElementById('npRomajiError').style.display = 'block'; valid = false;
+            } else { document.getElementById('npRomaji').classList.remove('error'); document.getElementById('npRomajiError').style.display = 'none'; }
+            if (!valid) return;
+
+            // 管理会社コード自動生成
+            var partners = [];
+            try { partners = JSON.parse(localStorage.getItem('partners') || '[]'); } catch(e) {}
+            var num = partners.length + 1;
+            var code = 'PN' + String(num).padStart(3, '0');
+            while (partners.find(function(p) { return p.id === code; })) { num++; code = 'PN' + String(num).padStart(3, '0'); }
+
+            var newPartner = {
+                name: name, contactName: contact, loginId: romaji,
+                phone: document.getElementById('npPhone').value.trim(),
+                code: code
+            };
+                setupData.newPartner = newPartner;
+                setupData.partnerIsNew = true;
+                setupData.partnerId = code;
+                setupData.partnerName = name;
+
+                // 管理会社マスタに実際に登録
+                partners.push({
+                    id: code, partnerCode: code, name: name,
+                    contactName: contact, loginId: romaji,
+                    password: 'partner123',
+                    phone: newPartner.phone,
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('partners', JSON.stringify(partners));
+                sessionStorage.setItem('partners', JSON.stringify(partners));
+
+            setupData.currentStep = 2;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('管理会社「' + setupData.partnerName + '」を登録しました');
+        }
+
+        // ========== ステップ2: 会社登録（旧ステップ1） ==========
+        function renderStep1() {
+            var content = document.getElementById('wizardContent');
+            var isEdit = setupData.companyName !== '';
+
+            content.innerHTML = ''
+                + '<div class="wizard-card">'
+                + '  <div class="wizard-card-title">ステップ 2：会社登録</div>'
+                + '  <div class="wizard-card-sub">セットアップする会社の情報を入力してください</div>'
+                + '  <div class="form-group">'
+                + '    <label class="form-label">会社名<span class="required">*</span></label>'
+                + '    <input type="text" class="form-input" id="companyName" placeholder="例：タムジ株式会社" value="' + esc(setupData.companyName) + '">'
+                + '    <div class="form-error" id="companyNameError">会社名を入力してください</div>'
+                + '  </div>'
+                + '  <div class="form-group">'
+                + '    <label class="form-label">会社コード<span class="required">*</span></label>'
+                + '    <input type="text" class="form-input" id="companyCode" placeholder="例：TAMJ" value="' + esc(setupData.companyCode) + '" maxlength="10" style="text-transform:uppercase;" oninput="onCodeInput()">'
+                + '    <div class="form-hint">半角英数2〜10文字。会社を識別する一意のコードです。</div>'
+                + '    <div class="form-error" id="companyCodeError"></div>'
+                + '  </div>'
+                + '  <div class="form-group">'
+                + '    <label class="form-label">代表者名</label>'
+                + '    <input type="text" class="form-input" id="representative" placeholder="例：田村 太郎" value="' + esc(setupData.representative) + '">'
+                + '  </div>'
+                + '  <div class="form-group">'
+                + '    <label class="form-label">電話番号</label>'
+                + '    <input type="tel" class="form-input" id="phone" placeholder="例：03-1234-5678" value="' + esc(setupData.phone) + '">'
+                + '  </div>'
+                + '  <div class="form-group">'
+                + '    <label class="form-label">住所</label>'
+                + '    <input type="text" class="form-input" id="address" placeholder="例：東京都新宿区..." value="' + esc(setupData.address) + '">'
+                + '  </div>'
+                + '  <div id="autoPreview" style="display:none;">'
+                + '    <div class="auto-preview">'
+                + '      <div class="auto-preview-label">自動作成されるもの</div>'
+                + '      <div id="autoPreviewText"></div>'
+                + '    </div>'
+                + '  </div>'
+                + '  <div class="btn-row">'
+                + '    <button class="btn btn-secondary" onclick="goBack()">戻る</button>'
+                + '    <button class="btn btn-save" onclick="saveStep1()">保存</button>'
+                + '    <button class="btn btn-primary" onclick="completeStep1()">次へ</button>'
+                + '  </div>'
+                + '</div>';
+
+            // 会社コードが入っていたらプレビュー更新
+            if (setupData.companyCode) {
+                onCodeInput();
+            }
+        }
+
+        function onCodeInput() {
+            var code = document.getElementById('companyCode').value.trim().toUpperCase();
+            var preview = document.getElementById('autoPreview');
+            var previewText = document.getElementById('autoPreviewText');
+
+            if (code) {
+                preview.style.display = 'block';
+                previewText.innerHTML = '本社ID：<strong>' + esc(code) + '-H001</strong>　／　本社管理者アカウントが自動作成されます';
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function validateStep1() {
+            var valid = true;
+            var name = document.getElementById('companyName').value.trim();
+            var code = document.getElementById('companyCode').value.trim().toUpperCase();
+
+            // 会社名
+            var nameErr = document.getElementById('companyNameError');
+            if (!name) {
+                document.getElementById('companyName').classList.add('error');
+                nameErr.style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('companyName').classList.remove('error');
+                nameErr.style.display = 'none';
+            }
+
+            // 会社コード
+            var codeErr = document.getElementById('companyCodeError');
+            if (!code) {
+                document.getElementById('companyCode').classList.add('error');
+                codeErr.textContent = '会社コードを入力してください';
+                codeErr.style.display = 'block';
+                valid = false;
+            } else if (!/^[A-Z0-9]{2,10}$/.test(code)) {
+                document.getElementById('companyCode').classList.add('error');
+                codeErr.textContent = '半角英数2〜10文字で入力してください';
+                codeErr.style.display = 'block';
+                valid = false;
+            } else {
+                // 既存の会社コードと重複チェック
+                var companies = [];
+                try { companies = JSON.parse(localStorage.getItem('companies') || '[]'); } catch(e) {}
+                try { var cs = JSON.parse(sessionStorage.getItem('companies') || '[]'); cs.forEach(function(c) { if (!companies.find(function(x) { return x.code === c.code; })) companies.push(c); }); } catch(e) {}
+                var duplicate = companies.find(function(c) { return c.code === code && code !== setupData.companyCode; });
+                if (duplicate) {
+                    document.getElementById('companyCode').classList.add('error');
+                    codeErr.textContent = 'この会社コードは既に使用されています';
+                    codeErr.style.display = 'block';
+                    valid = false;
+                } else {
+                    document.getElementById('companyCode').classList.remove('error');
+                    codeErr.style.display = 'none';
+                }
+            }
+
+            return valid;
+        }
+
+        function collectStep1() {
+            setupData.companyName = document.getElementById('companyName').value.trim();
+            setupData.companyCode = document.getElementById('companyCode').value.trim().toUpperCase();
+            setupData.representative = document.getElementById('representative').value.trim();
+            setupData.phone = document.getElementById('phone').value.trim();
+            setupData.address = document.getElementById('address').value.trim();
+        }
+
+        function saveStep1() {
+            collectStep1();
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStep1() {
+            if (!validateStep1()) return;
+            collectStep1();
+
+            // 会社マスタに実際に登録
+            var companies = [];
+            try { companies = JSON.parse(localStorage.getItem('companies') || '[]'); } catch(e) {}
+            try { var cs = JSON.parse(sessionStorage.getItem('companies') || '[]'); cs.forEach(function(c) { if (!companies.find(function(x) { return x.code === c.code; })) companies.push(c); }); } catch(e) {}
+
+            var existing = companies.findIndex(function(c) { return c.code === setupData.companyCode; });
+            var companyData = {
+                code: setupData.companyCode,
+                name: setupData.companyName,
+                representative: setupData.representative,
+                phone: setupData.phone,
+                address: setupData.address,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            if (existing >= 0) {
+                companies[existing] = { ...companies[existing], ...companyData };
+            } else {
+                companies.push(companyData);
+            }
+
+            localStorage.setItem('companies', JSON.stringify(companies));
+            sessionStorage.setItem('companies', JSON.stringify(companies));
+
+            // 本社管理者アカウントを自動作成
+            var accounts = [];
+            try { accounts = JSON.parse(localStorage.getItem('accounts') || '[]'); } catch(e) {}
+            try { var as = JSON.parse(sessionStorage.getItem('accounts') || '[]'); as.forEach(function(a) { if (!accounts.find(function(x) { return x.id === a.id; })) accounts.push(a); }); } catch(e) {}
+
+            var honshaUserId = setupData.companyCode + '-admin';
+            if (!accounts.find(function(a) { return a.id === honshaUserId; })) {
+                accounts.push({
+                    id: honshaUserId,
+                    name: '本社管理者',
+                    password: 'admin123',
+                    role: 'company_admin',
+                    companyCode: setupData.companyCode,
+                    officeCode: setupData.companyCode + '-H001',
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                });
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                sessionStorage.setItem('accounts', JSON.stringify(accounts));
+            }
+
+            // 次のステップへ
+            setupData.currentStep = 3;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('会社「' + setupData.companyName + '」を登録しました');
+        }
+
+        // ========== ステップ2〜5: 事業所・アカウント・管理会社・商品 ==========
+
+        // --- サービス種類の選択肢 ---
+        var serviceTypes = [
+            '訪問介護','訪問入浴介護','訪問看護','訪問リハビリテーション','居宅療養管理指導',
+            '通所介護','通所リハビリテーション','短期入所生活介護','短期入所療養介護',
+            '特定施設入居者生活介護','福祉用具貸与','特定福祉用具販売','居宅介護支援',
+            '介護老人福祉施設','介護老人保健施設','介護医療院',
+            '認知症対応型通所介護','小規模多機能型居宅介護','認知症対応型共同生活介護',
+            '看護小規模多機能型居宅介護','定期巡回・随時対応型訪問介護看護',
+            '住宅型有料老人ホーム','サービス付高齢者住宅','病院/医院'
+        ];
+
+        function renderStep2() {
+            var content = document.getElementById('wizardContent');
+            var html = '';
+
+            // ステップ1完了サマリー
+            html += '<div class="step-done-summary">'
+                + '<div class="title">✓ ステップ2 完了：会社登録</div>'
+                + '<div class="detail">' + esc(setupData.companyName) + '（' + esc(setupData.companyCode) + '）</div>'
+                + '</div>';
+
+            // 登録済み事業所一覧
+            if (setupData.offices.length > 0) {
+                html += '<div class="wizard-card" style="padding:16px;">';
+                html += '<div style="font-size:14px;font-weight:600;color:#555;margin-bottom:10px;">登録済み事業所（' + setupData.offices.length + '件）</div>';
+                setupData.offices.forEach(function(o, i) {
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
+                        + '<div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(o.name) + '</div>'
+                        + '<div style="font-size:13px;color:#888;">' + esc(o.code) + '　' + esc(o.serviceType || '') + '</div>'
+                        + '</div>'
+                        + '<button onclick="removeOffice(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
+                        + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // 事業所追加フォーム
+            var serviceOpts = '<option value="">選択してください</option>';
+            serviceTypes.forEach(function(s) { serviceOpts += '<option value="' + s + '">' + s + '</option>'; });
+
+            html += '<div class="wizard-card">'
+                + '<div class="wizard-card-title">ステップ 3：事業所登録</div>'
+                + '<div class="wizard-card-sub">' + esc(setupData.companyName) + ' の事業所を登録してください</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">事業所名<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="officeName" placeholder="例：タムジ介護施設">'
+                + '  <div class="form-error" id="officeNameError">事業所名を入力してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">サービスの種類<span class="required">*</span></label>'
+                + '  <select class="form-input" id="serviceType">' + serviceOpts + '</select>'
+                + '  <div class="form-error" id="serviceTypeError">サービスの種類を選択してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">電話番号</label>'
+                + '  <input type="tel" class="form-input" id="officePhone" placeholder="例：03-1234-5678">'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">住所</label>'
+                + '  <input type="text" class="form-input" id="officeAddress" placeholder="例：東京都新宿区...">'
+                + '</div>'
+                + '<button class="btn btn-save" onclick="addOffice()" style="width:100%;margin-top:8px;">＋ この事業所を追加</button>'
+                + '</div>';
+
+            // ナビゲーション
+            html += '<div class="btn-row">'
+                + '<button class="btn btn-secondary" onclick="goToStep(2)">前へ</button>'
+                + '<button class="btn btn-save" onclick="saveStep2()">保存</button>'
+                + '<button class="btn btn-primary" onclick="completeStep2()"' + (setupData.offices.length === 0 ? ' disabled title="事業所を1件以上追加してください"' : '') + '>次へ</button>'
+                + '</div>';
+
+            content.innerHTML = html;
+        }
+
+        function addOffice() {
+            var name = document.getElementById('officeName').value.trim();
+            var serviceType = document.getElementById('serviceType').value;
+            var valid = true;
+
+            if (!name) {
+                document.getElementById('officeName').classList.add('error');
+                document.getElementById('officeNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('officeName').classList.remove('error');
+                document.getElementById('officeNameError').style.display = 'none';
+            }
+            if (!serviceType) {
+                document.getElementById('serviceType').classList.add('error');
+                document.getElementById('serviceTypeError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('serviceType').classList.remove('error');
+                document.getElementById('serviceTypeError').style.display = 'none';
+            }
+            if (!valid) return;
+
+            // 事業所コード自動生成
+            var num = setupData.offices.length + 1;
+            var code = setupData.companyCode + '-J' + String(num).padStart(4, '0');
+            // 重複回避
+            while (setupData.offices.find(function(o) { return o.code === code; })) {
+                num++;
+                code = setupData.companyCode + '-J' + String(num).padStart(4, '0');
+            }
+
+            setupData.offices.push({
+                code: code,
+                name: name,
+                serviceType: serviceType,
+                phone: document.getElementById('officePhone').value.trim(),
+                address: document.getElementById('officeAddress').value.trim(),
+                companyCode: setupData.companyCode
+            });
+
+            saveCurrentSetup();
+            renderStep2();
+            showToast('事業所「' + name + '」を追加しました');
+        }
+
+        function removeOffice(index) {
+            var name = setupData.offices[index].name;
+            if (!confirm('「' + name + '」を削除しますか？')) return;
+            setupData.offices.splice(index, 1);
+            saveCurrentSetup();
+            renderStep2();
+        }
+
+        function saveStep2() {
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStep2() {
+            if (setupData.offices.length === 0) {
+                showToast('事業所を1件以上追加してください');
+                return;
+            }
+
+            // 事業所マスタに実際に登録
+            var offices = [];
+            try { offices = JSON.parse(localStorage.getItem('offices') || '[]'); } catch(e) {}
+            try { var os = JSON.parse(sessionStorage.getItem('offices') || '[]'); os.forEach(function(o) { if (!offices.find(function(x) { return x.code === o.code; })) offices.push(o); }); } catch(e) {}
+
+            setupData.offices.forEach(function(o) {
+                var existing = offices.findIndex(function(x) { return x.code === o.code; });
+                var officeData = {
+                    code: o.code,
+                    name: o.name,
+                    companyCode: o.companyCode,
+                    serviceType: o.serviceType,
+                    phone: o.phone,
+                    address: o.address,
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                if (existing >= 0) {
+                    offices[existing] = { ...offices[existing], ...officeData };
+                } else {
+                    offices.push(officeData);
+                }
+            });
+
+            localStorage.setItem('offices', JSON.stringify(offices));
+            sessionStorage.setItem('offices', JSON.stringify(offices));
+
+            setupData.currentStep = 4;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('事業所を' + setupData.offices.length + '件登録しました');
+        }
+
+        // ========== ナビゲーション ==========
+        // ステップ番号のマッピング:
+        // 新1=管理会社選択, 新2=会社(旧1), 新3=事業所(旧2), 新4=契約(新規), 新5=アカウント(旧3), 新6=商品(旧5)
+        function renderCurrentStep() {
+            try {
+                updateStepBar();
+                var step = setupData.currentStep;
+                if (step === 1) renderStepPartner();
+                else if (step === 2) renderStep1(); // 会社登録
+                else if (step === 3) renderStep2(); // 事業所登録
+                else if (step === 4) renderStepContract(); // 契約設定
+                else if (step === 5) renderStep3(); // アカウント登録
+                else if (step === 6) renderStepItems(); // 商品登録
+                else renderComplete(); // 7以上は完了画面
+            } catch(e) {
+                var content = document.getElementById('wizardContent');
+                if (content) content.innerHTML = '<div class="wizard-card" style="color:red;padding:20px;">エラー: ' + e.message + '</div>';
+                console.error('renderCurrentStep error:', e);
+            }
+        }
+
+        function renderComplete() {
+            updateStepBar();
+            var content = document.getElementById('wizardContent');
+            content.innerHTML = '<div class="wizard-card" style="text-align:center;padding:40px 24px;">'
+                + '<div style="font-size:48px;margin-bottom:16px;">✓</div>'
+                + '<div style="font-size:20px;font-weight:700;color:#166534;margin-bottom:8px;">セットアップ完了</div>'
+                + '<div style="font-size:16px;color:#555;margin-bottom:8px;">' + esc(setupData.companyName) + ' の初期設定が完了しました</div>'
+                + '<div style="font-size:14px;color:#888;margin-bottom:24px;">'
+                + '管理会社：' + esc(setupData.partnerName) + ' / 事業所 ' + setupData.offices.length + '件 / 契約 ' + setupData.contracts.length + '件 / アカウント ' + setupData.accounts.length + '件 / 商品 ' + setupData.items.length + '件'
+                + '</div>'
+                + '<a href="system-admin.html" class="btn btn-primary" style="display:inline-block;text-decoration:none;padding:14px 32px;">管理画面に戻る</a>'
+                + '</div>';
+        }
+
+        // ステップ完了サマリーHTML生成
+        function doneSummary() {
+            var html = '';
+            if (setupData.currentStep > 1) {
+                html += '<div class="step-done-summary"><div class="title">✓ 管理会社登録</div><div class="detail">' + esc(setupData.partnerName) + '（' + esc(setupData.partnerId) + '）</div></div>';
+            }
+            if (setupData.currentStep > 2) {
+                html += '<div class="step-done-summary"><div class="title">✓ 会社登録</div><div class="detail">' + esc(setupData.companyName) + '（' + esc(setupData.companyCode) + '）</div></div>';
+            }
+            if (setupData.currentStep > 3) {
+                html += '<div class="step-done-summary"><div class="title">✓ 事業所登録</div><div class="detail">' + setupData.offices.length + '件</div></div>';
+            }
+            if (setupData.currentStep > 4) {
+                html += '<div class="step-done-summary"><div class="title">✓ 契約設定</div><div class="detail">' + setupData.contracts.length + '件</div></div>';
+            }
+            if (setupData.currentStep > 5) {
+                html += '<div class="step-done-summary"><div class="title">✓ アカウント登録</div><div class="detail">' + setupData.accounts.length + '件</div></div>';
+            }
+            return html;
+        }
+
+        function renderStep3() {
+            var content = document.getElementById('wizardContent');
+            var html = doneSummary();
+
+            // 登録済みアカウント一覧
+            if (setupData.accounts.length > 0) {
+                var roleNames = { staff: 'スタッフ', office_admin: '事業所管理者', company_admin: '本社管理者' };
+                html += '<div class="wizard-card" style="padding:16px;">';
+                html += '<div style="font-size:14px;font-weight:600;color:#555;margin-bottom:10px;">登録済みアカウント（' + setupData.accounts.length + '件）</div>';
+                setupData.accounts.forEach(function(a, i) {
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
+                        + '<div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(a.name) + '</div>'
+                        + '<div style="font-size:13px;color:#888;">' + esc(a.id) + '　' + (roleNames[a.role] || a.role) + '　' + esc(a.officeName || '') + '</div>'
+                        + '</div>'
+                        + '<button onclick="removeAccount(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
+                        + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // 事業所（1つなら自動、複数なら選択）
+            var singleOffice = setupData.offices.length === 1;
+            var officeField = '';
+            if (singleOffice) {
+                officeField = '<div class="form-group">'
+                    + '  <label class="form-label">所属事業所</label>'
+                    + '  <input type="text" class="form-input" readonly style="background:#f5f5f5;color:#333;" value="' + esc(setupData.offices[0].name) + '">'
+                    + '  <input type="hidden" id="acctOffice" value="' + esc(setupData.offices[0].code) + '">'
+                    + '</div>';
+            } else {
+                var officeOpts = '<option value="">選択してください</option>';
+                setupData.offices.forEach(function(o) {
+                    officeOpts += '<option value="' + esc(o.code) + '">' + esc(o.name) + '</option>';
+                });
+                officeField = '<div class="form-group">'
+                    + '  <label class="form-label">所属事業所<span class="required">*</span></label>'
+                    + '  <select class="form-input" id="acctOffice">' + officeOpts + '</select>'
+                    + '  <div class="form-error" id="acctOfficeError">事業所を選択してください</div>'
+                    + '</div>';
+            }
+
+            html += '<div class="wizard-card">'
+                + '<div class="wizard-card-title">ステップ 5：アカウント登録</div>'
+                + '<div class="wizard-card-sub">スタッフや事業所管理者のアカウントを登録してください</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">表示名<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="acctName" placeholder="例：田中 太郎">'
+                + '  <div class="form-error" id="acctNameError">表示名を入力してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">ログイン名<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="acctLogin" placeholder="例：tanaka" oninput="previewAccountId()">'
+                + '  <div class="form-hint">半角英数。ユーザーIDは「' + esc(setupData.companyCode) + '-ログイン名」になります</div>'
+                + '  <div id="acctIdPreview" style="display:none;margin-top:4px;font-size:14px;color:#2563eb;"></div>'
+                + '  <div class="form-error" id="acctLoginError"></div>'
+                + '</div>'
+                + officeField
+                + '<div class="form-group">'
+                + '  <label class="form-label">ロール<span class="required">*</span></label>'
+                + '  <select class="form-input" id="acctRole">'
+                + '    <option value="staff">スタッフ</option>'
+                + '    <option value="office_admin">事業所管理者</option>'
+                + '  </select>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">パスワード<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="acctPassword" placeholder="初期パスワード" value="pass123">'
+                + '  <div class="form-hint">初回ログイン後に変更を推奨</div>'
+                + '</div>'
+                + '<button class="btn btn-save" onclick="addAccount()" style="width:100%;margin-top:8px;">＋ このアカウントを追加</button>'
+                + '</div>';
+
+            html += '<div class="btn-row">'
+                + '<button class="btn btn-secondary" onclick="goToStep(4)">前へ</button>'
+                + '<button class="btn btn-save" onclick="saveStep3()">保存</button>'
+                + '<button class="btn btn-primary" onclick="completeStep3()"' + (setupData.accounts.length === 0 ? ' disabled title="アカウントを1件以上追加してください"' : '') + '>次へ</button>'
+                + '</div>';
+
+            content.innerHTML = html;
+        }
+
+        function previewAccountId() {
+            var login = document.getElementById('acctLogin').value.trim();
+            var preview = document.getElementById('acctIdPreview');
+            if (login) {
+                preview.style.display = 'block';
+                preview.textContent = 'ユーザーID：' + setupData.companyCode + '-' + login;
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function addAccount() {
+            var name = document.getElementById('acctName').value.trim();
+            var login = document.getElementById('acctLogin').value.trim();
+            var office = document.getElementById('acctOffice').value;
+            var role = document.getElementById('acctRole').value;
+            var password = document.getElementById('acctPassword').value;
+            var valid = true;
+
+            if (!name) {
+                document.getElementById('acctName').classList.add('error');
+                document.getElementById('acctNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('acctName').classList.remove('error');
+                document.getElementById('acctNameError').style.display = 'none';
+            }
+
+            if (!login || !/^[a-zA-Z0-9._-]+$/.test(login)) {
+                document.getElementById('acctLogin').classList.add('error');
+                document.getElementById('acctLoginError').textContent = !login ? 'ログイン名を入力してください' : '半角英数字・ドット・ハイフン・アンダーバーのみ';
+                document.getElementById('acctLoginError').style.display = 'block';
+                valid = false;
+            } else {
+                // 重複チェック
+                var accountId = setupData.companyCode + '-' + login;
+                if (setupData.accounts.find(function(a) { return a.id === accountId; })) {
+                    document.getElementById('acctLogin').classList.add('error');
+                    document.getElementById('acctLoginError').textContent = 'このログイン名は既に追加されています';
+                    document.getElementById('acctLoginError').style.display = 'block';
+                    valid = false;
+                } else {
+                    document.getElementById('acctLogin').classList.remove('error');
+                    document.getElementById('acctLoginError').style.display = 'none';
+                }
+            }
+
+            if (!office) {
+                document.getElementById('acctOffice').classList.add('error');
+                document.getElementById('acctOfficeError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('acctOffice').classList.remove('error');
+                document.getElementById('acctOfficeError').style.display = 'none';
+            }
+
+            if (!valid) return;
+
+            var officeData = setupData.offices.find(function(o) { return o.code === office; });
+
+            setupData.accounts.push({
+                id: setupData.companyCode + '-' + login,
+                name: name,
+                loginName: login,
+                password: password,
+                role: role,
+                companyCode: setupData.companyCode,
+                officeCode: office,
+                officeName: officeData ? officeData.name : '',
+                status: 'active'
+            });
+
+            saveCurrentSetup();
+            renderStep3();
+            showToast('アカウント「' + name + '」を追加しました');
+        }
+
+        function removeAccount(index) {
+            var name = setupData.accounts[index].name;
+            if (!confirm('「' + name + '」を削除しますか？')) return;
+            setupData.accounts.splice(index, 1);
+            saveCurrentSetup();
+            renderStep3();
+        }
+
+        function saveStep3() {
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStep3() {
+            if (setupData.accounts.length === 0) {
+                showToast('アカウントを1件以上追加してください');
+                return;
+            }
+
+            // アカウントマスタに実際に登録
+            var accounts = [];
+            try { accounts = JSON.parse(localStorage.getItem('accounts') || '[]'); } catch(e) {}
+            try { var as = JSON.parse(sessionStorage.getItem('accounts') || '[]'); as.forEach(function(a) { if (!accounts.find(function(x) { return x.id === a.id; })) accounts.push(a); }); } catch(e) {}
+
+            setupData.accounts.forEach(function(a) {
+                var existing = accounts.findIndex(function(x) { return x.id === a.id; });
+                var acctData = {
+                    id: a.id,
+                    name: a.name,
+                    loginName: a.loginName,
+                    password: a.password,
+                    role: a.role,
+                    companyCode: a.companyCode,
+                    officeCode: a.officeCode,
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                };
+                if (existing >= 0) {
+                    accounts[existing] = { ...accounts[existing], ...acctData };
+                } else {
+                    accounts.push(acctData);
+                }
+            });
+
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            sessionStorage.setItem('accounts', JSON.stringify(accounts));
+
+            setupData.currentStep = 6;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('アカウントを' + setupData.accounts.length + '件登録しました');
+        }
+
+        // ========== ステップ4: 契約設定 ==========
+        function renderStepContract() {
+            var content = document.getElementById('wizardContent');
+            var html = doneSummary();
+
+            // 登録済み契約一覧
+            if (setupData.contracts.length > 0) {
+                html += '<div class="wizard-card" style="padding:16px;">';
+                html += '<div style="font-size:14px;font-weight:600;color:#555;margin-bottom:10px;">設定済み契約（' + setupData.contracts.length + '件）</div>';
+                setupData.contracts.forEach(function(c, i) {
+                    var officeName = '';
+                    if (c.officeCode) {
+                        var o = setupData.offices.find(function(o) { return o.code === c.officeCode; });
+                        officeName = o ? o.name : c.officeCode;
+                    } else {
+                        officeName = '全事業所';
+                    }
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
+                        + '<div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(officeName) + '</div>'
+                        + '<div style="font-size:12px;color:#2563eb;margin-top:2px;">' + (c.categories || []).join(', ') + '</div>'
+                        + '</div>'
+                        + '<button onclick="removeContract(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
+                        + '</div>';
+                });
+                html += '</div>';
+            }
+
+            html += '<div class="wizard-card">'
+                + '<div class="wizard-card-title">ステップ 4：契約設定</div>'
+                + '<div class="wizard-card-sub">「' + esc(setupData.partnerName) + '」が担当するカテゴリを設定してください</div>'
+                + '<div style="padding:10px 14px;background:#f0f7ff;border-radius:8px;font-size:13px;color:#1e3a5f;margin-bottom:16px;">登録済みの全事業所に適用されます（事業所ごとの変更は後から契約管理画面で行えます）</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">担当カテゴリ<span class="required">*</span></label>'
+                + '  <div id="contractCatChecks" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>'
+                + '  <div class="form-error" id="contractCatError">カテゴリを1つ以上選択してください</div>'
+                + '</div>'
+                + '<button class="btn btn-save" onclick="addContract()" style="width:100%;margin-top:8px;">＋ この契約を追加</button>'
+                + '</div>';
+
+            html += '<div class="btn-row">'
+                + '<button class="btn btn-secondary" onclick="goToStep(3)">前へ</button>'
+                + '<button class="btn btn-save" onclick="saveStepContract()">保存</button>'
+                + '<button class="btn btn-primary" onclick="completeStepContract()"' + (setupData.contracts.length === 0 ? ' disabled title="契約を1件以上追加してください"' : '') + '>次へ</button>'
+                + '</div>';
+
+            content.innerHTML = html;
+
+            // カテゴリチェックボックスを生成
+            var catDiv = document.getElementById('contractCatChecks');
+            if (catDiv) {
+                var cats = (typeof window.getAllCategories === 'function')
+                    ? window.getAllCategories((typeof currentUser !== 'undefined' && currentUser.officeCode) ? currentUser.officeCode : 'TAMJ-J0001')
+                    : ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','浴室','福祉用具','その他'];
+                catDiv.innerHTML = cats.map(function(c) {
+                    return '<label style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:#f5f5f5;border-radius:8px;font-size:14px;cursor:pointer;white-space:nowrap;">'
+                        + '<input type="checkbox" value="' + c + '" class="contract-cat-check"> ' + c + '</label>';
+                }).join('');
+            }
+        }
+
+        function addContract() {
+            var selectedCats = [];
+            document.querySelectorAll('.contract-cat-check:checked').forEach(function(cb) { selectedCats.push(cb.value); });
+
+            if (selectedCats.length === 0) {
+                document.getElementById('contractCatError').style.display = 'block';
+                return;
+            }
+            document.getElementById('contractCatError').style.display = 'none';
+
+            var contractId = 'CNT-' + setupData.companyCode + '-' + setupData.partnerId + '-' + (setupData.contracts.length + 1);
+
+            setupData.contracts.push({
+                id: contractId,
+                partnerId: setupData.partnerId,
+                companyCode: setupData.companyCode,
+                officeCode: '',
+                categories: selectedCats,
+                status: 'active'
+            });
+
+            saveCurrentSetup();
+            renderStepContract();
+            showToast('全事業所の契約を追加しました');
+        }
+
+        function removeContract(index) {
+            if (!confirm('この契約を削除しますか？')) return;
+            setupData.contracts.splice(index, 1);
+            saveCurrentSetup();
+            renderStepContract();
+        }
+
+        function saveStepContract() {
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStepContract() {
+            if (setupData.contracts.length === 0) {
+                showToast('契約を1件以上追加してください');
+                return;
+            }
+
+            // 契約テーブルに実際に登録
+            var contracts = [];
+            try { contracts = JSON.parse(localStorage.getItem('onetouch.contracts') || '[]'); } catch(e) {}
+            try { var cs = JSON.parse(sessionStorage.getItem('onetouch.contracts') || '[]'); cs.forEach(function(c) { if (!contracts.find(function(x) { return x.id === c.id; })) contracts.push(c); }); } catch(e) {}
+
+            setupData.contracts.forEach(function(c) {
+                if (!contracts.find(function(x) { return x.id === c.id; })) {
+                    contracts.push({
+                        id: c.id,
+                        partnerId: c.partnerId,
+                        companyCode: c.companyCode,
+                        officeCode: c.officeCode,
+                        categories: c.categories,
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            });
+
+            localStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+            sessionStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+
+            setupData.currentStep = 5;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('契約を' + setupData.contracts.length + '件登録しました');
+        }
+
+        // ========== 管理会社追加関連 ==========
+
+        function previewPartnerId() {
+            var romaji = document.getElementById('partnerRomaji').value.trim().toLowerCase();
+            var preview = document.getElementById('partnerIdPreview');
+            if (romaji) {
+                var num = setupData.partners.length + 1;
+                preview.style.display = 'block';
+                preview.textContent = '管理会社コード：PN' + String(num).padStart(3, '0') + '　ログインID：' + romaji;
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function addPartner() {
+            var name = document.getElementById('partnerName').value.trim();
+            var contact = document.getElementById('partnerContact').value.trim();
+            var romaji = document.getElementById('partnerRomaji').value.trim().toLowerCase();
+            var valid = true;
+
+            if (!name) {
+                document.getElementById('partnerName').classList.add('error');
+                document.getElementById('partnerNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('partnerName').classList.remove('error');
+                document.getElementById('partnerNameError').style.display = 'none';
+            }
+            if (!contact) {
+                document.getElementById('partnerContact').classList.add('error');
+                document.getElementById('partnerContactError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('partnerContact').classList.remove('error');
+                document.getElementById('partnerContactError').style.display = 'none';
+            }
+            if (!romaji || !/^[a-zA-Z]+$/.test(romaji)) {
+                document.getElementById('partnerRomaji').classList.add('error');
+                document.getElementById('partnerRomajiError').textContent = !romaji ? '担当者ローマ字を入力してください' : '半角英字のみ';
+                document.getElementById('partnerRomajiError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('partnerRomaji').classList.remove('error');
+                document.getElementById('partnerRomajiError').style.display = 'none';
+            }
+
+            // カテゴリ取得・バリデーション
+            var selectedCategories = [];
+            var checks = document.querySelectorAll('.cat-check:checked');
+            checks.forEach(function(cb) { selectedCategories.push(cb.value); });
+            if (selectedCategories.length === 0) {
+                document.getElementById('partnerCategoryError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('partnerCategoryError').style.display = 'none';
+            }
+
+            if (!valid) return;
+
+            // 管理会社コード自動生成
+            var num = setupData.partners.length + 1;
+            var code = 'PN' + String(num).padStart(3, '0');
+            while (setupData.partners.find(function(p) { return p.code === code; })) {
+                num++;
+                code = 'PN' + String(num).padStart(3, '0');
+            }
+
+            setupData.partners.push({
+                code: code,
+                name: name,
+                contactName: contact,
+                loginId: romaji,
+                phone: document.getElementById('partnerPhone').value.trim(),
+                categories: selectedCategories,
+                assignedCompanies: [setupData.companyCode]
+            });
+
+            saveCurrentSetup();
+            renderStep4();
+            showToast('管理会社「' + name + '」を追加しました');
+        }
+
+        function removePartner(index) {
+            var name = setupData.partners[index].name;
+            if (!confirm('「' + name + '」を削除しますか？')) return;
+            setupData.partners.splice(index, 1);
+            saveCurrentSetup();
+            renderStep4();
+        }
+
+        function saveStep4() {
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStep4() {
+            if (setupData.partners.length === 0) {
+                showToast('管理会社を1件以上追加してください');
+                return;
+            }
+
+            // 管理会社マスタに実際に登録
+            var partners = [];
+            try { partners = JSON.parse(localStorage.getItem('partners') || '[]'); } catch(e) {}
+            try { var ps = JSON.parse(sessionStorage.getItem('partners') || '[]'); ps.forEach(function(p) { if (!partners.find(function(x) { return x.id === p.id; })) partners.push(p); }); } catch(e) {}
+
+            setupData.partners.forEach(function(p) {
+                var existing = partners.findIndex(function(x) { return x.id === p.code; });
+                var partnerData = {
+                    id: p.code,
+                    partnerCode: p.code,
+                    name: p.name,
+                    contactName: p.contactName,
+                    loginId: p.loginId,
+                    password: 'partner123',
+                    phone: p.phone,
+                    assignedCompanies: p.assignedCompanies,
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                };
+                if (existing >= 0) {
+                    partners[existing] = { ...partners[existing], ...partnerData };
+                } else {
+                    partners.push(partnerData);
+                }
+            });
+
+            localStorage.setItem('partners', JSON.stringify(partners));
+            sessionStorage.setItem('partners', JSON.stringify(partners));
+
+            // 契約テーブルにも登録
+            var contracts = [];
+            try { contracts = JSON.parse(localStorage.getItem('onetouch.contracts') || '[]'); } catch(e) {}
+            try { var cs = JSON.parse(sessionStorage.getItem('onetouch.contracts') || '[]'); cs.forEach(function(c) { if (!contracts.find(function(x) { return x.id === c.id; })) contracts.push(c); }); } catch(e) {}
+
+            setupData.partners.forEach(function(p, idx) {
+                var contractId = 'CNT-' + setupData.companyCode + '-' + p.code;
+                if (!contracts.find(function(c) { return c.id === contractId; })) {
+                    contracts.push({
+                        id: contractId,
+                        partnerId: p.code,
+                        companyCode: setupData.companyCode,
+                        officeCode: '',
+                        categories: p.categories || [],
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            });
+
+            localStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+            sessionStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+
+            setupData.currentStep = 5;
+            saveCurrentSetup();
+            renderCurrentStep();
+            showToast('管理会社を' + setupData.partners.length + '件登録しました');
+        }
+        // ========== ステップ6: 商品登録（旧ステップ5を再利用） ==========
+        function renderStepItems() { renderStep5(); }
+
+        function renderStep5() {
+            var content = document.getElementById('wizardContent');
+            var html = doneSummary();
+
+            // 登録済み商品一覧
+            if (setupData.items.length > 0) {
+                html += '<div class="wizard-card" style="padding:16px;">';
+                html += '<div style="font-size:14px;font-weight:600;color:#555;margin-bottom:10px;">登録済み商品（' + setupData.items.length + '件）</div>';
+                setupData.items.forEach(function(item, i) {
+                    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
+                        + '<div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(item.name) + '</div>'
+                        + '<div style="font-size:13px;color:#888;">' + esc(item.category || '') + '　' + esc(item.partnerName || '管理会社未設定') + '</div>'
+                        + '</div>'
+                        + '<button onclick="removeItem(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
+                        + '</div>';
+                });
+                html += '</div>';
+            }
+
+            // カテゴリ選択肢
+            var categories = (typeof window.getAllCategories === 'function')
+                ? window.getAllCategories((typeof currentUser !== 'undefined' && currentUser.officeCode) ? currentUser.officeCode : 'TAMJ-J0001')
+                : ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','浴室','福祉用具','その他'];
+            var catOpts = '<option value="">選択してください</option>';
+            categories.forEach(function(c) { catOpts += '<option value="' + c + '">' + c + '</option>'; });
+
+            // 管理会社選択肢（partnersがない場合はステップ1の管理会社を使う）
+            var partnerOpts = '<option value="">自動（契約から判定）</option>';
+            var partnerList = setupData.partners || [];
+            if (partnerList.length === 0 && setupData.partnerId) {
+                partnerList = [{ code: setupData.partnerId, name: setupData.partnerName }];
+            }
+            partnerList.forEach(function(p) {
+                partnerOpts += '<option value="' + esc(p.code) + '">' + esc(p.name) + '</option>';
+            });
+
+            // 事業所選択肢
+            var officeOpts = '<option value="">選択してください</option>';
+            setupData.offices.forEach(function(o) {
+                officeOpts += '<option value="' + esc(o.code) + '">' + esc(o.name) + '</option>';
+            });
+
+            html += '<div class="wizard-card">'
+                + '<div class="wizard-card-title">ステップ 6：商品（設備）登録</div>'
+                + '<div class="wizard-card-sub">施設の設備を登録してください。後からインポートで一括登録もできます。</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">商品名<span class="required">*</span></label>'
+                + '  <input type="text" class="form-input" id="itemName" placeholder="例：エアコン 1号機">'
+                + '  <div class="form-error" id="itemNameError">商品名を入力してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">カテゴリ<span class="required">*</span></label>'
+                + '  <select class="form-input" id="itemCategory">' + catOpts + '</select>'
+                + '  <div class="form-error" id="itemCategoryError">カテゴリを選択してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">設置事業所<span class="required">*</span></label>'
+                + '  <select class="form-input" id="itemOffice">' + officeOpts + '</select>'
+                + '  <div class="form-error" id="itemOfficeError">事業所を選択してください</div>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">担当管理会社</label>'
+                + '  <select class="form-input" id="itemPartner">' + partnerOpts + '</select>'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">メーカー</label>'
+                + '  <input type="text" class="form-input" id="itemMaker" placeholder="例：ダイキン">'
+                + '</div>'
+                + '<div class="form-group">'
+                + '  <label class="form-label">設置場所</label>'
+                + '  <input type="text" class="form-input" id="itemLocation" placeholder="例：1F 居室101">'
+                + '</div>'
+                + '<button class="btn btn-save" onclick="addItem()" style="width:100%;margin-top:8px;">＋ この商品を追加</button>'
+                + '</div>';
+
+            html += '<div style="text-align:center;padding:12px;font-size:14px;color:#666;">商品が多い場合は、セットアップ完了後に<a href="import.html" style="color:#2563eb;">インポート機能</a>で一括登録できます</div>';
+
+            html += '<div class="btn-row">'
+                + '<button class="btn btn-secondary" onclick="goToStep(5)">前へ</button>'
+                + '<button class="btn btn-save" onclick="saveStep5()">保存</button>'
+                + '<button class="btn btn-primary" onclick="completeStep5()">セットアップ完了</button>'
+                + '</div>';
+            html += '<div style="text-align:center;padding:8px 0;"><button onclick="completeStep5()" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;text-decoration:underline;">商品登録をスキップして完了 →</button></div>';
+
+            content.innerHTML = html;
+        }
+
+        function addItem() {
+            var name = document.getElementById('itemName').value.trim();
+            var category = document.getElementById('itemCategory').value;
+            var office = document.getElementById('itemOffice').value;
+            var valid = true;
+
+            if (!name) {
+                document.getElementById('itemName').classList.add('error');
+                document.getElementById('itemNameError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('itemName').classList.remove('error');
+                document.getElementById('itemNameError').style.display = 'none';
+            }
+            if (!category) {
+                document.getElementById('itemCategory').classList.add('error');
+                document.getElementById('itemCategoryError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('itemCategory').classList.remove('error');
+                document.getElementById('itemCategoryError').style.display = 'none';
+            }
+            if (!office) {
+                document.getElementById('itemOffice').classList.add('error');
+                document.getElementById('itemOfficeError').style.display = 'block';
+                valid = false;
+            } else {
+                document.getElementById('itemOffice').classList.remove('error');
+                document.getElementById('itemOfficeError').style.display = 'none';
+            }
+            if (!valid) return;
+
+            var partnerCode = document.getElementById('itemPartner').value;
+            var partnerList = setupData.partners || [];
+            if (partnerList.length === 0 && setupData.partnerId) {
+                partnerList = [{ code: setupData.partnerId, name: setupData.partnerName }];
+            }
+            var partnerData = partnerList.find(function(p) { return p.code === partnerCode; });
+            var officeData = setupData.offices.find(function(o) { return o.code === office; });
+
+            setupData.items.push({
+                name: name,
+                category: category,
+                officeCode: office,
+                officeName: officeData ? officeData.name : '',
+                companyCode: setupData.companyCode,
+                assignedPartnerId: partnerCode || null,
+                partnerName: partnerData ? partnerData.name : '',
+                maker: document.getElementById('itemMaker').value.trim(),
+                location: document.getElementById('itemLocation').value.trim()
+            });
+
+            saveCurrentSetup();
+            renderStep5();
+            showToast('商品「' + name + '」を追加しました');
+        }
+
+        function removeItem(index) {
+            var name = setupData.items[index].name;
+            if (!confirm('「' + name + '」を削除しますか？')) return;
+            setupData.items.splice(index, 1);
+            saveCurrentSetup();
+            renderStep5();
+        }
+
+        function saveStep5() {
+            saveCurrentSetup();
+            showToast('保存しました');
+        }
+
+        function completeStep5() {
+            // 商品は0件でも完了可（後からインポートで追加できる）
+
+            // 商品マスタに実際に登録
+            if (setupData.items.length > 0) {
+                var items = [];
+                try { items = JSON.parse(localStorage.getItem('onetouch.items') || '[]'); } catch(e) {}
+                try { var is2 = JSON.parse(sessionStorage.getItem('onetouch.items') || '[]'); is2.forEach(function(it) { if (!items.find(function(x) { return x.itemId === it.itemId; })) items.push(it); }); } catch(e) {}
+
+                setupData.items.forEach(function(item, idx) {
+                    var itemId = 'ITEM-' + setupData.companyCode + '-' + String(items.length + idx + 1).padStart(3, '0');
+                    items.push({
+                        itemId: itemId,
+                        companyCode: item.companyCode,
+                        officeCode: item.officeCode,
+                        name: item.name,
+                        category: item.category,
+                        maker: item.maker,
+                        location: item.location,
+                        assignedPartnerId: item.assignedPartnerId,
+                        assignedPartnerName: item.partnerName,
+                        unit: '台',
+                        stock: 1,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    });
+                });
+
+                localStorage.setItem('onetouch.items', JSON.stringify(items));
+                sessionStorage.setItem('onetouch.items', JSON.stringify(items));
+            }
+
+            // セットアップ完了
+            setupData.currentStep = 7;
+            saveCurrentSetup();
+            renderComplete();
+        }
+
+        function renderPlaceholder(step, title) {
+            var content = document.getElementById('wizardContent');
+            content.innerHTML = doneSummary()
+                + '<div class="wizard-card">'
+                + '  <div class="wizard-card-title">ステップ ' + step + '：' + title + '</div>'
+                + '  <div class="wizard-card-sub">この機能は次回のセッションで追加予定です</div>'
+                + '  <div class="btn-row">'
+                + '    <button class="btn btn-secondary" onclick="goToStep(' + (step - 1) + ')">前へ</button>'
+                + '    <button class="btn btn-primary" onclick="window.location.href=\'system-admin.html\'">管理画面に戻る</button>'
+                + '  </div>'
+                + '</div>';
+        }
+
+        function goToStep(step) {
+            setupData.currentStep = step;
+            saveCurrentSetup();
+            renderCurrentStep();
+        }
+
+        function goBack() {
+            if (setupData.currentStep === 1) {
+                window.location.href = 'system-admin.html';
+            } else {
+                goToStep(setupData.currentStep - 1);
+            }
+        }
+
+        // ========== ユーティリティ ==========
+        function esc(s) {
+            if (!s) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 2500);
+        }
+
+        // ========== 初期化 ==========
+        try {
+            loadOrCreateSetup();
+            renderCurrentStep();
+        } catch(e) {
+            var wc = document.getElementById('wizardContent');
+            if (wc) wc.innerHTML = '<div style="background:#fee;border:1px solid #fcc;padding:20px;border-radius:8px;color:#c00;margin:20px;">初期化エラー: ' + e.message + '<br><pre>' + e.stack + '</pre></div>';
+        }
+    </script>
+
+    <script>
+    UnifiedHeader.init({
+        icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+        title: '会社セットアップ',
+        backUrl: 'system-admin.html'
+    });
+    </script>
+</body>
+</html>

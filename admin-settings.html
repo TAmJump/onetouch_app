@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>統合管理画面 | ワンタッチ管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+        }
+h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-unit {
+            font-size: 18px;
+            font-weight: 400;
+            color: #666;
+            margin-left: 4px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fafafa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a5f, #2d4a7a);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 35, 53, 0.3);
+        }
+
+        .btn-secondary {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .ranking-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            width: 50px;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .ranking-stats {
+            font-size: 13px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+.container {
+                padding: 0 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+<div class="container">
+        <!-- 全システム統計 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">総会社数</div>
+                <div class="stat-value" id="totalCompanies">0<span class="stat-unit">社</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">総ユーザー数</div>
+                <div class="stat-value" id="totalUsers">0<span class="stat-unit">人</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">総事業所数</div>
+                <div class="stat-value" id="totalOffices">0<span class="stat-unit">件</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">総通報数</div>
+                <div class="stat-value" id="totalReports">0<span class="stat-unit">件</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">システムデータ使用量</div>
+                <div class="stat-value" id="totalStorage">0<span class="stat-unit">KB</span></div>
+            </div>
+        </div>
+
+        <!-- 会社別アクティビティランキング -->
+        <div class="section">
+            <div class="section-title">会社別アクティビティランキング（通報数順）</div>
+            <div id="activityRanking"></div>
+        </div>
+
+        <!-- 全会社一覧 -->
+        <div class="section">
+            <div class="section-title">全会社一覧</div>
+            <div style="margin-bottom: 16px; display: flex; gap: 12px;">
+                <button class="btn btn-primary" onclick="exportAllData()">全データエクスポート</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>会社コード</th>
+                        <th>会社名</th>
+                        <th>ユーザー数</th>
+                        <th>事業所数</th>
+                        <th>通報数</th>
+                        <th>状態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="companyTableBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                            データを読み込んでいます...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // ログインチェック
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        } else if (currentUser.role !== 'system_admin') {
+            ErrorHandler.showWarning('この画面はシステム管理者のみアクセスできます。');
+            window.location.href = 'system-admin.html';
+        }
+
+        // 戻る機能
+        // 戻る（ロールに応じたホームに遷移）
+        function goBack() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                
+                if (!currentUser || !currentUser.role) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // ロール別のホーム画面
+                const homePages = {
+                    'system_admin': 'system-admin.html',
+                    'company_admin': 'master-top.html',
+                    'office_admin': 'master-top.html',
+                    'staff': 'report.html',
+                    'contractor': 'contractor-dashboard.html'
+                };
+
+                const homePage = homePages[currentUser.role] || 'master-top.html';
+                window.location.href = homePage;
+            } catch (e) {
+                console.error('goBack error:', e);
+                window.location.href = 'system-admin.html';
+            }
+        }
+
+        // 全システム統計を計算
+        function calculateGlobalStats() {
+            try {
+                const companies = JSON.parse(localStorage.getItem('companies') || '[]').filter(c => c.code !== 'SYSTEM');
+                const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+                const offices = JSON.parse(localStorage.getItem('offices') || '[]');
+                const reports = JSON.parse(localStorage.getItem('onetouch.reports') || '[]');
+                
+                // 総会社数
+                document.getElementById('totalCompanies').innerHTML = companies.length + '<span class="stat-unit">社</span>';
+                
+                // 総ユーザー数
+                document.getElementById('totalUsers').innerHTML = accounts.length + '<span class="stat-unit">人</span>';
+                
+                // 総事業所数
+                document.getElementById('totalOffices').innerHTML = offices.length + '<span class="stat-unit">件</span>';
+                
+                // 総通報数
+                document.getElementById('totalReports').innerHTML = reports.length + '<span class="stat-unit">件</span>';
+                
+                // システムデータ使用量
+                const getSize = (key) => {
+                    const data = localStorage.getItem(key);
+                    return data ? new Blob([data]).size / 1024 : 0;
+                };
+                const totalSize = getSize('companies') + getSize('accounts') + getSize('offices') + getSize('onetouch.reports') + getSize('audit.logs') + getSize('partners');
+                document.getElementById('totalStorage').innerHTML = totalSize.toFixed(2) + '<span class="stat-unit">KB</span>';
+                
+            } catch (e) {
+                console.error('統計計算エラー:', e);
+            }
+        }
+
+        // 会社別アクティビティランキング
+        function renderActivityRanking() {
+            try {
+                const companies = JSON.parse(localStorage.getItem('companies') || '[]').filter(c => c.code !== 'SYSTEM');
+                const reports = JSON.parse(localStorage.getItem('onetouch.reports') || '[]');
+                const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+                const offices = JSON.parse(localStorage.getItem('offices') || '[]');
+                
+                // 会社ごとの統計を計算
+                const companyStats = companies.map(company => {
+                    const companyReports = reports.filter(r => r.companyCode === company.code).length;
+                    const companyAccounts = accounts.filter(a => a.companyCode === company.code).length;
+                    const companyOffices = offices.filter(o => o.companyCode === company.code).length;
+                    
+                    return {
+                        code: company.code,
+                        name: company.name,
+                        reports: companyReports,
+                        accounts: companyAccounts,
+                        offices: companyOffices
+                    };
+                });
+                
+                // 通報数順にソート
+                companyStats.sort((a, b) => b.reports - a.reports);
+                
+                // 上位5社を表示
+                const rankingHTML = companyStats.slice(0, 5).map((company, index) => `
+                    <div class="ranking-item">
+                        <div class="ranking-number">${index + 1}</div>
+                        <div class="ranking-info">
+                            <div class="ranking-name">${company.name}</div>
+                            <div class="ranking-stats">
+                                通報: ${company.reports}件 / ユーザー: ${company.accounts}人 / 事業所: ${company.offices}件
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('activityRanking').innerHTML = rankingHTML || '<div style="text-align: center; padding: 40px; color: #999;">データがありません</div>';
+                
+            } catch (e) {
+                console.error('ランキング計算エラー:', e);
+            }
+        }
+
+        // 全会社一覧を表示
+        function renderCompanyTable() {
+            try {
+                const companies = JSON.parse(localStorage.getItem('companies') || '[]').filter(c => c.code !== 'SYSTEM');
+                const accounts = JSON.parse(localStorage.getItem('accounts') || '[]');
+                const offices = JSON.parse(localStorage.getItem('offices') || '[]');
+                const reports = JSON.parse(localStorage.getItem('onetouch.reports') || '[]');
+                
+                if (companies.length === 0) {
+                    document.getElementById('companyTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                                登録されている会社がありません
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                const tableHTML = companies.map(company => {
+                    const companyAccounts = accounts.filter(a => a.companyCode === company.code).length;
+                    const companyOffices = offices.filter(o => o.companyCode === company.code).length;
+                    const companyReports = reports.filter(r => r.companyCode === company.code).length;
+                    const isActive = company.status === 'active';
+                    
+                    return `
+                        <tr>
+                            <td>${company.code}</td>
+                            <td><strong>${company.name}</strong></td>
+                            <td>${companyAccounts}人</td>
+                            <td>${companyOffices}件</td>
+                            <td>${companyReports}件</td>
+                            <td>
+                                <span class="badge ${isActive ? 'badge-active' : 'badge-inactive'}">
+                                    ${isActive ? '有効' : '無効'}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="exportCompanyData('${company.code}')">エクスポート</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                document.getElementById('companyTableBody').innerHTML = tableHTML;
+                
+            } catch (e) {
+                console.error('会社一覧表示エラー:', e);
+            }
+        }
+
+        // 会社データエクスポート
+        function exportCompanyData(companyCode) {
+            try {
+                const accounts = JSON.parse(localStorage.getItem('accounts') || '[]').filter(a => a.companyCode === companyCode);
+                const offices = JSON.parse(localStorage.getItem('offices') || '[]').filter(o => o.companyCode === companyCode);
+                const reports = JSON.parse(localStorage.getItem('onetouch.reports') || '[]').filter(r => r.companyCode === companyCode);
+                const partners = JSON.parse(localStorage.getItem('partners') || '[]').filter(p => p.companyCode === companyCode);
+                
+                const data = {
+                    companyCode: companyCode,
+                    exportDate: new Date().toISOString(),
+                    accounts: accounts,
+                    offices: offices,
+                    reports: reports,
+                    partners: partners
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `company-data-${companyCode}-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+            } catch (e) {
+                console.error('エクスポートエラー:', e);
+                ErrorHandler.showError('データのエクスポートに失敗しました。');
+            }
+        }
+
+        // 全データエクスポート
+        function exportAllData() {
+            try {
+                const allData = {
+                    exportDate: new Date().toISOString(),
+                    companies: JSON.parse(localStorage.getItem('companies') || '[]'),
+                    accounts: JSON.parse(localStorage.getItem('accounts') || '[]'),
+                    offices: JSON.parse(localStorage.getItem('offices') || '[]'),
+                    reports: JSON.parse(localStorage.getItem('onetouch.reports') || '[]'),
+                    partners: JSON.parse(localStorage.getItem('partners') || '[]'),
+                    auditLogs: JSON.parse(localStorage.getItem('audit.logs') || '[]')
+                };
+                
+                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `all-system-data-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+            } catch (e) {
+                console.error('全データエクスポートエラー:', e);
+                ErrorHandler.showError('データのエクスポートに失敗しました。');
+            }
+        }
+
+        // 初期化
+        calculateGlobalStats();
+        renderActivityRanking();
+        renderCompanyTable();
+    </script>
+
+    <script>
+    UnifiedHeader.init({
+        icon: '',
+        title: '統合管理',
+        backButton: true
+    });
+    </script>
+</body>
+</html>

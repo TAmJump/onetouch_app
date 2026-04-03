@@ -1,0 +1,19 @@
+name = "onetouch-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "onetouch_db"
+database_id = "YOUR_DB_ID_HERE"
+
+[vars]
+ENVIRONMENT = "production"
+
+# シークレットはwrangler secretコマンドで設定:
+# wrangler secret put JWT_SECRET
+# wrangler secret put ADMIN_TOKEN
+
+[[routes]]
+pattern = "api.one-touch.tamjump.com/*"
+zone_name = "tamjump.com"

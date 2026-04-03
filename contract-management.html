@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>契約管理 | ワンタッチ管理</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a5f">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .section {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8e8e8;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 20px;
+        }
+        .links-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .section { padding: 16px; }
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+</head>
+<body>
+    <div id="unified-header-mount"></div>
+    <div class="container">
+
+        <!-- 関連リンク -->
+        <div class="section">
+            <div class="links-row">
+                <a href="docs.html#guide" class="link-btn" style="background:#f0f7ff; border:1px solid #bfdbfe; color:#1e3a5f;">
+                    📖 インポート補助機能について
+                </a>
+                <a href="docs.html#howto" class="link-btn" style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534;">
+                    🔧 管理会社の変更手順
+                </a>
+                <a href="docs.html#faq" class="link-btn" style="background:#fefce8; border:1px solid #fde68a; color:#854d0e;">
+                    ❓ よくある質問
+                </a>
+                <a href="partner-master.html" class="link-btn" style="background:#faf5ff; border:1px solid #e9d5ff; color:#7c3aed;">
+                    👤 取引先マスタを開く
+                </a>
+            </div>
+        </div>
+
+        <!-- インポート補助の説明バナー -->
+        <div class="section" style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:16px 20px; margin-bottom:0;">
+            <div style="font-size:14px; color:#92400e; line-height:1.7;">
+                💡 <strong>この設定はCSVインポートを楽にするためのものです。</strong><br>
+                カテゴリごとに管理会社を紐づけておくと、インポート時にCSV側の「担当管理会社」列を省略できます。<br>
+                商品マスタでの手動登録・編集では、契約未設定でも管理会社を直接選択できます。
+            </div>
+        </div>
+
+        <!-- 契約一覧テーブル -->
+        <div class="section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                <div class="section-title" style="margin-bottom:0;">契約一覧（インポート時の管理会社自動解決）</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="contractFilter" placeholder="管理会社名で検索..." oninput="cm_currentPage=1;renderTable()" style="padding:8px 14px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; width:220px;">
+                    <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space:nowrap;">CSVエクスポート</button>
+                </div>
+            </div>
+            <div style="overflow-x:hidden;">
+                <table style="width:100%; border-collapse:collapse; font-size:14px; table-layout:fixed;">
+                    <thead>
+                        <tr style="background:#f8f9fa; border-bottom:2px solid #e8e8e8;">
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b; width:90px;">管理会社コード</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b;">管理会社名</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b; width:120px;">契約会社</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b;">担当カテゴリ</th>
+                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#64748b; width:60px;">状態</th>
+                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#64748b; width:60px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractBody">
+                        <tr><td colspan="6" style="text-align:center; padding:30px; color:#aaa;">読み込み中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="cmPagination"></div>
+        </div>
+
+    </div>
+
+    <!-- 契約編集モーダル -->
+    <div id="contractEditModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999;">
+        <div style="background:#fff; border-radius:14px; padding:28px; max-width:500px; width:90%; margin:auto; position:relative; top:50%; transform:translateY(-50%);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-size:16px; font-weight:700; color:#1e293b;" id="contractEditTitle">契約編集</h3>
+                <button onclick="closeContractEdit()" style="background:none; border:none; font-size:20px; color:#999; cursor:pointer;">✕</button>
+            </div>
+            <input type="hidden" id="editContractId">
+            
+            <div style="margin-bottom:16px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:#64748b; margin-bottom:6px;">担当カテゴリ</label>
+                <div id="editCategoryCheckboxes" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+            </div>
+            
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:#64748b; margin-bottom:6px;">状態</label>
+                <select id="editContractStatus" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px;">
+                    <option value="active">有効</option>
+                    <option value="inactive">停止</option>
+                </select>
+            </div>
+            
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeContractEdit()" style="flex:1; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">キャンセル</button>
+                <button onclick="saveContractEdit()" style="flex:1; padding:12px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function renderPagination(containerId, currentPage, totalPages, totalItems, onPageChange) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        if (totalPages <= 1) { container.innerHTML = totalItems > 0 ? '<div style="text-align:center;padding:12px;font-size:13px;color:#999;">全 ' + totalItems + ' 件</div>' : ''; return; }
+        var html = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;flex-wrap:wrap;">';
+        html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
+        html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
+        var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
+        for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+        html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
+        container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
+    }
+
+    // 権限チェック
+    var currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!currentUser) {
+        window.location.href = 'login.html';
+    } else if (currentUser.role !== 'system_admin') {
+        ErrorHandler.showWarning('この画面はシステム管理者のみアクセスできます。');
+        window.location.href = 'login.html';
+    }
+
+    UnifiedHeader.init({
+        title: '契約管理',
+        backButton: true,
+        onBack: function() { window.location.href = 'system-admin.html'; }
+    });
+
+    // カテゴリはdemo-mode.jsのgetAllCategoriesから動的取得（ハードコードしない）
+    function getContractCategories() {
+        if (typeof window.getAllCategories === 'function') {
+            var officeCode = (typeof currentUser !== 'undefined' && currentUser.officeCode) ? currentUser.officeCode : 'TAMJ-J0001';
+            return window.getAllCategories(officeCode);
+        }
+        // フォールバック（demo-mode.js未読込時）
+        return ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','浴室','福祉用具','その他'];
+    }
+    var ALL_CATEGORIES = getContractCategories();
+    var _contracts = [];
+    var _partners = [];
+    var _companies = [];
+
+    function _loadData() {
+        _contracts = [];
+        try { _contracts = JSON.parse(sessionStorage.getItem('onetouch.contracts') || '[]'); } catch(e) {}
+        try { var cl = JSON.parse(localStorage.getItem('onetouch.contracts') || '[]'); cl.forEach(function(c){ if(!_contracts.find(function(x){return x.id===c.id;})) _contracts.push(c); }); } catch(e) {}
+
+        _partners = [];
+        try { _partners = JSON.parse(sessionStorage.getItem('partners') || '[]'); } catch(e) {}
+        try { var pl = JSON.parse(localStorage.getItem('partners') || '[]'); pl.forEach(function(p){ if(!_partners.find(function(x){return x.id===p.id || x.partnerCode===p.partnerCode;})) _partners.push(p); }); } catch(e) {}
+
+        _companies = [];
+        try { _companies = JSON.parse(sessionStorage.getItem('companies') || '[]'); } catch(e) {}
+        try { var cl2 = JSON.parse(localStorage.getItem('companies') || '[]'); cl2.forEach(function(c){ if(!_companies.find(function(x){return (x.companyCode||x.code)===(c.companyCode||c.code);})) _companies.push(c); }); } catch(e) {}
+    }
+
+    function getPartnerName(id) {
+        var p = _partners.find(function(x){ return x.id === id || x.partnerCode === id; });
+        return p ? p.name : id;
+    }
+    function getCompanyName(code) {
+        var c = _companies.find(function(x){ return (x.companyCode||x.code) === code; });
+        return c ? (c.companyName||c.name) : code;
+    }
+
+    var cm_currentPage = 1;
+    var cm_pageSize = 30;
+
+    // CSVエクスポート
+    function downloadCSV() {
+        _loadData();
+        var filterText = (document.getElementById('contractFilter').value || '').trim().toLowerCase();
+        var filtered = _contracts.filter(function(c) {
+            if (!filterText) return true;
+            var pName = (_partners.find(function(p){return p.id===c.partnerId;}) || {}).name || '';
+            return pName.toLowerCase().includes(filterText) || (c.partnerId||'').toLowerCase().includes(filterText);
+        });
+        if (filtered.length === 0) { ErrorHandler.showWarning('ダウンロードするデータがありません'); return; }
+
+        var bom = '\uFEFF';
+        var headers = ['管理会社コード','管理会社名','契約会社','担当カテゴリ','状態'];
+        var rows = filtered.map(function(c) {
+            var partner = _partners.find(function(p){return p.id===c.partnerId;}) || {};
+            var company = _companies.find(function(co){return co.code===c.companyCode;}) || {};
+            return [
+                c.partnerId || '',
+                partner.name || '',
+                company.name || c.companyCode || '',
+                (c.categories || []).join(' / '),
+                c.status === 'active' ? '有効' : '無効'
+            ].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+        });
+
+        var csv = bom + headers.join(',') + '\n' + rows.join('\n');
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        var d = new Date();
+        link.download = '契約一覧_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function renderTable() {
+        _loadData();
+        var tbody = document.getElementById('contractBody');
+        var filterText = (document.getElementById('contractFilter').value || '').trim().toLowerCase();
+        
+        var filtered = _contracts.filter(function(c) {
+            if (!filterText) return true;
+            var pName = getPartnerName(c.partnerId).toLowerCase();
+            var pCode = (c.partnerId || '').toLowerCase();
+            return pName.indexOf(filterText) >= 0 || pCode.indexOf(filterText) >= 0;
+        });
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#aaa;">' + (filterText ? '該当する契約がありません' : '契約データがありません') + '</td></tr>';
+            document.getElementById('contractCount').textContent = '';
+            if (document.getElementById('cmPagination')) document.getElementById('cmPagination').innerHTML = '';
+            return;
+        }
+
+        var totalPages = Math.ceil(filtered.length / cm_pageSize);
+        if (cm_currentPage > totalPages) cm_currentPage = totalPages;
+        var start = (cm_currentPage - 1) * cm_pageSize;
+        var pageItems = filtered.slice(start, start + cm_pageSize);
+
+        tbody.innerHTML = pageItems.map(function(c) {
+            var cats = (c.categories || []).map(function(cat) {
+                return '<span style="display:inline-block;padding:2px 8px;background:#f0f0f0;border-radius:4px;margin:2px;font-size:12px;">' + cat + '</span>';
+            }).join('');
+            var statusColor = c.status === 'active' ? '#22c55e' : '#ef4444';
+            var statusText = c.status === 'active' ? '有効' : '停止';
+            return '<tr style="border-bottom:1px solid #f0f0f0;">'
+                + '<td style="padding:10px 12px;font-family:monospace;font-size:13px;">' + (c.partnerId || '-') + '</td>'
+                + '<td style="padding:10px 12px;">' + getPartnerName(c.partnerId) + '</td>'
+                + '<td style="padding:10px 12px;">' + getCompanyName(c.companyCode) + '</td>'
+                + '<td style="padding:10px 12px;">' + (cats || '<span style="color:#ccc;">未設定</span>') + '</td>'
+                + '<td style="padding:10px 12px; text-align:center; white-space:nowrap;"><span style="display:inline-block;padding:3px 12px;border-radius:10px;font-size:12px;font-weight:600;color:#fff;background:' + statusColor + ';">' + statusText + '</span></td>'
+                + '<td style="padding:10px 12px; text-align:center; white-space:nowrap;"><button onclick="openContractEdit(\'' + c.id + '\')" style="padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">編集</button></td>'
+                + '</tr>';
+        }).join('');
+        document.getElementById('contractCount').textContent = '';
+        renderPagination('cmPagination', cm_currentPage, totalPages, filtered.length, function(page) {
+            cm_currentPage = page;
+            renderTable();
+        });
+    }
+    renderTable();
+
+    function openContractEdit(contractId) {
+        var contract = _contracts.find(function(c) { return c.id === contractId; });
+        if (!contract) return;
+        document.getElementById('editContractId').value = contractId;
+        document.getElementById('contractEditTitle').textContent = getPartnerName(contract.partnerId) + ' の契約編集';
+        document.getElementById('editContractStatus').value = contract.status || 'active';
+        var currentCats = contract.categories || [];
+        // モーダルopen時に最新カテゴリ一覧を再取得
+        var latestCategories = getContractCategories();
+        document.getElementById('editCategoryCheckboxes').innerHTML = latestCategories.map(function(cat) {
+            var checked = currentCats.indexOf(cat) >= 0 ? 'checked' : '';
+            return '<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:' + (checked ? '#eff6ff' : '#f8f9fa') + ';border:1px solid ' + (checked ? '#2563eb' : '#e5e7eb') + ';border-radius:6px;cursor:pointer;font-size:13px;">'
+                + '<input type="checkbox" name="editCat" value="' + cat + '" ' + checked + ' style="accent-color:#2563eb;">'
+                + cat + '</label>';
+        }).join('');
+        document.getElementById('contractEditModal').style.display = 'block';
+    }
+
+    function closeContractEdit() {
+        document.getElementById('contractEditModal').style.display = 'none';
+    }
+
+    function saveContractEdit() {
+        var contractId = document.getElementById('editContractId').value;
+        var newStatus = document.getElementById('editContractStatus').value;
+        var checkboxes = document.querySelectorAll('input[name="editCat"]:checked');
+        var newCats = [];
+        checkboxes.forEach(function(cb) { newCats.push(cb.value); });
+        if (newCats.length === 0) { ErrorHandler.showWarning('カテゴリを1つ以上選択してください。'); return; }
+
+        var contracts = [];
+        try { contracts = JSON.parse(sessionStorage.getItem('onetouch.contracts') || '[]'); } catch(e) {}
+        if (contracts.length === 0) {
+            try { contracts = JSON.parse(localStorage.getItem('onetouch.contracts') || '[]'); } catch(e) {}
+        }
+        var updated = false;
+        contracts.forEach(function(c) {
+            if (c.id === contractId) { c.categories = newCats; c.status = newStatus; updated = true; }
+        });
+        if (updated) {
+            sessionStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+            localStorage.setItem('onetouch.contracts', JSON.stringify(contracts));
+            closeContractEdit();
+            renderTable();
+            var toast = document.createElement('div');
+            toast.textContent = '契約を更新しました';
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 2000);
+        }
+    }
+    </script>
+</body>
+</html>

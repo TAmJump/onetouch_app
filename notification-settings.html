@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知設定 | ワンタッチ管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+        }
+h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group select,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 35, 53, 0.3);
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+.container {
+                padding: 0 20px;
+            }
+
+            .section {
+                padding: 24px 20px;
+            }
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+<div class="container">
+        <div class="success-message" id="successMessage">
+            ✓ 設定を保存しました
+        </div>
+
+        <!-- メール通知設定 -->
+        <div class="section">
+            <div class="section-title">メール通知設定</div>
+            
+            <div class="form-group">
+                <label>通知先</label>
+                <select id="emailRecipients">
+                    <option value="company_admin">本社管理者のみ</option>
+                    <option value="office_admin">関連事業所の管理者</option>
+                    <option value="all">全管理者</option>
+                </select>
+                <div class="help-text">通報発生時にメールを送信する対象を選択します</div>
+            </div>
+
+            <div class="form-group">
+                <label>通知タイミング</label>
+                <select id="emailTiming">
+                    <option value="immediate">即時</option>
+                    <option value="5min">5分おきにまとめて</option>
+                    <option value="1hour">1時間おきにまとめて</option>
+                </select>
+                <div class="help-text">通報をどのタイミングでメール送信するか設定します</div>
+            </div>
+
+            <div class="form-group">
+                <label>通知対象</label>
+                <select id="emailTarget">
+                    <option value="all">全通報</option>
+                    <option value="emergency">緊急のみ</option>
+                    <option value="category">カテゴリー別</option>
+                </select>
+                <div class="help-text">どの通報をメール送信するか設定します</div>
+            </div>
+        </div>
+
+        <!-- 通知ON/OFF -->
+        <div class="section">
+            <div class="section-title">通知ON/OFF</div>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="notifyNewReport" checked>
+                    <label for="notifyNewReport">新規通報の通知</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="notifyReportComplete">
+                    <label for="notifyReportComplete">通報完了の通知</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="notifyPartnerAdd">
+                    <label for="notifyPartnerAdd">管理会社追加の通知</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="notifyAccountAdd">
+                    <label for="notifyAccountAdd">アカウント追加の通知</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- プッシュ通知（PWA化後） -->
+        <div class="section">
+            <div class="section-title">プッシュ通知（PWA化後に有効）</div>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="pushEnabled" disabled>
+                    <label for="pushEnabled">ブラウザ通知を許可</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="pushSound" disabled>
+                    <label for="pushSound">通知音を鳴らす</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="pushVibration" disabled>
+                    <label for="pushVibration">バイブレーション</label>
+                </div>
+            </div>
+            <div class="help-text" style="margin-top: 16px;">
+                ※ プッシュ通知はPWA化後に利用可能になります
+            </div>
+        </div>
+
+        <!-- 保存ボタン -->
+        <button class="btn-save" onclick="saveSettings()">設定を保存</button>
+    </div>
+
+    <script>
+        // ログインチェック
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+
+        // 戻る機能
+        // 戻る（ロールに応じたホームに遷移）
+        function goBack() {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                
+                if (!currentUser || !currentUser.role) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // ロール別のホーム画面
+                const homePages = {
+                    'system_admin': 'system-admin.html',
+                    'company_admin': 'master-top.html',
+                    'office_admin': 'master-top.html',
+                    'staff': 'report.html',
+                    'contractor': 'contractor-dashboard.html'
+                };
+
+                const homePage = homePages[currentUser.role] || 'master-top.html';
+                window.location.href = homePage;
+            } catch (e) {
+                console.error('goBack error:', e);
+                window.history.back();
+            }
+        }
+
+        // 設定を読み込み
+        function loadSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('notificationSettings')) || {};
+                const userSettings = settings[currentUser.id] || getDefaultSettings();
+                
+                // メール通知設定
+                document.getElementById('emailRecipients').value = userSettings.emailNotification.recipients;
+                document.getElementById('emailTiming').value = userSettings.emailNotification.timing;
+                document.getElementById('emailTarget').value = userSettings.emailNotification.target;
+                
+                // 通知ON/OFF
+                document.getElementById('notifyNewReport').checked = userSettings.notifications.newReport;
+                document.getElementById('notifyReportComplete').checked = userSettings.notifications.reportComplete;
+                document.getElementById('notifyPartnerAdd').checked = userSettings.notifications.partnerAdd;
+                document.getElementById('notifyAccountAdd').checked = userSettings.notifications.accountAdd;
+                
+                // プッシュ通知
+                document.getElementById('pushEnabled').checked = userSettings.pushNotification.enabled;
+                document.getElementById('pushSound').checked = userSettings.pushNotification.sound;
+                document.getElementById('pushVibration').checked = userSettings.pushNotification.vibration;
+            } catch (e) {
+                console.error('設定の読み込みに失敗:', e);
+            }
+        }
+
+        // デフォルト設定
+        function getDefaultSettings() {
+            return {
+                emailNotification: {
+                    recipients: 'company_admin',
+                    timing: 'immediate',
+                    target: 'all'
+                },
+                notifications: {
+                    newReport: true,
+                    reportComplete: false,
+                    partnerAdd: false,
+                    accountAdd: false
+                },
+                pushNotification: {
+                    enabled: false,
+                    sound: true,
+                    vibration: true
+                }
+            };
+        }
+
+        // 設定を保存
+        function saveSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('notificationSettings')) || {};
+                
+                settings[currentUser.id] = {
+                    emailNotification: {
+                        recipients: document.getElementById('emailRecipients').value,
+                        timing: document.getElementById('emailTiming').value,
+                        target: document.getElementById('emailTarget').value
+                    },
+                    notifications: {
+                        newReport: document.getElementById('notifyNewReport').checked,
+                        reportComplete: document.getElementById('notifyReportComplete').checked,
+                        partnerAdd: document.getElementById('notifyPartnerAdd').checked,
+                        accountAdd: document.getElementById('notifyAccountAdd').checked
+                    },
+                    pushNotification: {
+                        enabled: document.getElementById('pushEnabled').checked,
+                        sound: document.getElementById('pushSound').checked,
+                        vibration: document.getElementById('pushVibration').checked
+                    }
+                };
+                
+                localStorage.setItem('notificationSettings', JSON.stringify(settings));
+                
+                // 成功メッセージ表示
+                const successMessage = document.getElementById('successMessage');
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+                
+            } catch (e) {
+                console.error('設定の保存に失敗:', e);
+                ErrorHandler.showError('設定の保存に失敗しました。');
+            }
+        }
+
+        // 初期化
+        loadSettings();
+    </script>
+
+    <script>
+    UnifiedHeader.init({
+        icon: '',
+        title: '通知設定',
+        backButton: true
+    });
+    </script>
+</body>
+</html>

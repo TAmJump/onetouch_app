@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドキュメント | ワンタッチ管理</title>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        .container { max-width: 900px; margin: 16px auto; padding: 0 16px; }
+
+        /* タブナビゲーション */
+        .doc-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+        .doc-tab {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 8px;
+            text-align: center;
+            border: none;
+            background: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .doc-tab:hover { background: #f1f5f9; }
+        .doc-tab.active { background: #1e3a5f; color: white; }
+        .doc-tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+        /* コンテンツ */
+        .doc-content { display: none; }
+        .doc-content.active { display: block; }
+
+        .doc-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .doc-card h2 {
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #2563eb;
+        }
+        .doc-card h3 {
+            font-size: 15px;
+            color: #334155;
+            margin: 16px 0 8px;
+        }
+        .doc-card p, .doc-card li {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.8;
+        }
+        .doc-card ul, .doc-card ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        .doc-card li { margin-bottom: 4px; }
+
+        /* ステップガイド */
+        .step-guide {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 12px 0;
+            border-left: 4px solid #2563eb;
+        }
+        .step-guide .step-num {
+            display: inline-block;
+            width: 24px; height: 24px;
+            background: #2563eb;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .step-guide .step-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .step-guide .step-desc {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+            margin-left: 32px;
+        }
+
+        /* FAQ */
+        .faq-item {
+            border-bottom: 1px solid #f1f5f9;
+            padding: 14px 0;
+        }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-q {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-q::after { content: '▼'; font-size: 10px; color: #94a3b8; transition: transform 0.2s; }
+        .faq-q.open::after { transform: rotate(180deg); }
+        .faq-a {
+            font-size: 14px;
+            color: #475569;
+            margin-top: 8px;
+            display: none;
+            line-height: 1.7;
+        }
+        .faq-a.open { display: block; }
+
+        /* 権限表 */
+        .perm-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 12px 0;
+        }
+        .perm-table th, .perm-table td {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .perm-table th {
+            background: #1e3a5f;
+            color: white;
+            font-weight: 600;
+        }
+        .perm-table td:first-child { text-align: left; font-weight: 600; }
+        .perm-ok { color: #16a34a; font-weight: 700; }
+        .perm-no { color: #dc2626; }
+        .perm-partial { color: #d97706; font-size: 11px; }
+
+        /* フロー図 */
+        .flow-box {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .flow-item {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+        .flow-arrow { color: #94a3b8; font-size: 18px; }
+
+        /* 注意書き */
+        .doc-note {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #854d0e;
+            margin: 12px 0;
+        }
+        .doc-note::before { content: '💡 '; }
+
+        .doc-warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #991b1b;
+            margin: 12px 0;
+        }
+        .doc-warning::before { content: '⚠️ '; }
+
+        @media (max-width: 480px) {
+            .doc-tab { padding: 10px 6px; font-size: 12px; }
+            .doc-tab-icon { font-size: 16px; }
+            .doc-card { padding: 16px; }
+        }
+
+        /* 検索 */
+        .doc-search {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 14px center no-repeat;
+            margin-bottom: 16px;
+        }
+        .doc-search:focus { outline: none; border-color: #2563eb; }
+        .highlight { background: #fef08a; padding: 1px 2px; border-radius: 2px; }
+    </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div id="unified-header-mount"></div>
+    <div class="container">
+        <input type="text" class="doc-search" id="docSearch" placeholder="ドキュメント内を検索..." oninput="searchDocs(this.value)">
+
+        <div class="doc-tabs">
+            <button class="doc-tab active" onclick="switchTab('guide')">
+                <span class="doc-tab-icon">📖</span>運用マニュアル
+            </button>
+            <button class="doc-tab" onclick="switchTab('howto')">
+                <span class="doc-tab-icon">🔧</span>操作手順
+            </button>
+            <button class="doc-tab" onclick="switchTab('roles')">
+                <span class="doc-tab-icon">👤</span>権限
+            </button>
+            <button class="doc-tab" onclick="switchTab('faq')">
+                <span class="doc-tab-icon">❓</span>FAQ
+            </button>
+            <button class="doc-tab" onclick="switchTab('spec')">
+                <span class="doc-tab-icon">⚙️</span>仕様書
+            </button>
+        </div>
+
+        <!-- ========== 運用ガイド ========== -->
+        <div class="doc-content active" id="tab-guide">
+            <div class="doc-card">
+                <h2>このシステムについて</h2>
+                <p>ワンタッチ管理システムは、介護施設の設備トラブルを「ワンタッチ」で通報し、担当管理会社に自動で連絡が行く仕組みです。</p>
+                <h3>登場人物</h3>
+                <ul>
+                    <li><strong>システム管理者（あなた）</strong> — システム全体を管理。管理会社登録、会社セットアップ、契約管理を行います</li>
+                    <li><strong>施設スタッフ</strong> — 設備の故障を発見したら通報します。それだけ。簡単です</li>
+                    <li><strong>事業所管理者</strong> — 自分の事業所の通報状況を確認し、対応を管理します</li>
+                    <li><strong>本社管理者</strong> — 全事業所の通報を横断的に見れます</li>
+                    <li><strong>管理会社</strong> — 通報を受け取り、修理・対応を行います</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h2>基本の流れ</h2>
+                <div class="flow-box">
+                    <div class="flow-item">管理会社が申し込み</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">管理会社を登録</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">施設をセットアップ</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">契約設定</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">運用開始</div>
+                </div>
+                <p>セットアップウィザードに沿って進めるだけで、すべての初期設定が完了します。</p>
+            </div>
+
+            <div class="doc-card">
+                <h2>通報→対応の流れ</h2>
+                <div class="flow-box">
+                    <div class="flow-item">スタッフが通報</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">カテゴリから管理会社を自動特定</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">管理会社に通知</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">管理会社が対応</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-item">完了</div>
+                </div>
+                <div class="doc-note">商品のカテゴリと契約設定に基づいて、担当管理会社が自動で決まります。契約が設定されていない場合は、商品マスタで手動で管理会社を選択できます。</div>
+            </div>
+
+            <div class="doc-card">
+                <h2>契約テーブルとは</h2>
+                <p>CSVインポート時に「担当管理会社」列を省略できるようにするための補助機能です。カテゴリごとに管理会社を紐づけておくと、インポート時に自動で管理会社が設定されます。</p>
+                <h3>主な用途</h3>
+                <ul>
+                    <li><strong>インポートの省力化</strong> — CSVに管理会社列がなくても、カテゴリから自動で管理会社を解決</li>
+                    <li><strong>通報時の自動振り分け</strong> — 通報された商品のカテゴリから担当管理会社を特定して通知</li>
+                </ul>
+                <h3>例</h3>
+                <ul>
+                    <li>「建物・外」カテゴリ → TAMJ建設 に割り当て済みの場合、该当カテゴリの商品インポート時に自動セット</li>
+                    <li>契約未設定のカテゴリは、商品マスタで手動で管理会社を選択できます</li>
+                </ul>
+                <div class="doc-note">契約は事業所単位でも設定できます。「全事業所」にすれば、その会社の全施設に適用されます。</div>
+            </div>
+
+            <!-- ========== 日常運用ガイド ========== -->
+            <div class="doc-card">
+                <h2>日常運用でやること</h2>
+                <h3>毎日（推奨）</h3>
+                <ul>
+                    <li><strong>通報履歴を確認</strong> — 未対応の通報がないかチェック。担当未割当や長期未対応がないか確認</li>
+                    <li><strong>管理会社のステータス確認</strong> — 「対応中」のまま止まっている案件がないか確認</li>
+                </ul>
+                <h3>週1回（推奨）</h3>
+                <ul>
+                    <li><strong>監査ログ確認</strong> — 不審な操作がないか確認（システム設定 → 監査ログ）</li>
+                    <li><strong>データバックアップ</strong> — システム設定 → データエクスポートで主要データをCSV出力</li>
+                </ul>
+                <h3>月1回（推奨）</h3>
+                <ul>
+                    <li><strong>アカウント棚卸</strong> — 退職したスタッフのアカウントを無効化</li>
+                    <li><strong>管理会社の対応実績確認</strong> — 管理会社ダッシュボードで対応件数・完了率をチェック</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h2>よくある運用シナリオ</h2>
+                
+                <h3>スタッフが退職した場合</h3>
+                <ol>
+                    <li>マスタ管理 → アカウントマスタを開く</li>
+                    <li>該当スタッフを検索して「編集」</li>
+                    <li>アカウントを削除、または初期パスワードにリセットして引き継ぎ</li>
+                </ol>
+
+                <h3>新しい事業所を追加する場合</h3>
+                <ol>
+                    <li>マスタ管理 → 事業所マスタから「新規追加」</li>
+                    <li>事業所名・住所・電話番号を入力</li>
+                    <li>契約管理画面で、その事業所のカテゴリ別担当管理会社を設定</li>
+                    <li>アカウントマスタでスタッフ・管理者アカウントを発行</li>
+                </ol>
+                <div class="doc-note">「全事業所」の契約がある場合は、新しい事業所にも自動で適用されます。個別の契約が必要な場合だけ追加設定してください。</div>
+
+                <h3>管理会社が変わった場合</h3>
+                <ol>
+                    <li>新しい管理会社を管理会社マスタで登録（未登録の場合）</li>
+                    <li>契約管理画面で旧管理会社の契約を「停止」にする</li>
+                    <li>新しい管理会社の契約を作成（カテゴリを紐づけ）</li>
+                    <li>必要に応じて、商品マスタで該当商品の担当管理会社を手動更新</li>
+                </ol>
+                <div class="doc-note">契約を更新すると、以降のインポートや通報では新しい管理会社が自動で適用されます。既存の商品の担当管理会社は商品マスタから個別に変更できます。</div>
+
+                <h3>商品を大量に追加する場合</h3>
+                <ol>
+                    <li>Excelファイルに商品情報を入力（商品名、メーカー、型番、カテゴリ等）</li>
+                    <li>商品マスタ → インポートからファイルを取り込み</li>
+                    <li>列の割当を確認し、プレビューで内容チェック</li>
+                    <li>問題なければ「取り込み」を実行</li>
+                </ol>
+
+                <h3>パスワードを忘れたスタッフがいる場合</h3>
+                <ol>
+                    <li>マスタ管理 → アカウントマスタを開く</li>
+                    <li>該当アカウントの「編集」→「初期パスワードにリセット」</li>
+                    <li>リセット後、スタッフに初期パスワードを伝える</li>
+                    <li>次回ログイン時にパスワード変更推奨バナーが表示される</li>
+                </ol>
+            </div>
+
+            <div class="doc-card">
+                <h2>トラブルシューティング</h2>
+
+                <h3>通報したのに管理会社に通知が行かない</h3>
+                <ul>
+                    <li>商品マスタで該当商品の「担当管理会社」が設定されているか確認</li>
+                    <li>商品のカテゴリが正しく設定されているか確認</li>
+                    <li>管理会社のアカウントが有効か確認</li>
+                    <li>契約管理画面で該当カテゴリの契約が「有効」になっているか確認（インポートで自動設定した場合）</li>
+                </ul>
+
+                <h3>管理会社がダッシュボードにログインできない</h3>
+                <ul>
+                    <li>ログイン画面で会社コードに「管理会社コード」（例: PN001）を入力しているか確認</li>
+                    <li>管理会社マスタでログインIDとパスワードが正しいか確認</li>
+                    <li>必要に応じてパスワードを再設定</li>
+                </ul>
+
+                <h3>商品インポートでエラーが出る</h3>
+                <ul>
+                    <li>Excelファイルの1行目が列名（ヘッダー）になっているか確認</li>
+                    <li>必須項目（商品名）が空でないか確認</li>
+                    <li>CSV形式の場合、文字コードがUTF-8かShift-JISか確認</li>
+                </ul>
+
+                <h3>画面が正しく表示されない</h3>
+                <ul>
+                    <li>ブラウザのキャッシュをクリア（Ctrl+Shift+R / Cmd+Shift+R）</li>
+                    <li>別のブラウザで試す</li>
+                    <li>スマートフォンの場合、ホーム画面のアイコンを削除して再追加</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h2>画面一覧と役割</h2>
+                <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                    <tr style="background:#f1f5f9;"><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">画面名</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">用途</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">使う人</th></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">通報画面</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">設備トラブルを通報+履歴確認</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">スタッフ</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社ダッシュボード</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">対応依頼の確認・ステータス更新</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">マスタ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">アカウント・事業所・管理会社・商品の管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理者全般</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">通報履歴</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">全通報の確認・検索・CSV出力</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理者全般</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">セットアップウィザード</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">新規施設の一括登録</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム管理者</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">契約管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社×会社×カテゴリの紐づけ</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム管理者</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム設定</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">ロゴ・カテゴリ・データ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">本社管理者以上（事業所管理者は閲覧のみ）</td></tr>
+                    <tr><td style="padding:8px 12px;">商品インポート</td><td style="padding:8px 12px;">Excel/CSVから商品を一括登録</td><td style="padding:8px 12px;">管理会社・管理者</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== 操作手順 ========== -->
+        <div class="doc-content" id="tab-howto">
+            <div class="doc-card">
+                <h2>新しい管理会社を登録する</h2>
+                <div class="step-guide">
+                    <span class="step-num">1</span><span class="step-title">マスタ管理 → 管理会社マスタを開く</span>
+                    <div class="step-desc">システム管理画面のカード一覧から進みます</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">2</span><span class="step-title">「新規登録」ボタンをクリック</span>
+                    <div class="step-desc">会社名、担当者名、ログイン名を入力。ログインIDは「管理会社コード＋ログイン名」で自動生成されます（例: PN001-yamada）</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">3</span><span class="step-title">追加担当者がいれば「＋担当者を追加」</span>
+                    <div class="step-desc">1つの管理会社に複数の担当者を登録できます。それぞれ別のログインIDが発行されます</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">4</span><span class="step-title">保存</span>
+                    <div class="step-desc">管理会社コード（PN001など）が自動発行されます</div>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <h2>新しい施設をセットアップする</h2>
+                <div class="step-guide">
+                    <span class="step-num">1</span><span class="step-title">管理会社選択</span>
+                    <div class="step-desc">登録済みの管理会社から選ぶか、新しく登録します</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">2</span><span class="step-title">会社登録</span>
+                    <div class="step-desc">会社名、会社コード（4文字）、代表者名などを入力</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">3</span><span class="step-title">事業所登録</span>
+                    <div class="step-desc">施設の名前、種別、住所を登録。複数追加できます</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">4</span><span class="step-title">契約設定</span>
+                    <div class="step-desc">管理会社が担当するカテゴリを選択。事業所ごとに設定も可能です</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">5</span><span class="step-title">アカウント登録</span>
+                    <div class="step-desc">施設のスタッフや管理者のログインアカウントを作成</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">6</span><span class="step-title">商品登録</span>
+                    <div class="step-desc">管理対象の設備・機器を登録。0件でもOK（後からインポートで一括登録可）</div>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <h2>担当管理会社を変更する</h2>
+                <h3>カテゴリ全体の管理会社を変更する場合</h3>
+                <div class="step-guide">
+                    <span class="step-num">1</span><span class="step-title">現在の契約を停止（suspended）にする</span>
+                    <div class="step-desc">契約管理画面で該当の契約のステータスを変更</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">2</span><span class="step-title">新しい管理会社の契約を作成する</span>
+                    <div class="step-desc">同じカテゴリで新しい管理会社との契約を追加</div>
+                </div>
+                <div class="doc-note">契約を更新すると、以降のインポートや通報では新しい管理会社が自動で適用されます。既存の商品の担当管理会社を一括で変えたい場合は、商品マスタから個別に変更するか、CSVで再インポートしてください。</div>
+            </div>
+
+            <div class="doc-card">
+                <h2>商品を一括登録する</h2>
+                <div class="step-guide">
+                    <span class="step-num">1</span><span class="step-title">商品マスタ画面の「インポート」ボタンをクリック</span>
+                    <div class="step-desc">CSV/Excelファイルに対応しています</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">2</span><span class="step-title">ファイルを選択してアップロード</span>
+                    <div class="step-desc">列の自動マッピングが行われます。正しくない場合は手動で修正</div>
+                </div>
+                <div class="step-guide">
+                    <span class="step-num">3</span><span class="step-title">プレビューを確認して「登録」</span>
+                    <div class="step-desc">エラーがある行は赤色で表示されます</div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- ========== 権限 ========== -->
+        <div class="doc-content" id="tab-roles">
+            <div class="doc-card">
+                <h2>権限一覧</h2>
+                <p>各役割がアクセスできる画面と操作の一覧です。</p>
+                <table class="perm-table">
+                    <tr>
+                        <th>画面</th>
+                        <th>システム管理者</th>
+                        <th>本社管理者</th>
+                        <th>事業所管理者</th>
+                        <th>スタッフ</th>
+                        <th>管理会社</th>
+                    </tr>
+                    <tr>
+                        <td>管理会社マスタ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>会社マスタ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>契約管理</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○（自社）</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>セットアップウィザード</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>事業所マスタ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○（自社）</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>アカウントマスタ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○（自社）</td>
+                        <td class="perm-ok">○（自事業所）</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>商品マスタ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-ok">○</td>
+                    </tr>
+                    <tr>
+                        <td>通報</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>通報履歴</td>
+                        <td class="perm-ok">○（全社）</td>
+                        <td class="perm-ok">○（自社）</td>
+                        <td class="perm-ok">○（自事業所）</td>
+                        <td class="perm-ok">○（自事業所）</td>
+                        <td class="perm-partial">自分担当分</td>
+                    </tr>
+                    <tr>
+                        <td>システム設定</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                    <tr>
+                        <td>監査ログ</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-ok">○</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                        <td class="perm-no">✕</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="doc-card">
+                <h2>ログインの仕組み</h2>
+                <p>全ユーザーは3つの情報でログインします。</p>
+                <ul>
+                    <li><strong>会社コード</strong> — 施設スタッフなら会社コード（例: TAMJ）、管理会社なら管理会社コード（例: PN001）</li>
+                    <li><strong>ログインID</strong> — 「会社コード＋ログイン名」が自動生成（例: TAMJ-yamada）。アカウント登録時にQRコードも発行されます</li>
+                    <li><strong>パスワード</strong> — 初回は管理者が設定したパスワード。変更可能。初回ログイン時に変更を推奨するバナーが表示されます</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ========== FAQ ========== -->
+        <div class="doc-content" id="tab-faq">
+            <div class="doc-card">
+                <h2>よくある質問</h2>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">管理会社が変わったらどうする？</div>
+                    <div class="faq-a">契約管理画面で旧管理会社の契約を「停止」にして、新しい管理会社の契約を作成します。以降のインポートや通報では新しい管理会社が自動で適用されます。既存の商品の担当管理会社は商品マスタから手動で変更できます。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">新しい事業所を追加したい</div>
+                    <div class="faq-a">マスタ管理 → 事業所マスタから追加できます。追加後、契約設定でその事業所のカテゴリ別担当管理会社を設定してください。「全事業所」の契約がある場合は自動的に適用されます。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">スタッフのアカウントを増やしたい</div>
+                    <div class="faq-a">マスタ管理 → アカウントマスタから追加できます。本社管理者は自社のアカウント、事業所管理者は自事業所のアカウントを追加できます。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">管理会社に複数の担当者がいる場合は？</div>
+                    <div class="faq-a">管理会社マスタの編集画面で「＋担当者を追加」から追加できます。各担当者に個別のログインIDが発行され、それぞれ管理会社ダッシュボードにログインできます。</div>
+                </div>
+
+
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">パスワードを忘れた場合は？</div>
+                    <div class="faq-a">システム管理者がアカウントマスタからパスワードをリセットできます。施設の管理者もアカウントマスタのパスワード変更機能で再設定できます。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">商品が多すぎて1件ずつ登録するのが大変</div>
+                    <div class="faq-a">商品マスタのインポート機能を使ってください。ExcelやCSVファイルから一括で登録できます。列の自動マッピング機能もあります。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">「その他」カテゴリの通報はどうなる？</div>
+                    <div class="faq-a">「その他」カテゴリには通常、管理会社が割り当てられていません。事業所管理者に通知が行き、施設側で対応を判断します。購入品（洗濯機など）の故障報告などに使います。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">DEMOモードとは？</div>
+                    <div class="faq-a">ログイン画面下部の「体験」ボタンからアクセスできます。サンプルデータで各役割（スタッフ、管理会社、管理者）の画面を体験できます。DEMOのデータは本番データに影響しません。</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">データを全て消したい</div>
+                    <div class="faq-a">システム設定画面の「全データ削除」ボタンから実行できます。この操作は元に戻せません。システム管理者のみ実行できます。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 仕様書 ========== -->
+        <div class="doc-content" id="tab-spec">
+
+            <!-- 1. システム概要 -->
+            <div class="doc-card">
+                <h2>1. システム概要</h2>
+                <p>ワンタッチ管理システムは、介護施設・福祉施設における設備トラブルの通報と備品管理を効率化するWebアプリケーションです。スタッフが簡単に通報でき、管理会社と連携して迅速な対応を実現します。</p>
+                <h3 style="margin-top:16px;">主要機能</h3>
+                <ul style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li><strong>通報管理</strong> — 設備トラブルの通報・追跡・履歴管理（設備名/商品名から選択、カテゴリ自動判定）</li>
+                    <li><strong>管理会社連携</strong> — 通報の自動振り分け・ステータス管理・対応実績ダッシュボード</li>
+                    <li><strong>商品管理</strong> — 設備・備品のマスタ管理、CSV/Excel/PDF/画像インポート、エクスポート</li>
+                    <li><strong>アカウント管理</strong> — ロール別アクセス制御、パスワード管理</li>
+                    <li><strong>マスタ管理</strong> — 会社・事業所・管理会社の階層管理</li>
+                </ul>
+                <h3 style="margin-top:16px;">対象ユーザー</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ロール</th><th>画面</th><th>主な操作</th></tr>
+                    <tr><td>スタッフ</td><td>report.html</td><td>設備トラブルの通報、履歴確認</td></tr>
+                    <tr><td>事業所管理者</td><td>master-top.html</td><td>商品マスタ管理、通報確認、管理会社管理</td></tr>
+                    <tr><td>本社管理者</td><td>master-top.html</td><td>事業所管理、アカウント管理、全社横断管理</td></tr>
+                    <tr><td>管理会社</td><td>contractor-dashboard.html</td><td>対応依頼確認、ステータス更新、対応実績確認、商品マスタ登録</td></tr>
+                    <tr><td>システム管理者</td><td>system-admin.html</td><td>会社マスタ管理、セットアップ</td></tr>
+                </table>
+            </div>
+
+            <!-- 2. アーキテクチャ -->
+            <div class="doc-card">
+                <h2>2. アーキテクチャ</h2>
+                <h3>技術スタック</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>レイヤー</th><th>技術</th><th>備考</th></tr>
+                    <tr><td>フロントエンド</td><td>HTML / CSS / Vanilla JS</td><td>フレームワーク不使用</td></tr>
+                    <tr><td>バックエンド</td><td>Node.js / Express</td><td>AWS Lightsail上で稼働（PM2管理）</td></tr>
+                    <tr><td>データベース</td><td>PostgreSQL</td><td>onetouch_db、スキーマは schema.sql</td></tr>
+                    <tr><td>リバースプロキシ</td><td>Nginx</td><td>ポート80/443 → localhost:3000</td></tr>
+                    <tr><td>CSVパース</td><td>Papa Parse (CDN)</td><td>CSV/TSV読み込み</td></tr>
+                    <tr><td>Excelパース</td><td>SheetJS (CDN)</td><td>.xlsx/.xls読み込み</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">ストレージ設計</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>モード</th><th>ストレージ</th><th>キープレフィックス</th><th>ライフサイクル</th></tr>
+                    <tr><td>DEMOモード</td><td>sessionStorage</td><td><code>demo.*</code></td><td>ブラウザタブを閉じると消去</td></tr>
+                    <tr><td>本番モード</td><td>localStorage</td><td><code>onetouch.*</code></td><td>明示的に消すまで永続</td></tr>
+                </table>
+                <div class="doc-note" style="margin-top:12px;"><strong>DEMOモード判定（isDemoMode）:</strong> <code>currentUser.companyCode === 'TAMJ'</code> または <code>currentUser.isDemoMode === true</code>（管理会社ログイン対応）</div>
+            </div>
+
+            <!-- 3. サーバー仕様 -->
+            <div class="doc-card">
+                <h2>3. サーバー仕様</h2>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>項目</th><th>内容</th></tr>
+                    <tr><td>クラウド</td><td>AWS Lightsail（東京リージョン ap-northeast-1）</td></tr>
+                    <tr><td>OS</td><td>Ubuntu 24.04 LTS</td></tr>
+                    <tr><td>IPアドレス</td><td>52.196.74.227（静的IP）</td></tr>
+                    <tr><td>ドメイン</td><td>onetouch.tamjump.com（Cloudflare DNS経由）</td></tr>
+                    <tr><td>Node.js</td><td>v20 LTS</td></tr>
+                    <tr><td>PostgreSQL</td><td>DB名: onetouch_db</td></tr>
+                    <tr><td>プロセス管理</td><td>PM2（<code>pm2 start server.js --name onetouch</code>）</td></tr>
+                    <tr><td>リバースプロキシ</td><td>Nginx（80/443 → localhost:3000）</td></tr>
+                    <tr><td>SSL</td><td>Let's Encrypt（DNS設定後に取得）</td></tr>
+                    <tr><td>デプロイパス</td><td><code>~/onetouch-server/</code></td></tr>
+                </table>
+                <h3 style="margin-top:16px;">.env 構成</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>変数名</th><th>内容</th></tr>
+                    <tr><td><code>DATABASE_URL</code></td><td>PostgreSQL接続文字列</td></tr>
+                    <tr><td><code>JWT_SECRET</code></td><td>認証トークン署名キー（openssl rand -base64 64 で生成）</td></tr>
+                    <tr><td><code>PORT</code></td><td>3000</td></tr>
+                    <tr><td><code>NODE_ENV</code></td><td>production</td></tr>
+                    <tr><td><code>AWS_REGION</code></td><td>ap-northeast-1</td></tr>
+                    <tr><td><code>SES_FROM_EMAIL</code></td><td>送信元メールアドレス（SES用）</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">デプロイ手順</h3>
+                <ol style="margin-top:8px;padding-left:20px;line-height:2.2;">
+                    <li>Cloudflare で <code>onetouch.tamjump.com</code> のAレコードを 52.196.74.227 に設定</li>
+                    <li>Let's Encrypt で SSL 取得（<code>certbot --nginx -d onetouch.tamjump.com</code>）</li>
+                    <li>ファイルを <code>scp</code> でサーバーに転送</li>
+                    <li><code>pm2 restart onetouch</code> で再起動</li>
+                    <li>動作確認 → Google Play Store TWA 申請</li>
+                </ol>
+            </div>
+
+            <!-- 4. データ構造 -->
+            <div class="doc-card">
+                <h2>4. データ構造</h2>
+                <h3>アカウントデータ</h3>
+<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+  "companyCode": "TAMJ",
+  "id": "TAMJ-tanaka",               // 会社コード + ログイン名
+  "name": "田中 太郎",
+  "role": "office_admin",            // staff | office_admin | company_admin | contractor | system_admin
+  "scope": "office",
+  "companyName": "タムジ株式会社",
+  "officeCode": "TAMJ-J0001",
+  "officeName": "東京事業所",
+  "status": "active",
+  "isFirstLogin": false,
+  "isDemoMode": true
+}</pre>
+                <h3 style="margin-top:16px;">通報データ</h3>
+<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+  "id": "RPT-XXXXXX",
+  "title": "エアコン1号機",
+  "itemId": "ITEM-DEMO-003",
+  "category": "部屋・共用部",
+  "description": "異音がする",
+  "status": "未対応",                // 未対応 | 対応中 | 完了 | 対応不可
+  "assignedPartnerId": "PN001",
+  "assignedPartnerName": "〇〇管理株式会社",
+  "timestamp": "2026-03-13T10:00:00Z",
+  "statusHistory": [
+    { "status": "対応中", "changedAt": "...", "changedBy": "..." }
+  ]
+}</pre>
+                <h3 style="margin-top:16px;">管理会社データ</h3>
+<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+  "id": "PN001",
+  "name": "〇〇管理株式会社",
+  "partnerCode": "PN001",            // PN + 3桁連番
+  "categories": ["建物・外", "部屋・共用部"],
+  "assignedCompanies": ["TAMJ"],
+  "status": "active",
+  "contactName": "担当者名",
+  "loginId": "PN001-yamada",         // 会社コード + ログイン名
+  "password": "（初期パスワード）"
+}</pre>
+                <h3 style="margin-top:16px;">商品データ</h3>
+<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+  "itemId": "ITEM-DEMO-003",
+  "companyCode": "TAMJ",
+  "officeCode": "TAMJ-J0001",
+  "name": "エアコン 1号機",
+  "maker": "ダイキン",
+  "model": "AN22XRS-W",
+  "category": "部屋・共用部",
+  "assignedPartnerId": "PN001",
+  "assignedPartnerName": "〇〇管理株式会社",
+  "floor": "2F",
+  "location": "会議室",
+  "partnerHistory": []               // 管理会社変更履歴
+}</pre>
+            </div>
+
+            <!-- 5. 認証・権限 -->
+            <div class="doc-card">
+                <h2>5. 認証・権限</h2>
+                <h3>ログインフロー</h3>
+                <ol style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>会社コード + ログインID + パスワードを入力</li>
+                    <li>DEMOアカウント（TAMJ）→ sessionStorage の currentUser にセット</li>
+                    <li>本番アカウント → localStorage の accounts を検索</li>
+                    <li>管理会社アカウント → 会社コード欄に管理会社コード（PN001等）を入力。currentContractorもセット</li>
+                    <li>ロール別ホーム画面にリダイレクト</li>
+                </ol>
+                <div class="doc-note" style="margin-top:12px;">ID・パスワードは大文字小文字を区別します。</div>
+                <h3 style="margin-top:16px;">ロール別ホーム画面</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ロール</th><th>リダイレクト先</th></tr>
+                    <tr><td>staff</td><td>report.html</td></tr>
+                    <tr><td>office_admin</td><td>master-top.html</td></tr>
+                    <tr><td>company_admin</td><td>master-top.html</td></tr>
+                    <tr><td>contractor</td><td>contractor-dashboard.html</td></tr>
+                    <tr><td>system_admin</td><td>system-admin.html</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">パスワード管理</h3>
+                <ul style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>統一ヘッダーのメニューから「パスワード変更」</li>
+                    <li>現在のパスワード確認 → 新パスワード（6文字以上）→ 確認入力</li>
+                    <li>DEMOモード: sessionStorageのみ更新（ログアウト後に元に戻る）</li>
+                    <li>本番モード: accounts（管理者・スタッフ）またはpartners（管理会社）を更新</li>
+                    <li>初回ログイン時: パスワード変更推奨バナーを表示</li>
+                </ul>
+            </div>
+
+            <!-- 6. DEMOモード -->
+            <div class="doc-card">
+                <h2>6. DEMOモード</h2>
+                <p>会社コード「TAMJ」でログインするとDEMOモードが有効になります。ヘッダーに紫色の「DEMOモード」バッジが表示されます。</p>
+                <h3 style="margin-top:16px;">判定ロジック（isDemoMode）</h3>
+                <ul style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>スタッフ・管理者: <code>companyCode</code> が <code>TAMJ</code> / <code>JMAT</code> / <code>SYSTEM</code> のいずれか</li>
+                    <li>管理会社: <code>currentUser.isDemoMode === true</code>（assignedCompaniesにTAMJが含まれる場合）</li>
+                </ul>
+                <h3 style="margin-top:16px;">DEMOアカウント一覧</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ロール</th><th>会社コード</th><th>ログインID</th><th>パスワード</th><th>名前・事業所</th></tr>
+                    <tr><td>staff</td><td>TAMJ</td><td>tamj-j1-staff1</td><td>demo</td><td>さくら苑スタッフ1</td></tr>
+                    <tr><td>office_admin</td><td>TAMJ</td><td>tamj-j1-admin</td><td>demo</td><td>さくら苑 管理者</td></tr>
+                    <tr><td>company_admin</td><td>TAMJ</td><td>TAMJ-H001</td><td>demo</td><td>タムジ 本社管理者</td></tr>
+                    <tr><td>管理会社</td><td>PN001</td><td>pn001-yamada</td><td>demo</td><td>山田 太郎（TAMJ建設）</td></tr>
+                    <tr><td>system_admin</td><td>SYSTEM</td><td>admin</td><td>admin</td><td>システム管理者</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">DEMOデータ</h3>
+                <ul style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li><strong>商品:</strong> 18件（全カテゴリをカバー）</li>
+                    <li><strong>管理会社:</strong> 15社</li>
+                    <li><strong>通報:</strong> 約108件（スタッフ1人あたり3件）</li>
+                    <li><strong>ストレージ:</strong> sessionStorage（ブラウザを閉じると消える）</li>
+                </ul>
+                <h3 style="margin-top:16px;">DEMO切替機能</h3>
+                <p style="margin-top:8px;">統一ヘッダーのメニューに「DEMO切替」セクションがあり、スタッフ・管理会社・事業所管理者の表示を切り替えてテストできます。ログアウト時にDEMOデータはsessionStorageに退避・復元されるため、切替後もデータが維持されます。</p>
+            </div>
+
+            <!-- 7. 通報・管理会社連携 -->
+            <div class="doc-card">
+                <h2>7. 通報・管理会社連携</h2>
+                <h3>通報フロー</h3>
+                <ol style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>スタッフが通報画面を開く</li>
+                    <li><strong>設備名/商品名</strong>を選択（カテゴリタブで絞り込み + 検索サジェスト）</li>
+                    <li>状況を入力（200文字以内）</li>
+                    <li>写真を添付（最大3枚、任意）</li>
+                    <li>通報ボタンで送信 → 担当管理会社に自動割り当て</li>
+                </ol>
+                <h3 style="margin-top:16px;">管理会社自動割り当て</h3>
+                <p style="margin-top:8px;">商品マスタの<code>assignedPartnerId</code>で商品→管理会社を直接紐づけ。通報時に自動的に割り当てられます。未設定の場合は「担当未割当」の状態で保存されます。</p>
+                <h3 style="margin-top:16px;">ステータス遷移</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>遷移元</th><th>遷移先</th><th>操作者</th></tr>
+                    <tr><td>未対応</td><td>対応中</td><td>管理会社 / 管理者</td></tr>
+                    <tr><td>対応中</td><td>完了</td><td>管理会社 / 管理者</td></tr>
+                    <tr><td>未対応 / 対応中</td><td>対応不可</td><td>管理会社 / 管理者</td></tr>
+                    <tr><td>対応不可</td><td>未対応</td><td>管理者のみ（差し戻し）</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">通報履歴の閲覧範囲</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ロール</th><th>閲覧範囲</th></tr>
+                    <tr><td>system_admin</td><td>全社</td></tr>
+                    <tr><td>company_admin</td><td>自社全事業所</td></tr>
+                    <tr><td>office_admin</td><td>自事業所のみ</td></tr>
+                    <tr><td>contractor</td><td>自分担当分のみ</td></tr>
+                </table>
+            </div>
+
+            <!-- 8. 商品管理 -->
+            <div class="doc-card">
+                <h2>8. 商品管理</h2>
+                <h3>商品マスタ（items.html）</h3>
+                <ul style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>Excel風テーブル表示（商品No.・商品名・メーカー・型番・担当管理会社・設置場所・在庫・単価）</li>
+                    <li>検索: 商品名・型番・メーカーで検索（大文字小文字・全角半角対応）</li>
+                    <li>ページネーション: 50件/ページ</li>
+                    <li>エクスポート: CSVダウンロード</li>
+                </ul>
+                <h3 style="margin-top:16px;">商品登録・編集</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>項目</th><th>必須/推奨</th><th>備考</th></tr>
+                    <tr><td>商品名</td><td><strong>必須</strong></td><td></td></tr>
+                    <tr><td>担当管理会社</td><td><strong>必須</strong></td><td>契約未設定の場合も手動選択可能</td></tr>
+                    <tr><td>カテゴリー</td><td><strong>推奨</strong></td><td>未入力で保存時に警告ダイアログ</td></tr>
+                    <tr><td>設置場所（フロア）</td><td><strong>推奨</strong></td><td>未入力で保存時に警告ダイアログ</td></tr>
+                    <tr><td>メーカー / 型番 / 単価 / 在庫 / 備考</td><td>任意</td><td></td></tr>
+                </table>
+                <h3 style="margin-top:16px;">インポートフロー</h3>
+                <p style="margin-top:8px;"><strong>対応ファイル形式:</strong> CSV/TXT、Excel (.xlsx/.xls)、PDF（テキスト抽出）、画像 (JPG/PNG)</p>
+                <ol style="margin-top:8px;padding-left:20px;line-height:2;">
+                    <li>ファイル選択（ドラッグ&ドロップまたはクリック）</li>
+                    <li>自動解析 → 列マッピング推定</li>
+                    <li>プレビュー&設定（列の割当・管理会社マッチング確認）</li>
+                    <li>確認画面（confirm-items.html）でカテゴリ推定・全角→半角変換</li>
+                    <li>確定して商品マスタに登録</li>
+                </ol>
+                <h3 style="margin-top:16px;">新規登録と上書き更新</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>条件</th><th>動作</th></tr>
+                    <tr><td>商品No.なし</td><td>新規登録（商品No.は自動採番）</td></tr>
+                    <tr><td>商品No.あり（既存に一致）</td><td>上書き更新（空欄は既存データを維持）</td></tr>
+                    <tr><td>商品No.あり（既存に不一致）</td><td>警告付き新規登録</td></tr>
+                </table>
+            </div>
+
+            <!-- 9. カテゴリ体系 -->
+            <div class="doc-card">
+                <h2>9. カテゴリ体系</h2>
+                <p>標準カテゴリ8種類＋カスタムカテゴリ最大2種類（合計最大10種類）。カスタムカテゴリはシステム設定から追加できます。</p>
+                <table class="perm-table" style="margin-top:12px;">
+                    <tr><th>#</th><th>カテゴリ名</th><th>具体例</th></tr>
+                    <tr><td>1</td><td>建物・外</td><td>外壁、屋根、駐車場、玄関、フェンス</td></tr>
+                    <tr><td>2</td><td>部屋・共用部</td><td>居室、廊下、エレベーター、階段、照明</td></tr>
+                    <tr><td>3</td><td>介護医療備品</td><td>車椅子、歩行器、手すり、血圧計、AED</td></tr>
+                    <tr><td>4</td><td>厨房</td><td>冷蔵庫、食洗機、調理器具、コンロ、食器</td></tr>
+                    <tr><td>5</td><td>ネットワーク</td><td>Wi-Fi、ルーター、LAN、ナースコール、インターホン</td></tr>
+                    <tr><td>6</td><td>浴室</td><td>給湯器、ボイラー、浴槽、シャワー</td></tr>
+                    <tr><td>7</td><td>福祉用具</td><td>特殊寝台、床ずれ防止用具、スロープ</td></tr>
+                    <tr><td>8</td><td>その他</td><td>上記に該当しないもの</td></tr>
+                    <tr><td>+1〜2</td><td style="color:#166534;">カスタム（任意）</td><td>システム設定から追加可能</td></tr>
+                </table>
+            </div>
+
+            <!-- 10. ファイル構成 -->
+            <div class="doc-card">
+                <h2>10. ファイル構成</h2>
+                <h3>HTML画面</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ファイル</th><th>画面名</th><th>対象ロール</th></tr>
+                    <tr><td>login.html</td><td>ログイン</td><td>全員</td></tr>
+                    <tr><td>report.html</td><td>トラブル通報</td><td>staff, office_admin, company_admin</td></tr>
+                    <tr><td>report-history.html</td><td>通報履歴</td><td>office_admin, company_admin, system_admin</td></tr>
+                    <tr><td>items.html</td><td>商品マスタ</td><td>office_admin, company_admin, contractor</td></tr>
+                    <tr><td>import.html</td><td>商品インポート</td><td>office_admin, company_admin, contractor</td></tr>
+                    <tr><td>confirm-items.html</td><td>インポート確認</td><td>office_admin, company_admin, contractor</td></tr>
+                    <tr><td>contractor-dashboard.html</td><td>対応依頼一覧</td><td>contractor</td></tr>
+                    <tr><td>contractor-performance.html</td><td>対応実績</td><td>contractor</td></tr>
+                    <tr><td>master-top.html</td><td>管理トップ</td><td>office_admin, company_admin</td></tr>
+                    <tr><td>account-master.html</td><td>アカウントマスタ</td><td>office_admin, company_admin</td></tr>
+                    <tr><td>partner-master.html</td><td>管理会社マスタ</td><td>office_admin, company_admin</td></tr>
+                    <tr><td>contract-management.html</td><td>契約管理</td><td>company_admin, system_admin</td></tr>
+                    <tr><td>setup-wizard.html</td><td>セットアップウィザード</td><td>system_admin</td></tr>
+                    <tr><td>company-master.html</td><td>会社マスタ</td><td>system_admin</td></tr>
+                    <tr><td>office-master.html</td><td>事業所マスタ</td><td>company_admin</td></tr>
+                    <tr><td>system-settings.html</td><td>システム設定</td><td>company_admin, system_admin</td></tr>
+                    <tr><td>system-admin.html</td><td>システム管理</td><td>system_admin</td></tr>
+                    <tr><td>system-admin-dashboard.html</td><td>システム管理者ダッシュボード</td><td>system_admin</td></tr>
+                    <tr><td>audit-log.html</td><td>監査ログ</td><td>company_admin, system_admin</td></tr>
+                    <tr><td>notification-settings.html</td><td>通知設定</td><td>company_admin, system_admin</td></tr>
+                    <tr><td>change-password.html</td><td>パスワード変更（単体）</td><td>全員</td></tr>
+                    <tr><td>help.html</td><td>ヘルプ</td><td>staff, office_admin, company_admin</td></tr>
+                    <tr><td>contractor-help.html</td><td>管理会社ヘルプ</td><td>contractor</td></tr>
+                    <tr><td>docs.html</td><td>ドキュメント</td><td>全員</td></tr>
+                </table>
+                <h3 style="margin-top:16px;">共通JavaScript</h3>
+                <table class="perm-table" style="margin-top:8px;">
+                    <tr><th>ファイル</th><th>役割</th></tr>
+                    <tr><td>unified-header.js</td><td>統一ヘッダー（メニュー・DEMO切替・パスワード変更）</td></tr>
+                    <tr><td>demo-mode.js</td><td>DEMOデータ生成・isDemoMode判定・カテゴリ定義</td></tr>
+                    <tr><td>item-storage.js</td><td>商品CRUD（DEMOモード/本番モード自動切替）</td></tr>
+                    <tr><td>document-storage.js</td><td>インポートドキュメント・LineItems管理</td></tr>
+                    <tr><td>csv-utils.js</td><td>CSVエクスポートユーティリティ</td></tr>
+                    <tr><td>api-client.js</td><td>バックエンドAPI通信クライアント</td></tr>
+                    <tr><td>upload-limits.js</td><td>アップロード回数制限</td></tr>
+                    <tr><td>error-handler.js</td><td>グローバルエラーハンドリング</td></tr>
+                    <tr><td>loading.js</td><td>ローディング表示</td></tr>
+                </table>
+            </div>
+
+            <!-- 11. 設計判断の記録 -->
+            <div class="doc-card">
+                <h2>11. 設計判断の記録</h2>
+                <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>DEMOモードをsessionStorageにした理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">ブラウザを閉じるとデータが消える → デモとして適切。本番データとの混在を防ぐ。ログアウト時はデータを退避・復元（ロール切替テスト用）。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>管理会社ログインを統一ログイン画面にした理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">ログイン画面が分かれていると混乱する。会社コード欄に管理会社コード（PN001等）を入力する運用で一本化。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>管理会社を自動割り当てにした理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">スタッフが管理会社を選ぶ手間を省く。商品→管理会社の直接紐づけでヒューマンエラーを防ぐ。該当管理会社がいない場合は未割当で通報。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>契約テーブルはインポート補助機能として位置づけた理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">CSVインポート時に管理会社列を省略できるようにするための補助機能。手動登録・編集では契約なしでも管理会社を直接選択可能。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>カテゴリを介護施設向けに再設計した理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">旧カテゴリは「設備の種類」で分類していたが施設スタッフには馴染みにくい。新カテゴリは「場所・用途」ベースで直感的に選べる。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>通報画面から場所欄・緊急通報を削除した理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">設備を選択すると設置場所が自動入力されるため場所欄は重複。緊急通報（火災・急病等）は119/110への直接連絡が適切で、このシステムを経由するのは不適切。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>アカウントIDを自動生成にした理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">「会社コード + ログイン名」形式（例: TAMJ-tanaka）で自動生成。手入力ミスを防ぎ、QRコードへの埋め込みも容易になる。</p>
+                    </div>
+                    <div style="padding:14px;background:#f0fdf4;border-left:4px solid #22c55e;border-radius:0 8px 8px 0;">
+                        <strong>商品マスタをテーブル表示にした理由</strong>
+                        <p style="margin-top:4px;font-size:13px;color:#555;">account-master.htmlと表示方式を統一。多項目を一覧で比較しやすい。ヘッダー固定、カテゴリバッジ、スマホ横スクロール対応。</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        UnifiedHeader.init({
+            title: 'ドキュメント',
+            backButton: true,
+            backUrl: 'system-admin.html'
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.doc-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.doc-content').forEach(function(c) { c.classList.remove('active'); });
+            event.target.closest('.doc-tab').classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function toggleFaq(el) {
+            el.classList.toggle('open');
+            el.nextElementSibling.classList.toggle('open');
+        }
+
+        function searchDocs(query) {
+            // 以前のハイライトを削除
+            document.querySelectorAll('.highlight').forEach(function(el) {
+                el.outerHTML = el.textContent;
+            });
+            if (!query || query.length < 2) return;
+
+            var regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            var allCards = document.querySelectorAll('.doc-card');
+            var foundTab = null;
+
+            allCards.forEach(function(card) {
+                var walker = document.createTreeWalker(card, NodeFilter.SHOW_TEXT, null, false);
+                var textNodes = [];
+                while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+                textNodes.forEach(function(node) {
+                    if (regex.test(node.textContent)) {
+                        var span = document.createElement('span');
+                        span.innerHTML = node.textContent.replace(regex, '<span class="highlight">$1</span>');
+                        node.parentNode.replaceChild(span, node);
+                        if (!foundTab) {
+                            var content = card.closest('.doc-content');
+                            if (content) {
+                                foundTab = content.id.replace('tab-', '');
+                                switchTabById(foundTab);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function switchTabById(tabId) {
+            document.querySelectorAll('.doc-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.doc-content').forEach(function(c) { c.classList.remove('active'); });
+            document.getElementById('tab-' + tabId).classList.add('active');
+            // タブボタンもアクティブに
+            document.querySelectorAll('.doc-tab').forEach(function(t) {
+                if (t.textContent.trim().indexOf(tabId === 'guide' ? '運用' : tabId === 'howto' ? '操作' : tabId === 'roles' ? '権限' : tabId === 'faq' ? 'FAQ' : '仕様') !== -1) {
+                    t.classList.add('active');
+                }
+            });
+        }
+
+        // URLハッシュでタブ直接表示対応（例: docs.html#howto）
+        (function() {
+            var hash = location.hash.replace('#', '');
+            if (hash && document.getElementById('tab-' + hash)) {
+                switchTabById(hash);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事業所マスタ管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { overflow-x: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+
+        .main-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* 旧ヘッダーCSS削除済み */
+
+        .btn-add {
+            background: #1e3a5f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #2d4a7a;
+        }
+
+        .btn-add::before {
+            content: "+";
+            font-size: 14px;
+        }
+
+        .search-panel {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            padding: 24px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .search-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        select.search-input {
+            cursor: pointer;
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-search {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 32px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-clear {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            padding: 10px 32px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
+        }
+
+        .result-header {
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 14px 14px 0 0;
+            font-weight: 600;
+            color: #1e293b;
+            border: 1px solid #e8e8e8;
+            border-bottom: none;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+        }
+
+        .table-container {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow-x: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th {
+            padding: 8px 10px; font-size: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        td {
+            padding: 8px 10px; font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .btn-edit {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: #1e3a5f;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+        }
+
+        .btn-close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .form-group label .required {
+            color: #f44336;
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container { padding: 16px; }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+    <div class="main-container">
+        <!-- 操作バー -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <button class="btn-add" id="btnAdd" onclick="openModal()">新規追加</button>
+        </div>
+
+        <div class="search-panel">
+            <div class="search-row">
+                <div class="search-label">事業所コード</div>
+                <input type="text" id="searchCode" class="search-input" placeholder="事業所コードを入力">
+            </div>
+
+            <div class="search-row">
+                <div class="search-label">事業所名</div>
+                <input type="text" id="searchName" class="search-input" placeholder="事業所名を入力">
+            </div>
+
+            <div class="search-row">
+                <div class="search-label">ステータス</div>
+                <select id="searchStatus" class="search-input">
+                    <option value="">すべて</option>
+                    <option value="active">有効</option>
+                    <option value="inactive">無効</option>
+                </select>
+            </div>
+
+            <div class="search-buttons">
+                <button class="btn-search" onclick="searchOffices()">検索</button>
+                <button class="btn-clear" onclick="clearSearch()">クリア</button>
+            </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="result-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>検索結果: <span id="displayCount">0</span>件 / 全 <span id="totalCount">0</span>件</span>
+                <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:18%;">事業所コード</th>
+                            <th style="width:22%;">事業所名</th>
+                            <th style="width:18%;">指定番号</th>
+                            <th style="width:16%;">電話番号</th>
+                            <th style="width:13%;">ステータス</th>
+                            <th style="width:13%;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="officeList"></tbody>
+                </table>
+                <div id="omPagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- モーダル -->
+    <div class="modal" id="officeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">事業所設定</h2>
+                <button class="btn-close" onclick="closeModal()">×</button>
+            </div>
+            <form id="officeForm">
+                <input type="hidden" id="editIndex">
+
+                <div class="form-group">
+                    <label>事業所コード</label>
+                    <input type="text" id="officeCode" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="自動付与されます">
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">※事業所コードは保存時に自動的に付与されます</small>
+                </div>
+
+                <div class="form-group">
+                    <label>事業所名 <span class="required">*</span></label>
+                    <input type="text" id="officeName" required placeholder="例: タムジ介護施設">
+                </div>
+
+                <div class="form-group">
+                    <label>指定番号</label>
+                    <input type="text" id="designationNumber" placeholder="例: 1234567890">
+                    <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">※介護保険の指定番号など（任意）</small>
+                </div>
+
+                <div class="form-group">
+                    <label>サービスの種類 <span class="required">*</span></label>
+                    <select id="serviceType" required>
+                        <option value="">選択してください</option>
+                        <option value="訪問介護">訪問介護</option>
+                        <option value="訪問入浴介護">訪問入浴介護</option>
+                        <option value="訪問看護">訪問看護</option>
+                        <option value="訪問リハビリテーション">訪問リハビリテーション</option>
+                        <option value="居宅療養管理指導">居宅療養管理指導</option>
+                        <option value="通所介護">通所介護（デイサービス）</option>
+                        <option value="通所リハビリテーション">通所リハビリテーション（デイケア）</option>
+                        <option value="短期入所生活介護">短期入所生活介護（ショートステイ）</option>
+                        <option value="短期入所療養介護">短期入所療養介護</option>
+                        <option value="特定施設入居者生活介護">特定施設入居者生活介護</option>
+                        <option value="福祉用具貸与">福祉用具貸与</option>
+                        <option value="特定福祉用具販売">特定福祉用具販売</option>
+                        <option value="居宅介護支援">居宅介護支援（ケアマネジメント）</option>
+                        <option value="介護老人福祉施設">介護老人福祉施設（特別養護老人ホーム）</option>
+                        <option value="介護老人保健施設">介護老人保健施設（老健）</option>
+                        <option value="介護医療院">介護医療院</option>
+                        <option value="認知症対応型通所介護">認知症対応型通所介護</option>
+                        <option value="小規模多機能型居宅介護">小規模多機能型居宅介護</option>
+                        <option value="認知症対応型共同生活介護">認知症対応型共同生活介護（グループホーム）</option>
+                        <option value="地域密着型特定施設入居者生活介護">地域密着型特定施設入居者生活介護</option>
+                        <option value="地域密着型介護老人福祉施設入所者生活介護">地域密着型介護老人福祉施設入所者生活介護</option>
+                        <option value="看護小規模多機能型居宅介護">看護小規模多機能型居宅介護</option>
+                        <option value="定期巡回・随時対応型訪問介護看護">定期巡回・随時対応型訪問介護看護</option>
+                        <option value="夜間対応型訪問介護">夜間対応型訪問介護</option>
+                        <option value="地域密着型通所介護">地域密着型通所介護</option>
+                        <option value="住宅型有料老人ホーム">住宅型有料老人ホーム</option>
+                        <option value="サービス付高齢者住宅">サービス付高齢者住宅</option>
+                        <option value="病院/医院">病院/医院</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>郵便番号 <span class="required">*</span></label>
+                        <input type="text" id="postalCode" required placeholder="例: 100-0001" pattern="\d{3}-?\d{4}" maxlength="8">
+                        <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">※ハイフンあり・なし両方OK。入力すると住所が自動表示されます</small>
+                    </div>
+                    <div class="form-group">
+                        <label>都道府県 <span class="required">*</span></label>
+                        <select id="prefecture" required>
+                            <option value="">選択してください</option>
+                            <option value="北海道">北海道</option>
+                            <option value="青森県">青森県</option>
+                            <option value="岩手県">岩手県</option>
+                            <option value="宮城県">宮城県</option>
+                            <option value="秋田県">秋田県</option>
+                            <option value="山形県">山形県</option>
+                            <option value="福島県">福島県</option>
+                            <option value="茨城県">茨城県</option>
+                            <option value="栃木県">栃木県</option>
+                            <option value="群馬県">群馬県</option>
+                            <option value="埼玉県">埼玉県</option>
+                            <option value="千葉県">千葉県</option>
+                            <option value="東京都">東京都</option>
+                            <option value="神奈川県">神奈川県</option>
+                            <option value="新潟県">新潟県</option>
+                            <option value="富山県">富山県</option>
+                            <option value="石川県">石川県</option>
+                            <option value="福井県">福井県</option>
+                            <option value="山梨県">山梨県</option>
+                            <option value="長野県">長野県</option>
+                            <option value="岐阜県">岐阜県</option>
+                            <option value="静岡県">静岡県</option>
+                            <option value="愛知県">愛知県</option>
+                            <option value="三重県">三重県</option>
+                            <option value="滋賀県">滋賀県</option>
+                            <option value="京都府">京都府</option>
+                            <option value="大阪府">大阪府</option>
+                            <option value="兵庫県">兵庫県</option>
+                            <option value="奈良県">奈良県</option>
+                            <option value="和歌山県">和歌山県</option>
+                            <option value="鳥取県">鳥取県</option>
+                            <option value="島根県">島根県</option>
+                            <option value="岡山県">岡山県</option>
+                            <option value="広島県">広島県</option>
+                            <option value="山口県">山口県</option>
+                            <option value="徳島県">徳島県</option>
+                            <option value="香川県">香川県</option>
+                            <option value="愛媛県">愛媛県</option>
+                            <option value="高知県">高知県</option>
+                            <option value="福岡県">福岡県</option>
+                            <option value="佐賀県">佐賀県</option>
+                            <option value="長崎県">長崎県</option>
+                            <option value="熊本県">熊本県</option>
+                            <option value="大分県">大分県</option>
+                            <option value="宮崎県">宮崎県</option>
+                            <option value="鹿児島県">鹿児島県</option>
+                            <option value="沖縄県">沖縄県</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>住所 <span class="required">*</span></label>
+                    <input type="text" id="address" required placeholder="例: 千代田区千代田1-1">
+                </div>
+
+                <div class="form-group">
+                    <label>建物名・部屋番号</label>
+                    <input type="text" id="building" placeholder="例: 千代田ビル5F">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>電話番号 <span class="required">*</span></label>
+                        <input type="tel" id="phone" required placeholder="例: 03-1234-5678" pattern="[0-9\-]+">
+                    </div>
+                    <div class="form-group">
+                        <label>FAX番号</label>
+                        <input type="tel" id="fax" placeholder="例: 03-1234-5679" pattern="[0-9\-]+">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>メールアドレス</label>
+                    <input type="email" id="email" placeholder="例: info@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>ステータス <span class="required">*</span></label>
+                    <select id="status" required>
+                        <option value="active">有効</option>
+                        <option value="inactive">無効</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>備考</label>
+                    <textarea id="notes" placeholder="備考があれば入力してください"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function renderPagination(containerId, currentPage, totalPages, totalItems, onPageChange) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            if (totalPages <= 1) { container.innerHTML = totalItems > 0 ? '<div style="text-align:center;padding:12px;font-size:13px;color:#999;">全 ' + totalItems + ' 件</div>' : ''; return; }
+            var html = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;flex-wrap:wrap;">';
+            html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
+            var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
+            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+            html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
+            container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
+        }
+
+        // 監査ログ記録関数
+        function logEvent(type, detail = {}) {
+            try {
+                const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                const logs = JSON.parse(localStorage.getItem('audit.logs') || '[]');
+                const logEntry = {
+                    timestamp: new Date().toISOString(),
+                    type: type,
+                    detail: detail,
+                    userId: currentUser?.id || 'unknown',
+                    userName: currentUser?.name || 'unknown',
+                    companyCode: currentUser?.companyCode || '',
+                    page: 'office-master.html'
+                };
+                logs.unshift(logEntry);
+                if (logs.length > 500) logs.length = 500;
+                localStorage.setItem('audit.logs', JSON.stringify(logs));
+            } catch (e) {
+                console.warn('監査ログの記録に失敗:', e);
+            }
+        }
+
+        // ログインチェックと権限確認
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        } else if (currentUser.role !== 'system_admin' && currentUser.role !== 'company_admin' && currentUser.role !== 'office_admin') {
+            ErrorHandler.showWarning('この画面は管理者のみアクセスできます。');
+            window.location.href = 'login.html';
+        }
+
+        // 事業所データ（LocalStorageから読み込み + フィルタリング）
+        let allOffices = JSON.parse(localStorage.getItem('offices')) || [];
+        let offices = filterOfficesByScope(allOffices);
+        let officeCounter = parseInt(localStorage.getItem('officeCounter')) || 1;
+
+        // スコープに応じて事業所をフィルタリング
+        function filterOfficesByScope(officeList) {
+            // 本社（H001）は事業所マスタに表示しない（施設ではないため）
+            var filtered = officeList.filter(o => !o.code || !o.code.match(/-H\d+$/));
+            
+            if (currentUser.role === 'system_admin') {
+                return filtered;
+            } else if (currentUser.scope === 'company' || currentUser.role === 'company_admin') {
+                return filtered.filter(o => o.companyCode === currentUser.companyCode);
+            } else if (currentUser.scope === 'office' || currentUser.role === 'office_admin') {
+                return filtered.filter(o => o.code === currentUser.officeCode);
+            }
+            return [];
+        }
+
+        // LocalStorageに保存
+        function saveToLocalStorage() {
+            localStorage.setItem('offices', JSON.stringify(offices));
+            localStorage.setItem('officeCounter', officeCounter.toString());
+        }
+
+        // カテゴリ別担当管理会社UIを生成
+        function renderCategoryPartners(categoryPartners) {
+            var area = document.getElementById('categoryPartnersArea');
+            if (!area) return;
+            var categories = (typeof SYSTEM_CATEGORIES !== 'undefined') ? SYSTEM_CATEGORIES : ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','その他'];
+            // 管理会社リストを取得
+            var partners = [];
+            try { partners = JSON.parse(sessionStorage.getItem('partners') || '[]'); } catch(e) {}
+            try {
+                var pLocal = JSON.parse(localStorage.getItem('partners') || '[]');
+                pLocal.forEach(function(p) { if (!partners.find(function(x) { return x.id === p.id; })) partners.push(p); });
+            } catch(e) {}
+            // DEMO管理会社を追加
+            if (typeof DEMO_PARTNERS !== 'undefined') {
+                DEMO_PARTNERS.forEach(function(dp) { if (!partners.find(function(x) { return x.id === dp.id; })) partners.push(dp); });
+            }
+            // 会社フィルタ
+            var companyCode = currentUser.companyCode;
+            var filtered = partners.filter(function(p) {
+                return p.status !== 'disabled' && (!p.assignedCompanies || p.assignedCompanies.length === 0 || p.assignedCompanies.includes(companyCode));
+            });
+            var cp = categoryPartners || {};
+            var html = '';
+            categories.forEach(function(cat) {
+                html += '<div style="display:flex;align-items:center;gap:8px;">';
+                html += '<div style="min-width:130px;font-size:13px;font-weight:500;color:#334155;">' + cat + '</div>';
+                html += '<select id="cp_' + cat.replace(/[\/]/g, '_') + '" style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;">';
+                html += '<option value="">未設定</option>';
+                filtered.forEach(function(p) {
+                    var sel = (cp[cat] === p.id || cp[cat] === p.partnerCode) ? ' selected' : '';
+                    html += '<option value="' + (p.id || p.partnerCode) + '"' + sel + '>' + p.name + '</option>';
+                });
+                html += '</select>';
+                html += '</div>';
+            });
+            area.innerHTML = html;
+        }
+
+        // カテゴリ別担当管理会社の値を取得
+        function getCategoryPartnersFromForm() {
+            var categories = (typeof SYSTEM_CATEGORIES !== 'undefined') ? SYSTEM_CATEGORIES : ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','その他'];
+            var result = {};
+            categories.forEach(function(cat) {
+                var sel = document.getElementById('cp_' + cat.replace(/[\/]/g, '_'));
+                result[cat] = sel ? (sel.value || null) : null;
+            });
+            return result;
+        }
+
+        // 事業所コードを自動生成（既存コードとの重複を回避）
+        function generateOfficeCode() {
+            const companyCode = currentUser.companyCode || 'DEMO';
+            // 既存の全事業所コードを取得
+            var allOff = JSON.parse(localStorage.getItem('offices') || '[]');
+            var existingCodes = allOff.map(function(o) { return o.code; });
+            // 重複しない番号を探す
+            var num = officeCounter;
+            var code;
+            do {
+                code = companyCode + '-J' + String(num).padStart(4, '0');
+                num++;
+            } while (existingCodes.indexOf(code) >= 0);
+            officeCounter = num;
+            return code;
+        }
+
+        // ステータスのラベル
+        const statusLabels = {
+            active: '有効',
+            inactive: '無効'
+        };
+
+        // モーダル開閉
+        function openModal() {
+            document.body._scrollY = window.scrollY;
+            document.body.style.top = (-window.scrollY) + 'px';
+            document.body.classList.add('modal-open');
+            document.getElementById('modalTitle').textContent = '事業所設定';
+            document.getElementById('officeModal').classList.add('active');
+            document.getElementById('officeForm').reset();
+            document.getElementById('editIndex').value = '';
+            document.getElementById('status').value = 'active';
+            document.getElementById('officeCode').value = '';
+            renderCategoryPartners({});
+        }
+
+        function openEditModal(index) {
+            document.body._scrollY = window.scrollY;
+            document.body.style.top = (-window.scrollY) + 'px';
+            document.body.classList.add('modal-open');
+            const office = offices[index];
+            document.getElementById('modalTitle').textContent = '事業所編集';
+            document.getElementById('officeModal').classList.add('active');
+            document.getElementById('editIndex').value = index;
+            
+            // フォームにデータを設定
+            document.getElementById('officeCode').value = office.code;
+            document.getElementById('officeName').value = office.name;
+            document.getElementById('designationNumber').value = office.designationNumber || '';
+            document.getElementById('serviceType').value = office.serviceType;
+            document.getElementById('postalCode').value = office.postalCode;
+            document.getElementById('prefecture').value = office.prefecture;
+            document.getElementById('address').value = office.address;
+            document.getElementById('building').value = office.building || '';
+            document.getElementById('phone').value = office.phone;
+            document.getElementById('fax').value = office.fax || '';
+            document.getElementById('email').value = office.email || '';
+            document.getElementById('status').value = office.status;
+            document.getElementById('notes').value = office.notes || '';
+            renderCategoryPartners(office.categoryPartners || {});
+        }
+
+        function closeModal() {
+            document.body.classList.remove('modal-open');
+            document.body.style.top = '';
+            window.scrollTo(0, document.body._scrollY || 0);
+            document.getElementById('officeModal').classList.remove('active');
+        }
+
+        // フォーム送信
+        document.getElementById('officeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const editIndex = document.getElementById('editIndex').value;
+            let officeCode;
+            
+            if (editIndex !== '') {
+                // 編集モード：既存のコードを使用
+                officeCode = offices[editIndex].code;
+            } else {
+                // 新規登録モード：コードを自動生成
+                officeCode = generateOfficeCode();
+            }
+            
+            const officeData = {
+                companyCode: currentUser.companyCode || 'DEMO',
+                companyName: currentUser.companyName || 'デモ会社',
+                code: officeCode,
+                name: document.getElementById('officeName').value,
+                designationNumber: document.getElementById('designationNumber').value,
+                serviceType: document.getElementById('serviceType').value,
+                postalCode: document.getElementById('postalCode').value,
+                prefecture: document.getElementById('prefecture').value,
+                address: document.getElementById('address').value,
+                building: document.getElementById('building').value,
+                phone: document.getElementById('phone').value,
+                fax: document.getElementById('fax').value,
+                email: document.getElementById('email').value,
+                status: document.getElementById('status').value,
+                notes: document.getElementById('notes').value,
+                createdAt: new Date().toLocaleDateString('ja-JP')
+            };
+
+            
+            if (editIndex !== '') {
+                // 編集モード
+                const globalIndex = allOffices.findIndex(o => o.code === offices[editIndex].code);
+                if (globalIndex !== -1) {
+                    allOffices[globalIndex] = {
+                        ...officeData,
+                        createdAt: allOffices[globalIndex].createdAt // 登録日は保持
+                    };
+                }
+                var beforeOffice = JSON.parse(JSON.stringify(allOffices[globalIndex]));
+                logEvent('update_office', { officeCode: officeCode, officeName: officeData.name, before: { name: beforeOffice.name, address: beforeOffice.address }, after: { name: officeData.name, address: officeData.address } });
+                ErrorHandler.showSuccess('事業所情報を更新しました');
+            } else {
+                // 新規登録モード
+                allOffices.push(officeData);
+                logEvent('add_office', { officeCode: officeCode, officeName: officeData.name });
+                ErrorHandler.showSuccess('事業所を登録しました（事業所コード: ' + officeCode + '）');
+            }
+
+            // LocalStorageに保存（全データ）
+            localStorage.setItem('offices', JSON.stringify(allOffices));
+            localStorage.setItem('officeCounter', officeCounter.toString());
+
+            // フィルタリングして再表示
+            offices = filterOfficesByScope(allOffices);
+
+            // 検索結果を表示
+            document.getElementById('resultsSection').classList.add('visible');
+            renderOffices();
+            closeModal();
+        });
+
+        // 事業所一覧を表示
+        var om_currentPage = 1;
+        var om_pageSize = 30;
+        var om_lastFiltered = null;
+
+        function renderOffices(filteredOffices = null) {
+            const officeList = document.getElementById('officeList');
+            const displayOffices = filteredOffices || offices;
+            om_lastFiltered = filteredOffices;
+            
+            if (displayOffices.length === 0) {
+                officeList.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                            ${filteredOffices ? '該当する事業所がありません' : '事業所がありません。新規追加ボタンから登録してください。'}
+                        </td>
+                    </tr>
+                `;
+                if (document.getElementById('omPagination')) document.getElementById('omPagination').innerHTML = '';
+            } else {
+                var totalPages = Math.ceil(displayOffices.length / om_pageSize);
+                if (om_currentPage > totalPages) om_currentPage = totalPages;
+                var start = (om_currentPage - 1) * om_pageSize;
+                var pageOffices = displayOffices.slice(start, start + om_pageSize);
+
+                officeList.innerHTML = pageOffices.map((office, index) => {
+                    const originalIndex = offices.indexOf(office);
+                    return `
+                    <tr>
+                        <td>${office.code}</td>
+                        <td>${office.name}</td>
+                        <td>${office.designationNumber || '-'}</td>
+                        <td>${office.phone}</td>
+                        <td><span class="status-badge status-${office.status}">${statusLabels[office.status]}</span></td>
+                        <td><button class="btn-edit" onclick="openEditModal(${originalIndex})">編集</button></td>
+                    </tr>
+                `;
+                }).join('');
+
+                renderPagination('omPagination', om_currentPage, totalPages, displayOffices.length, function(page) {
+                    om_currentPage = page;
+                    renderOffices(om_lastFiltered);
+                });
+            }
+            
+            document.getElementById('totalCount').textContent = offices.length;
+            document.getElementById('displayCount').textContent = displayOffices.length;
+        }
+
+        // 検索
+        function searchOffices() {
+            om_currentPage = 1;
+            const searchCode = document.getElementById('searchCode').value.toLowerCase();
+            const searchName = document.getElementById('searchName').value.toLowerCase();
+            const searchStatus = document.getElementById('searchStatus').value;
+
+            const filtered = offices.filter(office => {
+                const matchCode = !searchCode || office.code.toLowerCase().includes(searchCode);
+                const matchName = !searchName || office.name.toLowerCase().includes(searchName);
+                const matchStatus = !searchStatus || office.status === searchStatus;
+                return matchCode && matchName && matchStatus;
+            });
+
+            // 検索結果セクションを表示
+            document.getElementById('resultsSection').classList.add('visible');
+            renderOffices(filtered);
+        }
+
+        // CSVエクスポート
+        function downloadCSV() {
+            const statusLabelsCSV = { active: '有効', inactive: '無効', suspended: '停止中' };
+            const data = om_lastFiltered || offices;
+            if (data.length === 0) { ErrorHandler.showWarning('ダウンロードするデータがありません'); return; }
+
+            const bom = '\uFEFF';
+            const headers = ['事業所コード','事業所名','指定番号','電話番号','住所','ステータス'];
+            const rows = data.map(function(o) {
+                return [
+                    o.code,
+                    o.name,
+                    o.designationNumber || '',
+                    o.phone || '',
+                    o.address || '',
+                    statusLabelsCSV[o.status] || o.status || ''
+                ].map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(',');
+            });
+
+            var csv = bom + headers.join(',') + '\n' + rows.join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            var d = new Date();
+            link.download = '事業所一覧_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // 検索条件クリア
+        function clearSearch() {
+            document.getElementById('searchCode').value = '';
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchStatus').value = '';
+            document.getElementById('resultsSection').classList.remove('visible');
+        }
+
+        // モーダル外クリックで閉じる
+        document.getElementById('officeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 郵便番号から住所を自動取得
+        document.getElementById('postalCode').addEventListener('blur', async function() {
+            let postalCode = this.value.replace(/-/g, ''); // ハイフンを除去
+            
+            // 7桁の数字かチェック
+            if (postalCode.length !== 7 || !/^\d{7}$/.test(postalCode)) {
+                return;
+            }
+
+            try {
+                // 郵便番号検索APIを使用（無料で利用可能）
+                const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode}`);
+                const data = await response.json();
+
+                if (data.status === 200 && data.results) {
+                    const result = data.results[0];
+                    
+                    // 都道府県を設定
+                    document.getElementById('prefecture').value = result.address1;
+                    
+                    // 住所（市区町村 + 町域）を設定
+                    const addressValue = result.address2 + result.address3;
+                    document.getElementById('address').value = addressValue;
+                    
+                    // ハイフン付きの郵便番号に整形
+                    this.value = postalCode.substring(0, 3) + '-' + postalCode.substring(3);
+                } else {
+                    // 該当する住所が見つからない場合
+                }
+            } catch (error) {
+                console.error('住所の取得に失敗しました:', error);
+            }
+        });
+
+        // 初期化処理
+        (function init() {
+            // office_admin の場合、新規追加ボタンを非表示
+            if (currentUser.scope === 'office') {
+                const btnAdd = document.getElementById('btnAdd');
+                if (btnAdd) {
+                    btnAdd.style.display = 'none';
+                }
+            }
+
+            // 初回表示
+            document.getElementById('resultsSection').classList.add('visible');
+            renderOffices();
+        })();
+    </script>
+
+    <script>
+    // 統一ヘッダー初期化
+    UnifiedHeader.init({
+        icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="15" y2="14"/></svg>',
+        title: '事業所マスタ',
+        backButton: true
+    });
+    </script>
+</body>
+</html>

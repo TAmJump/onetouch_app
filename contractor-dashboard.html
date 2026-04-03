@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>対応依頼 | ワンタッチ管理</title>
+    <script src="error-handler.js"></script>
+    <script src="plan-gate.js"></script>
+    <script src="unified-header.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { overflow-x: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body.modal-open { overflow: hidden; position: fixed; width: 100%; }
+
+        /* コンテンツ */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ステータスタブ */
+        .status-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .status-tab {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .status-tab:hover {
+            border-color: #ccc;
+        }
+
+        .status-tab.active {
+            background: #1e3a5f;
+            border-color: #1e3a5f;
+        }
+
+        .status-tab-label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        .status-tab.active .status-tab-label {
+            color: rgba(255,255,255,.7);
+            font-weight: 600;
+        }
+
+        .status-tab-count {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .status-tab.active .status-tab-count {
+            color: #fff;
+        }
+
+        /* リクエストカード */
+        .request-card {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .request-card:hover {
+            border-color: #ccc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .request-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-low {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .request-meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .request-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+
+        /* 詳細モーダル */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overscroll-behavior: contain;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 1;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #1e3a5f;
+            padding: 8px 0;
+        }
+
+        .detail-photos {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .detail-photos img {
+            max-width: 200px;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            cursor: pointer;
+        }
+
+        .status-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .comment-input:focus,
+        .status-select:focus {
+            outline: none;
+            border-color: #999;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+
+        .btn-primary {
+            background: #1e3a5f;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a5f;
+        }
+
+        .comment-history {
+            margin-top: 16px;
+        }
+
+        .comment-item {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .comment-meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            color: #1e3a5f;
+        }
+
+        /* タイムライン */
+        .timeline { padding: 0; margin: 0; list-style: none; }
+        .timeline-item { display: flex; gap: 12px; padding-bottom: 20px; position: relative; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-left { width: 110px; flex-shrink: 0; text-align: right; padding-top: 2px; }
+        .timeline-date { font-size: 11px; color: #888; line-height: 1.4; }
+        .timeline-dot-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; flex-shrink: 0; margin-top: 4px; }
+        .timeline-dot.status-change { background: #1e3a5f; width: 12px; height: 12px; }
+        .timeline-dot.st-pending { background: #d97706; }
+        .timeline-dot.st-progress { background: #2563eb; }
+        .timeline-dot.st-complete { background: #16a34a; }
+        .timeline-dot.st-unavailable { background: #dc2626; }
+        .timeline-line { width: 1px; background: #e0e0e0; flex-grow: 1; margin-top: 4px; }
+        .timeline-item:last-child .timeline-line { display: none; }
+        .timeline-content { flex: 1; min-width: 0; padding-top: 0; }
+        .timeline-status { font-size: 13px; font-weight: 600; color: #1e3a5f; margin-bottom: 2px; }
+        .timeline-comment { font-size: 13px; color: #666; line-height: 1.5; }
+        
+        /* トーストアニメーション */
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(20px);
+                opacity: 0;
+            }
+        }
+        /* モバイル対応 */
+        @media (max-width: 768px) {
+            .container { padding: 12px; }
+            .section-title { font-size: 14px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .stat-card { padding: 12px; }
+            .stat-number { font-size: 20px; }
+            .report-card { padding: 14px; }
+            .report-header { flex-direction: column; gap: 8px; }
+            .report-title { font-size: 14px; }
+            .report-actions { flex-wrap: wrap; }
+            .report-actions button { font-size: 12px; padding: 6px 10px; }
+            .detail-grid { grid-template-columns: 1fr; }
+            .modal-content { margin: 10px; padding: 20px; max-height: 90vh; }
+            .comment-input { font-size: 14px; }
+            .timeline-date { font-size: 10px; min-width: 40px; }
+        }
+    </style>
+    <meta name="theme-color" content="#1e3a5f">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <!-- 統一ヘッダー -->
+    <div id="unified-header-mount"></div>
+
+    <!-- コンテンツ -->
+    <div class="container">
+        <div class="section-title">状態</div>
+        
+        <!-- ステータスタブ -->
+        <div class="status-tabs">
+            <div class="status-tab active" onclick="handleFilterByStatus('未対応', this)">
+                <div class="status-tab-label">未対応</div>
+                <div class="status-tab-count" id="countPending">0</div>
+            </div>
+            <div class="status-tab" onclick="handleFilterByStatus('対応中', this)">
+                <div class="status-tab-label">対応中</div>
+                <div class="status-tab-count" id="countInProgress">0</div>
+            </div>
+            <div class="status-tab" onclick="handleFilterByStatus('対応不可', this)">
+                <div class="status-tab-label">対応不可</div>
+                <div class="status-tab-count" id="countUnavailable">0</div>
+            </div>
+            <div class="status-tab" onclick="handleFilterByStatus('完了', this)">
+                <div class="status-tab-label">完了</div>
+                <div class="status-tab-count" id="countCompleted">0</div>
+            </div>
+        </div>
+
+        <!-- リクエストリスト -->
+        <div id="requestList"></div>
+    </div>
+
+    <!-- 詳細モーダル -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="detailTitle">通報詳細</div>
+                <button class="modal-close" onclick="closeDetail()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <div class="detail-label">通報元</div>
+                    <div class="detail-value" id="detailOffice">-</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">設備名</div>
+                    <div class="detail-value" id="detailItemName">-</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">カテゴリー</div>
+                    <div class="detail-value" id="detailCategory">-</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">場所</div>
+                    <div class="detail-value" id="detailLocation">-</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">通報日時</div>
+                    <div class="detail-value" id="detailDate">-</div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">状況</div>
+                    <div class="detail-value" id="detailDescription">-</div>
+                </div>
+
+                <div class="detail-section" id="detailPhotosSection" style="display:none;">
+                    <div class="detail-label">添付写真</div>
+                    <div class="detail-photos" id="detailPhotos"></div>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">対応ステータス</div>
+                    <select class="status-select" id="statusSelect" onchange="handleStatusChange()">
+                        <option value="未対応">未対応</option>
+                        <option value="対応中">対応中</option>
+                        <option value="対応不可">対応不可</option>
+                        <option value="完了">完了</option>
+                    </select>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">コメントを追加</div>
+                    <textarea class="comment-input" id="commentInput" placeholder="対応内容を入力してください..."></textarea>
+                    <button class="btn-primary" onclick="submitComment()" style="margin-top: 12px;">コメントを送信</button>
+                </div>
+                
+                <div class="detail-section">
+                    <div class="detail-label">対応履歴</div>
+                    <div id="timelineArea">
+                        <div style="color: #aaa; text-align: center; padding: 20px; font-size: 13px;">まだ履歴はありません</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ログインチェック
+        const currentContractor = JSON.parse(sessionStorage.getItem('currentContractor'));
+        if (!currentContractor) {
+            ErrorHandler.showWarning('ログインが必要です');
+            window.location.href = 'login.html';
+        }
+
+        let allReports = [];
+        let currentFilter = '未対応';
+        let currentReportId = null;
+
+        // 初期化
+        function init() {
+            const contractorName = currentContractor.companyName || '管理会社';
+            
+            // 旧ヘッダー要素はオプショナルに参照（統一ヘッダーが担当）
+            const userInfoEl = document.getElementById('userInfo');
+            if (userInfoEl) userInfoEl.textContent = contractorName;
+            
+            const avatarEl = document.getElementById('avatar');
+            if (avatarEl) {
+                if (typeof getAvatarHTML === 'function') {
+                    avatarEl.innerHTML = getAvatarHTML(contractorName);
+                } else {
+                    avatarEl.innerHTML = `<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${contractorName.charAt(0)}</span>`;
+                }
+            }
+            
+            loadReports();
+        }
+
+        // 通報データ読み込み
+        function loadReports() {
+            // DEMOモードの通報（sessionStorage）と本番の通報（localStorage）の両方を取得
+            // 管理会社はTAMJ以外の会社コードなのでisDemoMode()=falseだが、
+            // TAMJ（DEMOスタッフ）が送った通報はsessionStorageにある
+            let reportsFromSession = [];
+            let reportsFromLocal = [];
+            try {
+                reportsFromSession = JSON.parse(sessionStorage.getItem('onetouch.reports') || '[]');
+            } catch(e) {}
+            try {
+                reportsFromLocal = JSON.parse(localStorage.getItem('onetouch.reports') || '[]');
+            } catch(e) {}
+            
+            // 重複排除してマージ（IDベース）
+            const merged = [...reportsFromSession];
+            reportsFromLocal.forEach(r => {
+                if (!merged.find(m => m.id === r.id)) merged.push(r);
+            });
+            
+            allReports = merged;
+            
+            // 現在の管理会社に割り当てられた通報のみフィルター
+            allReports = allReports.filter(report => {
+                const match = report.assignedPartnerId === currentContractor.id ||
+                              report.assignedPartnerId === currentContractor.partnerCode;
+                if (match) {
+                }
+                return match;
+            });
+            
+            
+            updateStatusCounts();
+            renderRequests();
+        }
+
+        // ステータス件数更新
+        function updateStatusCounts() {
+            document.getElementById('countPending').textContent = 
+                allReports.filter(r => r.contractorStatus === '未対応').length;
+            document.getElementById('countInProgress').textContent = 
+                allReports.filter(r => r.contractorStatus === '対応中').length;
+            document.getElementById('countUnavailable').textContent = 
+                allReports.filter(r => r.contractorStatus === '対応不可').length;
+            document.getElementById('countCompleted').textContent = 
+                allReports.filter(r => r.contractorStatus === '完了').length;
+        }
+
+        // フィルター処理
+        function handleFilterByStatus(status, element) {
+            currentFilter = status;
+            
+            // アクティブタブ切り替え
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            renderRequests();
+        }
+
+        // リクエスト表示
+        function renderRequests() {
+            const filtered = allReports.filter(r => r.contractorStatus === currentFilter);
+            const listEl = document.getElementById('requestList');
+            
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">—</div>
+                        <div>「${currentFilter}」の依頼はありません</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            listEl.innerHTML = filtered.map(report => {
+                const date = new Date(report.timestamp);
+                const dateStr = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                
+                // 最新コメント
+                const comments = report.contractorComments || [];
+                const lastComment = comments.length > 0 ? comments[comments.length - 1] : null;
+                
+                return `
+                    <div class="request-card" onclick="showDetail('${report.id || report.reportId}')">
+                        <div class="request-header">
+                            <div class="request-title">${report.title || report.category || '未分類'}</div>
+                        </div>
+                        <div class="request-meta">
+                            ${dateStr} | ${report.location || '未記入'}
+                        </div>
+                        <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                            ${report.officeName || '不明'} | ${report.category || '-'}
+                        </div>
+                        <div class="request-description">
+                            ${report.description || '詳細なし'}
+                        </div>
+                        ${lastComment ? `
+                        <div style="margin-top: 8px; padding: 8px 10px; background: #f0f7ff; border-radius: 6px; font-size: 12px; color: #1565c0;">
+                            ${lastComment.text.substring(0, 50)}${lastComment.text.length > 50 ? '...' : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ログアウト
+        function handleLogout() {
+            if (confirm('ログアウトしますか？')) {
+                // 全てのセッション情報をクリア
+                sessionStorage.removeItem('currentContractor');
+                sessionStorage.removeItem('currentUser');
+                sessionStorage.removeItem('currentAccount');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 詳細表示
+        function showDetail(reportId) {
+            const report = allReports.find(r => (r.id || r.reportId) === reportId);
+            if (!report) {
+                ErrorHandler.showError('通報が見つかりません');
+                return;
+            }
+            
+            currentReportId = reportId;
+            
+            // 詳細情報を設定
+            document.getElementById('detailTitle').textContent = report.title || report.category || '未分類';
+            document.getElementById('detailOffice').textContent = (report.officeName || '不明') + '（' + (report.reporter || '') + '）';
+            document.getElementById('detailItemName').textContent = report.title || '-';
+            document.getElementById('detailCategory').textContent = report.category || '未分類';
+            document.getElementById('detailLocation').textContent = report.location || '未記入';
+            
+            const date = new Date(report.timestamp);
+            const dateStr = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('detailDate').textContent = dateStr;
+            
+            document.getElementById('detailDescription').textContent = report.description || '詳細なし';
+            document.getElementById('statusSelect').value = report.contractorStatus || '未対応';
+            
+            // 写真表示
+            var photosSection = document.getElementById('detailPhotosSection');
+            var photosContainer = document.getElementById('detailPhotos');
+            if (report.photos && report.photos.length > 0) {
+                photosContainer.innerHTML = report.photos.map(function(src) {
+                    return '<img src="' + src + '" onclick="window.open(this.src)" style="max-width:200px;border-radius:8px;border:1px solid #e8e8e8;cursor:pointer;">';
+                }).join('');
+                photosSection.style.display = 'block';
+            } else {
+                photosSection.style.display = 'none';
+            }
+            
+            // コメント履歴を表示
+            renderCommentHistory(report);
+            
+            // モーダルを表示
+            document.body._scrollY = window.scrollY;
+            document.body.style.top = (-window.scrollY) + 'px';
+            document.body.classList.add('modal-open');
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        // 詳細を閉じる
+        function closeDetail() {
+            document.body.classList.remove('modal-open');
+            document.body.style.top = '';
+            window.scrollTo(0, document.body._scrollY || 0);
+            document.getElementById('detailModal').classList.remove('active');
+            document.getElementById('commentInput').value = '';
+            currentReportId = null;
+        }
+
+        // コメント履歴を表示
+        function renderCommentHistory(report) {
+            renderTimeline(report);
+        }
+
+        function renderTimeline(report) {
+            const area = document.getElementById('timelineArea');
+            if (!area) return;
+            const history = report.statusHistory || [];
+
+            if (history.length === 0) {
+                area.innerHTML = '<div style="color: #aaa; text-align: center; padding: 20px; font-size: 13px;">まだ履歴はありません</div>';
+                return;
+            }
+
+            var html = '<div class="timeline">';
+            history.forEach(function(entry, i) {
+                var d = new Date(entry.timestamp);
+                var dateStr = (d.getMonth()+1) + '/' + d.getDate();
+                var timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+                var isLast = (i === history.length - 1);
+                var isComment = entry.type === 'comment';
+
+                // ドットの色クラス
+                var dotClass = 'timeline-dot';
+                if (!isComment) {
+                    dotClass += ' status-change';
+                    if (entry.status === '未対応') dotClass += ' st-pending';
+                    else if (entry.status === '対応中') dotClass += ' st-progress';
+                    else if (entry.status === '完了') dotClass += ' st-complete';
+                    else if (entry.status === '対応不可') dotClass += ' st-unavailable';
+                }
+
+                html += '<div class="timeline-item">';
+                html += '<div class="timeline-left"><div class="timeline-date">' + dateStr + '<br>' + timeStr + '</div></div>';
+                html += '<div class="timeline-dot-line"><div class="' + dotClass + '"></div><div class="timeline-line"></div></div>';
+                html += '<div class="timeline-content">';
+                if (!isComment) {
+                    html += '<div class="timeline-status">' + (entry.status || '') + '</div>';
+                }
+                if (entry.comment) {
+                    html += '<div class="timeline-comment">' + escapeHtml(entry.comment) + '</div>';
+                }
+                html += '</div></div>';
+            });
+            html += '</div>';
+            area.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        // ステータス変更
+        function handleStatusChange() {
+            if (!currentReportId) return;
+            
+            const newStatus = document.getElementById('statusSelect').value;
+            const report = allReports.find(r => (r.id || r.reportId) === currentReportId);
+            
+            if (!report) return;
+            
+            const oldStatus = report.contractorStatus || '未対応';
+            const now = new Date().toISOString();
+            report.contractorStatus = newStatus;
+            
+            // ステータス変更履歴を記録
+            if (!report.statusHistory) report.statusHistory = [];
+            report.statusHistory.push({
+                status: newStatus,
+                author: currentContractor.companyName || '管理会社',
+                timestamp: now
+            });
+            
+            // 初回対応時間を記録（未対応→それ以外に変わった最初のタイミング）
+            if (!report.firstResponseAt && newStatus !== '未対応') {
+                report.firstResponseAt = now;
+            }
+            
+            // 完了時間を記録
+            if (newStatus === '完了') {
+                report.completedAt = now;
+            }
+            
+            // 対応者を記録
+            report.handler = currentContractor.companyName || '管理会社';
+            
+            saveReports();
+            updateStatusCounts();
+            
+            logContractorEvent('status_change', { reportId: currentReportId, newStatus: newStatus, handler: report.handler, before: { contractorStatus: oldStatus }, after: { contractorStatus: newStatus } });
+            showToast('ステータスを「' + newStatus + '」に変更しました');
+
+            // スタッフ向け通知
+            if (typeof sendNotification === 'function' && report.userId) {
+                var statusMsg = {
+                    '対応中': '管理会社が対応を開始しました',
+                    '完了': '対応が完了しました',
+                    '対応不可': '管理会社が対応不可としました'
+                };
+                var msg = (statusMsg[newStatus] || 'ステータスが変更されました') + '：' + (report.title || report.category || '');
+                sendNotification({
+                    toUserId: report.userId,
+                    toRole: 'staff',
+                    type: 'status_change',
+                    reportId: currentReportId,
+                    message: msg
+                });
+            }
+        }
+
+        // コメント送信
+        function submitComment() {
+            if (!currentReportId) return;
+            
+            const commentText = document.getElementById('commentInput').value.trim();
+            if (!commentText) {
+                showToast('コメントを入力してください');
+                return;
+            }
+            
+            const report = allReports.find(r => (r.id || r.reportId) === currentReportId);
+            if (!report) return;
+            
+            // コメントを追加
+            if (!report.contractorComments) {
+                report.contractorComments = [];
+            }
+            
+            report.contractorComments.push({
+                author: currentContractor.companyName || '管理会社',
+                text: commentText,
+                timestamp: new Date().toISOString()
+            });
+
+            // タイムライン履歴にも記録
+            if (!report.statusHistory) report.statusHistory = [];
+            report.statusHistory.push({
+                type: 'comment',
+                status: report.contractorStatus || '未対応',
+                author: currentContractor.companyName || '管理会社',
+                comment: commentText,
+                timestamp: new Date().toISOString()
+            });
+            
+            saveReports();
+            
+            logContractorEvent('add_comment', { reportId: currentReportId, comment: commentText });
+
+            // スタッフ向け通知
+            if (typeof sendNotification === 'function' && report.userId) {
+                sendNotification({
+                    toUserId: report.userId,
+                    toRole: 'staff',
+                    type: 'contractor_comment',
+                    reportId: currentReportId,
+                    message: '管理会社からコメント：' + (commentText.length > 30 ? commentText.substring(0, 30) + '...' : commentText)
+                });
+            }
+
+            // 表示を更新
+            renderCommentHistory(report);
+            document.getElementById('commentInput').value = '';
+            
+            // トースト通知を表示
+            showToast('コメントを送信しました');
+            
+            // 詳細を閉じてカード一覧を更新
+            closeDetail();
+            renderRequests();
+        }
+        
+        // トースト通知
+        function showToast(message) {
+            // 既存のトーストを削除
+            const existingToast = document.getElementById('toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // トースト要素を作成
+            const toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #1e3a5f;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideUp 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // 3秒後に削除
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // 通報データを保存
+        // 監査ログ記録
+        function logContractorEvent(type, detail) {
+            try {
+                var logs = [];
+                try { logs = JSON.parse(sessionStorage.getItem('audit.logs') || '[]'); } catch(e) {}
+                var logsLocal = [];
+                try { logsLocal = JSON.parse(localStorage.getItem('audit.logs') || '[]'); } catch(e) {}
+                var merged = [...logs];
+                logsLocal.forEach(function(r) { if (!merged.find(function(m) { return m.timestamp === r.timestamp && m.userId === r.userId; })) merged.push(r); });
+                merged.push({
+                    timestamp: new Date().toISOString(),
+                    type: type,
+                    screen: 'contractor-dashboard',
+                    user: currentContractor?.companyName || '',
+                    userId: currentContractor?.loginId || '',
+                    companyCode: currentContractor?.partnerCode || '',
+                    details: typeof detail === 'string' ? detail : JSON.stringify(detail)
+                });
+                sessionStorage.setItem('audit.logs', JSON.stringify(merged));
+                localStorage.setItem('audit.logs', JSON.stringify(merged));
+            } catch(e) { console.error('監査ログエラー:', e); }
+        }
+
+        function saveReports() {
+            // 通報データはsessionStorageとlocalStorage両方に存在する可能性がある
+            // 更新対象の通報を両方で更新する
+            ['sessionStorage', 'localStorage'].forEach(storageName => {
+                const storage = storageName === 'sessionStorage' ? sessionStorage : localStorage;
+                const allStoredReports = JSON.parse(storage.getItem('onetouch.reports') || '[]');
+                if (allStoredReports.length === 0) return;
+                
+                let updated = false;
+                allReports.forEach(report => {
+                    const index = allStoredReports.findIndex(r => 
+                        (r.id || r.reportId) === (report.id || report.reportId)
+                    );
+                    if (index !== -1) {
+                        allStoredReports[index] = report;
+                        updated = true;
+                    }
+                });
+                
+                if (updated) {
+                    storage.setItem('onetouch.reports', JSON.stringify(allStoredReports));
+                }
+            });
+        }
+
+        // 初期化実行
+        init();
+    </script>
+
+    <script>
+
+    // 統一ヘッダー初期化
+    UnifiedHeader.init({
+        icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 16,12 14,15 10,9 8,12 2,12"/></svg>',
+        title: '対応依頼',
+        backButton: false
+    });
+    </script>
+</body>
+</html>
