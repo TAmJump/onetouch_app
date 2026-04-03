@@ -3,613 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ワンタッチ管理システム | 施設×管理会社をつなぐ設備通報アプリ</title>
+<title>ワンタッチ管理 | 施設×管理会社をつなぐ設備通報アプリ</title>
 <meta name="description" content="介護施設の設備トラブルをワンタッチで通報。管理会社への自動通知で対応スピードが劇的に向上します。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #0f172a;
-    --ink-mid: #475569;
-    --ink-light: #94a3b8;
-    --bg: #f8fafc;
-    --white: #fff;
-    --blue: #1e3a5f;
-    --blue-bright: #2563eb;
-    --blue-pale: #eff6ff;
-    --green: #059669;
-    --green-pale: #ecfdf5;
-    --amber: #d97706;
-    --amber-pale: #fffbeb;
-    --border: #e2e8f0;
-    --radius: 12px;
-  }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;color:#0f172a;line-height:1.8;background:#fff;overflow-x:hidden;}
+a{text-decoration:none;}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid #e2e8f0;padding:0 24px;}
+.nav-inner{max-width:1100px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:16px;font-weight:700;color:#1e3a5f;display:flex;align-items:center;gap:8px;}
+.nav-logo img{width:32px;height:32px;border-radius:6px;}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-links a{font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;color:#475569;transition:all .15s;}
+.nav-links a:hover{background:#f1f5f9;color:#1e3a5f;}
+.btn-nav{background:#1e3a5f!important;color:#fff!important;border-radius:8px!important;}
+.btn-nav:hover{opacity:.88!important;background:#1e3a5f!important;}
 
-  body {
-    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--ink);
-    line-height: 1.8;
-    background: var(--bg);
-    -webkit-text-size-adjust: 100%;
-    overflow-x: hidden;
-  }
+/* HERO */
+.hero{background:linear-gradient(135deg,#1e3a5f 0%,#2d5a8e 100%);color:#fff;padding:80px 24px 72px;text-align:center;}
+.hero-badge{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:20px;letter-spacing:.05em;}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:900;line-height:1.3;margin-bottom:20px;}
+.hero h1 span{color:#60a5fa;}
+.hero p{font-size:16px;color:rgba(255,255,255,0.85);max-width:600px;margin:0 auto 36px;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{background:#fff;color:#1e3a5f;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;transition:all .15s;display:inline-block;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.5);padding:13px 32px;border-radius:10px;font-size:15px;font-weight:600;transition:all .15s;display:inline-block;}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,0.1);}
 
-  /* ===== HERO ===== */
-  .hero {
-    background: var(--blue);
-    color: var(--white);
-    padding: 56px 24px 48px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content:'';
-    position:absolute;
-    top:-40%;right:-20%;
-    width:400px;height:400px;
-    background:radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
-    border-radius:50%;
-  }
-  .hero-badge {
-    display:inline-block;
-    background:rgba(255,255,255,0.15);
-    color:var(--white);
-    padding:5px 16px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:1.5px;
-    margin-bottom:20px;
-    backdrop-filter:blur(4px);
-  }
-  .hero h1 {
-    font-size:26px;
-    font-weight:900;
-    line-height:1.45;
-    margin-bottom:14px;
-    letter-spacing:-0.3px;
-  }
-  .hero h1 em {
-    font-style:normal;
-    color:#93c5fd;
-  }
-  .hero p {
-    font-size:14px;
-    color:rgba(255,255,255,0.7);
-    max-width:380px;
-    margin:0 auto 28px;
-    line-height:1.7;
-  }
-  .hero-cta {
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:var(--white);
-    color:var(--blue);
-    padding:14px 28px;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:700;
-    text-decoration:none;
-    transition:transform .2s, box-shadow .2s;
-  }
-  .hero-cta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
-  .hero-cta svg { flex-shrink:0; }
+/* SECTION */
+section{padding:72px 24px;}
+.section-inner{max-width:1100px;margin:0 auto;}
+.section-label{font-size:12px;font-weight:700;color:#2563eb;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.section-title{font-size:clamp(22px,3.5vw,34px);font-weight:900;color:#0f172a;margin-bottom:14px;}
+.section-sub{font-size:15px;color:#64748b;max-width:600px;margin:0 auto 48px;}
 
-  /* ===== SECTIONS ===== */
-  .section {
-    padding:48px 20px;
-    max-width:540px;
-    margin:0 auto;
-  }
-  .section-label {
-    font-size:11px;
-    font-weight:700;
-    color:var(--blue-bright);
-    letter-spacing:2px;
-    margin-bottom:6px;
-  }
-  .section h2 {
-    font-size:22px;
-    font-weight:900;
-    line-height:1.4;
-    margin-bottom:20px;
-  }
-  .section h2 em { font-style:normal; color:var(--blue-bright); }
+/* PROBLEMS */
+.problems{background:#fafafa;}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;}
+.problem-card{background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0;}
+.problem-icon{font-size:28px;margin-bottom:10px;}
+.problem-card h3{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:6px;}
+.problem-card p{font-size:13px;color:#64748b;line-height:1.7;}
 
-  /* ===== お悩みセクション ===== */
-  .pain-section { background:var(--white); }
-  .pain-list { display:flex; flex-direction:column; gap:12px; }
-  .pain-item {
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-    padding:14px 16px;
-    background:var(--bg);
-    border-radius:var(--radius);
-    font-size:14px;
-    line-height:1.6;
-  }
-  .pain-icon {
-    flex-shrink:0;
-    width:32px;height:32px;
-    background:var(--amber-pale);
-    border-radius:8px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:16px;
-  }
+/* FEATURES */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
+.feature-card{border-radius:14px;border:1px solid #e2e8f0;padding:28px;transition:box-shadow .15s;}
+.feature-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.feature-card h3{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;}
+.feature-card p{font-size:13px;color:#64748b;line-height:1.7;}
 
-  /* ===== 機能セクション ===== */
-  .features { display:flex; flex-direction:column; gap:14px; }
-  .feature-card {
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:20px;
-    transition:box-shadow .2s;
-  }
-  .feature-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
-  .feature-icon {
-    width:40px;height:40px;
-    background:var(--blue-pale);
-    border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    margin-bottom:12px;
-  }
-  .feature-card h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
-  .feature-card p { font-size:13px; color:var(--ink-mid); line-height:1.6; }
+/* HOW */
+.how{background:#f8fafc;}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px;position:relative;}
+.step{text-align:center;}
+.step-num{width:44px;height:44px;border-radius:50%;background:#1e3a5f;color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.step h3{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:6px;}
+.step p{font-size:13px;color:#64748b;}
 
-  /* ===== カテゴリーセクション ===== */
-  .cat-grid {
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:10px;
-    margin-top:16px;
-  }
-  .cat-chip {
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:12px 14px;
-    font-size:14px;
-    font-weight:600;
-    text-align:center;
-    color:var(--ink);
-  }
-  .cat-chip.new {
-    border-color:var(--blue-bright);
-    background:var(--blue-pale);
-    color:var(--blue-bright);
-  }
+/* PRICING */
+.pricing{background:#fff;}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:760px;margin:0 auto;}
+.plan-card{border-radius:16px;border:2px solid #e2e8f0;padding:32px 28px;}
+.plan-card.featured{border-color:#1e3a5f;position:relative;}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#1e3a5f;color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;white-space:nowrap;}
+.plan-name{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:8px;}
+.plan-price{font-size:32px;font-weight:900;color:#1e3a5f;margin-bottom:6px;}
+.plan-price span{font-size:14px;font-weight:400;color:#64748b;}
+.plan-price.free-price{color:#059669;}
+.plan-desc{font-size:13px;color:#64748b;margin-bottom:24px;}
+.plan-features{list-style:none;margin-bottom:28px;}
+.plan-features li{font-size:13px;color:#374151;padding:6px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;}
+.plan-features li:last-child{border:none;}
+.check{color:#059669;font-weight:700;font-size:15px;}
+.cross{color:#cbd5e1;}
+.plan-btn{display:block;text-align:center;padding:12px;border-radius:8px;font-size:14px;font-weight:700;transition:all .15s;}
+.plan-btn.free-btn{background:#f1f5f9;color:#1e3a5f;}
+.plan-btn.free-btn:hover{background:#e2e8f0;}
+.plan-btn.pro-btn{background:#1e3a5f;color:#fff;}
+.plan-btn.pro-btn:hover{opacity:.88;}
 
-  /* ===== セキュリティ ===== */
-  .security-section { background:var(--ink); color:var(--white); padding:48px 20px; }
-  .security-section .section { padding:0; }
-  .security-section .section-label { color:#93c5fd; }
-  .security-section h2 { color:var(--white); }
-  .security-grid { display:flex; flex-direction:column; gap:12px; }
-  .security-item {
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    padding:16px;
-    background:rgba(255,255,255,0.06);
-    border-radius:var(--radius);
-    border:1px solid rgba(255,255,255,0.08);
-  }
-  .security-icon {
-    flex-shrink:0;
-    width:36px;height:36px;
-    background:rgba(37,99,235,0.2);
-    border-radius:8px;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .security-item h4 { font-size:14px; font-weight:700; margin-bottom:2px; }
-  .security-item p { font-size:12px; color:rgba(255,255,255,0.6); line-height:1.5; }
+/* CTA */
+.cta{background:linear-gradient(135deg,#1e3a5f,#2d5a8e);color:#fff;text-align:center;}
+.cta h2{font-size:clamp(22px,4vw,36px);font-weight:900;margin-bottom:14px;}
+.cta p{font-size:15px;color:rgba(255,255,255,0.85);margin-bottom:36px;}
 
-  /* ===== メリット ===== */
-  .merit-list { counter-reset:merit; display:flex; flex-direction:column; gap:14px; }
-  .merit-item {
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    padding:16px 18px;
-    background:var(--white);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-  }
-  .merit-num {
-    counter-increment:merit;
-    flex-shrink:0;
-    width:32px;height:32px;
-    background:var(--blue);
-    color:var(--white);
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:900;
-  }
-  .merit-num::before { content:counter(merit); }
-  .merit-item h4 { font-size:15px; font-weight:700; margin-bottom:2px; }
-  .merit-item p { font-size:13px; color:var(--ink-mid); line-height:1.5; }
+/* FOOTER */
+footer{background:#0f172a;color:#94a3b8;padding:32px 24px;text-align:center;font-size:13px;}
+footer a{color:#94a3b8;margin:0 8px;}
+footer a:hover{color:#fff;}
 
-  /* ===== 利用の流れ ===== */
-  .flow-section { background:var(--white); }
-  .flow-steps { display:flex; flex-direction:column; gap:0; }
-  .flow-step {
-    display:flex;
-    align-items:flex-start;
-    gap:16px;
-    padding:16px 0;
-    position:relative;
-  }
-  .flow-step:not(:last-child)::after {
-    content:'';
-    position:absolute;
-    left:19px;top:52px;bottom:0;
-    width:2px;
-    background:var(--border);
-  }
-  .flow-dot {
-    flex-shrink:0;
-    width:40px;height:40px;
-    background:var(--blue);
-    color:var(--white);
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:900;
-    position:relative;
-    z-index:1;
-  }
-  .flow-step h4 { font-size:15px; font-weight:700; margin-bottom:2px; }
-  .flow-step p { font-size:13px; color:var(--ink-mid); line-height:1.5; }
-
-  /* ===== デモ ===== */
-  .demo-section {
-    background:var(--blue-pale);
-    padding:48px 20px;
-  }
-  .demo-section .section { padding:0; }
-  .demo-box {
-    background:var(--white);
-    border-radius:var(--radius);
-    padding:24px;
-    border:1px solid var(--border);
-    margin-top:20px;
-  }
-  .demo-box h3 { font-size:15px; font-weight:700; margin-bottom:12px; }
-  .demo-table {
-    width:100%;
-    font-size:13px;
-    border-collapse:collapse;
-    margin-bottom:16px;
-  }
-  .demo-table th { text-align:left; padding:8px 10px; background:var(--bg); font-weight:600; color:var(--ink-mid); font-size:12px; }
-  .demo-table td { padding:8px 10px; border-top:1px solid var(--border); }
-  .demo-table code { background:var(--bg); padding:2px 6px; border-radius:4px; font-size:12px; }
-  .btn-demo {
-    display:block;
-    width:100%;
-    padding:14px;
-    background:var(--blue);
-    color:var(--white);
-    border:none;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:700;
-    text-align:center;
-    text-decoration:none;
-    cursor:pointer;
-    transition:background .2s;
-  }
-  .btn-demo:hover { background:#162d4a; }
-
-  /* ===== CTA ===== */
-  .cta-section {
-    background:var(--blue);
-    color:var(--white);
-    padding:48px 20px;
-    text-align:center;
-  }
-  .cta-section h2 { color:var(--white); font-size:22px; margin-bottom:12px; }
-  .cta-section p { color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:24px; }
-  .btn-line {
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:#06C755;
-    color:var(--white);
-    padding:14px 28px;
-    border-radius:8px;
-    font-size:15px;
-    font-weight:700;
-    text-decoration:none;
-    transition:background .2s;
-  }
-  .btn-line:hover { background:#05b14c; }
-
-  /* ===== FOOTER ===== */
-  footer {
-    background:var(--ink);
-    color:rgba(255,255,255,0.5);
-    text-align:center;
-    padding:24px 20px;
-    font-size:12px;
-  }
-  footer a { color:rgba(255,255,255,0.5); text-decoration:none; }
-  footer a:hover { color:var(--white); }
+@media(max-width:640px){
+  .plan-grid{grid-template-columns:1fr;}
+  .nav-links .btn-nav-secondary{display:none;}
+}
 </style>
 </head>
 <body>
 
-<!-- ===== HERO ===== -->
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <img src="icon-192.png" alt="">
+      ワンタッチ管理
+    </a>
+    <div class="nav-links">
+      <a href="#features">機能</a>
+      <a href="#pricing">料金</a>
+      <a href="login.html" class="nav-btn-secondary" style="font-size:13px;font-weight:600;color:#475569;padding:8px 16px;">ログイン</a>
+      <a href="register.html" class="btn-nav" style="font-size:13px;font-weight:700;padding:8px 18px;background:#1e3a5f;color:#fff;border-radius:8px;">無料で始める</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">FOR FACILITY MANAGEMENT</div>
-  <h1>施設からの通報対応を<br><em>もっとスムーズに。</em></h1>
-  <p>介護施設の設備トラブルをワンタッチで通報。管理会社への即時通知で対応スピードが劇的に向上します。</p>
-  <a href="login.html" class="hero-cta">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5,3 19,12 5,21"/></svg>
-    デモを試す
-  </a>
-</section>
-
-<!-- ===== お悩み ===== -->
-<section class="section pain-section">
-  <div class="section-label">ISSUES</div>
-  <h2>こんなお悩み、<em>ありませんか？</em></h2>
-  <div class="pain-list">
-    <div class="pain-item">
-      <div class="pain-icon">!</div>
-      <div>施設からの電話が多く、<strong>対応漏れや聞き間違い</strong>が発生している</div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">!</div>
-      <div>どの施設の、どの設備で、いつ通報があったか<strong>情報がバラバラ</strong></div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">!</div>
-      <div>対応状況を施設に逐一報告するのが<strong>手間になっている</strong></div>
-    </div>
-    <div class="pain-item">
-      <div class="pain-icon">!</div>
-      <div>過去の対応履歴が残らず、<strong>同じトラブルを繰り返している</strong></div>
-    </div>
+  <div class="hero-badge">介護・福祉施設向け 設備管理クラウド</div>
+  <h1>設備トラブルを<span>ワンタッチ</span>で<br>管理会社に通報</h1>
+  <p>スタッフが直接通報、管理会社に自動通知。電話対応・報告書作成の手間をゼロに。</p>
+  <div class="hero-btns">
+    <a href="register.html" class="btn-primary">無料プランで始める →</a>
+    <a href="#pricing" class="btn-outline">料金を見る</a>
   </div>
 </section>
 
-<!-- ===== 機能紹介 ===== -->
-<section class="section">
-  <div class="section-label">FEATURES</div>
-  <h2>ワンタッチ管理の<em>主な機能</em></h2>
-  <div class="features">
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+<!-- PROBLEMS -->
+<section class="problems">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">PROBLEM</div>
+    <h2 class="section-title">こんなお悩み、ありませんか？</h2>
+    <div class="problem-grid" style="margin-top:40px;">
+      <div class="problem-card">
+        <div class="problem-icon">📞</div>
+        <h3>電話対応の負担</h3>
+        <p>施設からの電話が多く、対応漏れや聞き間違いが頻発している</p>
       </div>
-      <h3>ワンタッチ通報</h3>
-      <p>スタッフはカテゴリーを選んで設備を選ぶだけ。写真添付・音声入力にも対応し、ITが苦手な方でも迷わず使えます。</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="problem-card">
+        <div class="problem-icon">📋</div>
+        <h3>情報がバラバラ</h3>
+        <p>どの施設のどの設備の通報か、情報が紙・電話・メールに散在</p>
       </div>
-      <h3>管理会社へ即時通知</h3>
-      <p>通報内容はカテゴリーに紐づく管理会社に自動配信。電話の聞き間違いや伝達ミスがなくなります。</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      <div class="problem-card">
+        <div class="problem-icon">⏱️</div>
+        <h3>対応状況が不透明</h3>
+        <p>施設側が「今どういう状況？」と問い合わせてくる</p>
       </div>
-      <h3>ステータス管理</h3>
-      <p>受付→対応中→解決済みの進捗をリアルタイムで共有。施設側も管理会社側も状況が一目でわかります。</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-      </div>
-      <h3>履歴の一元管理</h3>
-      <p>全通報がデータベースに蓄積。CSV出力にも対応し、月次報告や設備更新計画の材料としても活用できます。</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===== 対応カテゴリー ===== -->
-<section class="section" style="background:var(--white);max-width:none;">
-  <div style="max-width:540px;margin:0 auto;">
-    <div class="section-label">CATEGORIES</div>
-    <h2>施設設備を<em>8カテゴリー</em>で管理</h2>
-    <p style="font-size:14px;color:var(--ink-mid);margin-bottom:4px;">施設の設備を網羅的にカバーするカテゴリー体系で、通報時に迷いません。</p>
-    <div class="cat-grid">
-      <div class="cat-chip">建物・外</div>
-      <div class="cat-chip">部屋・共用部</div>
-      <div class="cat-chip">介護医療備品</div>
-      <div class="cat-chip">厨房</div>
-      <div class="cat-chip">ネットワーク</div>
-      <div class="cat-chip new">浴室</div>
-      <div class="cat-chip new">福祉用具</div>
-      <div class="cat-chip">その他</div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== セキュリティ ===== -->
-<section class="security-section">
-  <div class="section" style="max-width:540px;">
-    <div class="section-label">SECURITY</div>
-    <h2>安心のセキュリティ設計</h2>
-    <div class="security-grid">
-      <div class="security-item">
-        <div class="security-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        </div>
-        <div>
-          <h4>SSL/TLS暗号化通信</h4>
-          <p>すべての通信はHTTPSで暗号化。第三者による盗聴や改ざんを防ぎます。</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <div class="security-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div>
-          <h4>施設ごとのデータ分離</h4>
-          <p>マルチテナント構成で施設データを完全分離。他施設のデータにはアクセスできません。</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <div class="security-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <div>
-          <h4>ロール別アクセス制御</h4>
-          <p>スタッフ・管理者・管理会社ごとに閲覧・操作範囲を厳密に制限しています。</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <div class="security-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-        <div>
-          <h4>監査ログ</h4>
-          <p>すべての操作履歴を記録。いつ誰が何をしたかを追跡可能です。</p>
-        </div>
-      </div>
-      <div class="security-item">
-        <div class="security-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
-        </div>
-        <div>
-          <h4>定期バックアップ</h4>
-          <p>データは自動バックアップ。万が一の障害時も復旧が可能です。</p>
-        </div>
+      <div class="problem-card">
+        <div class="problem-icon">📁</div>
+        <h3>履歴が残らない</h3>
+        <p>過去の対応記録がなく、同じトラブルを繰り返している</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== 導入メリット ===== -->
-<section class="section">
-  <div class="section-label">BENEFITS</div>
-  <h2>導入することで<em>得られる効果</em></h2>
-  <div class="merit-list">
-    <div class="merit-item">
-      <div class="merit-num"></div>
-      <div>
-        <h4>対応スピードの向上</h4>
-        <p>電話→通報アプリへ。情報が正確に伝わり、初動が早くなります。</p>
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">FEATURES</div>
+    <h2 class="section-title">主な機能</h2>
+    <p class="section-sub">施設管理に必要な機能をすべて搭載。導入初日から使い始められます。</p>
+    <div class="feature-grid" style="text-align:left;">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.5 1.19a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 6.35a16 16 0 006.57 6.57l.76-.76a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <h3>ワンタッチ通報</h3>
+        <p>スタッフはカテゴリを選んで設備を選ぶだけ。写真添付も可能。ITが苦手な方でも迷わず使えます。</p>
       </div>
-    </div>
-    <div class="merit-item">
-      <div class="merit-num"></div>
-      <div>
-        <h4>対応漏れゼロ</h4>
-        <p>すべての通報がシステムに記録され、未対応がひと目でわかります。</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <h3>管理会社へ即時通知</h3>
+        <p>カテゴリに紐づく担当管理会社に自動通知。電話の聞き間違い・伝達ミスをゼロに。</p>
       </div>
-    </div>
-    <div class="merit-item">
-      <div class="merit-num"></div>
-      <div>
-        <h4>施設との信頼関係強化</h4>
-        <p>対応状況をリアルタイム共有。「ちゃんとやってくれている」という安心感を提供。</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h3>ステータス管理</h3>
+        <p>未対応→対応中→完了の進捗をリアルタイム共有。施設・管理会社双方が状況を把握できます。</p>
       </div>
-    </div>
-    <div class="merit-item">
-      <div class="merit-num"></div>
-      <div>
-        <h4>報告業務の効率化</h4>
-        <p>CSV出力で月次報告を自動化。手作業でのレポート作成が不要に。</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h3>商品・設備マスタ</h3>
+        <p>CSV・Excelから設備情報を一括インポート。カテゴリ別に管理会社を自動紐づけ。</p>
       </div>
-    </div>
-    <div class="merit-item">
-      <div class="merit-num"></div>
-      <div>
-        <h4>低コストで導入</h4>
-        <p>Webアプリなので専用機器不要。スマホがあれば今日から使い始められます。</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <h3>履歴の一元管理</h3>
+        <p>全通報をデータベースに蓄積。CSV出力で月次報告や設備更新計画の資料として活用できます。</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== ご利用の流れ ===== -->
-<section class="section flow-section">
-  <div class="section-label">FLOW</div>
-  <h2>ご利用の流れ</h2>
-  <div class="flow-steps">
-    <div class="flow-step">
-      <div class="flow-dot">1</div>
-      <div>
-        <h4>お問い合わせ</h4>
-        <p>公式LINEまたはお電話でご連絡ください。</p>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-dot">2</div>
-      <div>
-        <h4>ヒアリング・ご提案</h4>
-        <p>施設数や設備内容に応じた最適なプランをご提案します。</p>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-dot">3</div>
-      <div>
-        <h4>初期設定・導入</h4>
-        <p>商品マスタの登録やアカウント設定をサポートします。</p>
-      </div>
-    </div>
-    <div class="flow-step">
-      <div class="flow-dot">4</div>
-      <div>
-        <h4>運用開始</h4>
-        <p>導入後もサポート体制を整えています。</p>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>ロール別アクセス管理</h3>
+        <p>スタッフ・事業所管理者・本社管理者・管理会社それぞれに最適な画面を提供。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== デモ ===== -->
-<section class="demo-section">
-  <div class="section">
-    <div class="section-label">DEMO</div>
-    <h2>まずは体験してみてください</h2>
-    <p style="font-size:14px;color:var(--ink-mid);">実際の通報画面をデモモードでお試しいただけます。</p>
-    <div class="demo-box">
-      <h3>デモ用ログイン情報</h3>
-      <table class="demo-table">
-        <thead>
-          <tr><th>ロール</th><th>ID</th><th>パスワード</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>スタッフ</td><td><code>demo-staff</code></td><td><code>demo</code></td></tr>
-          <tr><td>管理会社</td><td><code>pn001-yamada</code></td><td><code>demo</code></td></tr>
-          <tr><td>事業所管理者</td><td><code>demo-office</code></td><td><code>demo</code></td></tr>
-          <tr><td>本社管理者</td><td><code>TAMJ-H001</code></td><td><code>demo</code></td></tr>
-        </tbody>
-      </table>
-      <a href="login.html" class="btn-demo">デモアプリを開く</a>
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">HOW IT WORKS</div>
+    <h2 class="section-title">ご利用の流れ</h2>
+    <div class="steps" style="margin-top:48px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>無料登録</h3>
+        <p>会社名・担当者情報を入力するだけ。最短3分で利用開始できます。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>初期設定</h3>
+        <p>管理会社・事業所・スタッフを登録。ウィザードに沿って進めるだけ。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>設備を登録</h3>
+        <p>Excelから一括インポート可能。手入力でも簡単に登録できます。</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>運用開始</h3>
+        <p>スタッフのスマホから即日利用開始。PWA対応でアプリのインストール不要。</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ===== CTA ===== -->
-<section class="cta-section">
-  <h2>お気軽にご相談ください</h2>
-  <p>導入のご相談・お見積りは公式LINEから承ります。</p>
-  <a href="#LINE_URL" class="btn-line">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
-    公式LINEで相談する
-  </a>
+<!-- PRICING -->
+<section id="pricing" class="pricing">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">PRICING</div>
+    <h2 class="section-title">シンプルな料金プラン</h2>
+    <p class="section-sub">まずは無料プランでお試しください。規模が拡大したらProプランへ。</p>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name">無料プラン</div>
+        <div class="plan-price free-price">¥0<span>/月</span></div>
+        <div class="plan-desc">小規模施設・お試しに最適</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 事業所 1か所まで</li>
+          <li><span class="check">✓</span> アカウント 5名まで</li>
+          <li><span class="check">✓</span> 管理会社 3社まで</li>
+          <li><span class="check">✓</span> 商品マスタ 100件まで</li>
+          <li><span class="check">✓</span> 通報・写真添付</li>
+          <li><span class="check">✓</span> CSV/Excelインポート</li>
+          <li><span class="cross">—</span> PDF/画像インポート</li>
+          <li><span class="cross">—</span> 通報履歴CSV出力</li>
+          <li><span class="cross">—</span> 監査ログ・バックアップ</li>
+        </ul>
+        <a href="register.html" class="plan-btn free-btn">無料で始める</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">おすすめ</div>
+        <div class="plan-name">Proプラン</div>
+        <div class="plan-price">要相談<span>/月〜</span></div>
+        <div class="plan-desc">複数施設・本格運用に</div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 事業所 <strong>無制限</strong></li>
+          <li><span class="check">✓</span> アカウント <strong>無制限</strong></li>
+          <li><span class="check">✓</span> 管理会社 <strong>無制限</strong></li>
+          <li><span class="check">✓</span> 商品マスタ <strong>無制限</strong></li>
+          <li><span class="check">✓</span> 通報・写真添付</li>
+          <li><span class="check">✓</span> CSV/Excelインポート</li>
+          <li><span class="check">✓</span> PDF/画像インポート</li>
+          <li><span class="check">✓</span> 通報履歴CSV出力</li>
+          <li><span class="check">✓</span> 監査ログ・バックアップ</li>
+        </ul>
+        <a href="upgrade.html" class="plan-btn pro-btn">Proプランを申し込む</a>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- ===== FOOTER ===== -->
+<!-- CTA -->
+<section class="cta">
+  <div class="section-inner">
+    <h2>今日から無料で始めましょう</h2>
+    <p>クレジットカード不要。3分で登録完了。いつでもキャンセルできます。</p>
+    <a href="register.html" class="btn-primary">無料プランで登録する →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  <div style="margin-bottom:8px;">
-    <a href="https://tamjump.com/terms.html" target="_blank">利用規約</a>
-    <span style="margin:0 8px;">|</span>
-    <a href="https://tamjump.com/privacy.html" target="_blank">プライバシーポリシー</a>
-  </div>
-  <div>&copy; TAMJ / OneTouch Management. All rights reserved.</div>
+  <p style="margin-bottom:12px;font-weight:700;color:#e2e8f0;">ワンタッチ管理システム</p>
+  <p>
+    <a href="terms.html">利用規約</a>
+    <a href="privacy.html">プライバシーポリシー</a>
+    <a href="login.html">ログイン</a>
+  </p>
+  <p style="margin-top:16px;">© TAMJ / OneTouch Management. All rights reserved.</p>
 </footer>
 
 </body>

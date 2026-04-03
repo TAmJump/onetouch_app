@@ -152,6 +152,14 @@
             window.location.href = 'login.html';
         }
 
+        // 初回ログイン時はセットアップウィザードへ
+        if (currentUser.isFirstLogin) {
+            currentUser.isFirstLogin = false;
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            window.location.href = 'setup-wizard.html';
+            return;
+        }
+
         // ロール別の表示制御
         if (currentUser) {
             const role = currentUser.role;
