@@ -351,9 +351,6 @@
                     accs.forEach(function(a) { if (a.id && a.officeCode) _officeCodeCache[a.id] = a.officeCode; });
                 } catch(e) {}
                 // DEMOアカウントからも補完
-                if (typeof DEMO_ACCOUNTS !== 'undefined') {
-                    Object.keys(DEMO_ACCOUNTS).forEach(function(k) {
-                        var a = DEMO_ACCOUNTS[k];
                         if (a.id && a.officeCode) _officeCodeCache[a.id] = a.officeCode;
                     });
                 }

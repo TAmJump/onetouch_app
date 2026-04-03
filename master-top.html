@@ -199,13 +199,11 @@
             
             var demoUser;
             if (role === 'staff') {
-                demoUser = (typeof DEMO_ACCOUNTS !== 'undefined' && DEMO_ACCOUNTS.staff) || {
                     companyCode: 'TAMJ', id: 'demo-staff', password: 'demo',
                     name: 'デモスタッフ', role: 'staff', scope: 'office',
                     companyName: 'タムジ株式会社', officeCode: 'TAMJ-J0001', officeName: '東京事業所'
                 };
             } else if (role === 'contractor') {
-                demoUser = (typeof DEMO_ACCOUNTS !== 'undefined' && DEMO_ACCOUNTS['pn001-yamada']) || {
                     companyCode: 'PN001', id: 'pn001-yamada', password: 'demo',
                     name: '山田 太郎', role: 'contractor', companyName: 'TAMJ建設',
                     partnerId: 'PN001', partnerCode: 'PN001'

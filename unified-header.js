@@ -922,9 +922,7 @@ const UnifiedHeader = {
         if (dd) dd.classList.remove('show');
 
         // IDで直接検索、なければロール名でマッピング
-        var user = window.DEMO_ACCOUNTS && window.DEMO_ACCOUNTS[roleOrId];
-        if (!user && window.DEMO_ACCOUNTS) {
-            var roleMap = {
+        var user =         if (!user &&             var roleMap = {
                 'staff': 'tamj-j1-staff1',
                 'office_admin': 'tamj-j1-admin',
                 'company_admin': 'TAMJ-H001',
@@ -932,8 +930,7 @@ const UnifiedHeader = {
                 'contractor': 'pn001-yamada'
             };
             var mappedId = roleMap[roleOrId];
-            if (mappedId) user = window.DEMO_ACCOUNTS[mappedId];
-        }
+            if (mappedId) user =         }
         if (!user) return;
 
         // セッション切替

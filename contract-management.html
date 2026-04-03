@@ -55,7 +55,7 @@
     </style>
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
-    <script src="unified-header.js"></script>
+<script src="unified-header.js"></script>
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -177,13 +177,13 @@
         onBack: function() { window.location.href = 'system-admin.html'; }
     });
 
-    // カテゴリはdemo-mode.jsのgetAllCategoriesから動的取得（ハードコードしない）
+    // カテゴリはplan-gate.jsのgetAllCategoriesから動的取得（ハードコードしない）
     function getContractCategories() {
         if (typeof window.getAllCategories === 'function') {
             var officeCode = (typeof currentUser !== 'undefined' && currentUser.officeCode) ? currentUser.officeCode : 'TAMJ-J0001';
             return window.getAllCategories(officeCode);
         }
-        // フォールバック（demo-mode.js未読込時）
+        // フォールバック（plan-gate.js未読込時）
         return ['建物・外','部屋・共用部','介護医療備品','厨房','ネットワーク','浴室','福祉用具','その他'];
     }
     var ALL_CATEGORIES = getContractCategories();

@@ -26,7 +26,6 @@ const CACHE_FILES = [
   './setup-wizard.html',
   './docs.html',
   './audit-log.html',
-  './demo-mode.js',
   './unified-header.js',
   './icon-pwa-192.png',
   './icon-pwa-512.png',

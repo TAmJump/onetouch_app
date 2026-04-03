@@ -835,9 +835,7 @@
         function resetDemoData() {
             if (!confirm('デモデータを初期状態にリセットします。\n\nカスタマイズした内容（会社名変更、カテゴリ変更等）は全てリセットされます。\n\n実行しますか？')) return;
             localStorage.removeItem('demo_initialized');
-            if (typeof initDemoData === 'function') {
-                initDemoData();
-            }
+            
             ErrorHandler.showSuccess('デモデータをリセットしました。\n\n会社2社・事業所6件・アカウント36名・管理会社15社・商品600件・通報108件が初期状態に戻りました。');
             window.location.reload();
         }
