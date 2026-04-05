@@ -385,9 +385,9 @@ const UnifiedHeader = {
             `;
         }
 
-        // DEMOモード切替メニュー
+        // DEMOモード切替メニュー（isDemoMode フラグのみで判定）
         var demoSwitchMenu = '';
-        const isDemoMode = user && (user.isDemoMode || user.companyCode === 'TAMJ' || user.companyCode === 'JMAT' || user.companyCode === 'SYSTEM' || user.companyCode === 'PN001');
+        const isDemoMode = user && user.isDemoMode === true;
         if (isDemoMode) {
             const currentRole = user.role;
             const roles = [
@@ -577,16 +577,8 @@ const UnifiedHeader = {
     // ========== DEMOバッジ初期化 ==========
     _initDemoBadge() {
         const user = this._getUser();
-        let isDemo = user && user.companyCode === 'TAMJ';
-        // 管理会社の場合: currentContractorのassignedCompaniesにTAMJが含まれるか確認
-        if (!isDemo && user && user.role === 'contractor') {
-            try {
-                const contractor = JSON.parse(sessionStorage.getItem('currentContractor'));
-                if (contractor && contractor.assignedCompanies && contractor.assignedCompanies.includes('TAMJ')) {
-                    isDemo = true;
-                }
-            } catch (e) {}
-        }
+        // isDemoMode フラグのみで判定（会社コードでは判定しない）
+        let isDemo = user && user.isDemoMode === true;
         if (isDemo) {
             const badge = document.getElementById('uhDemoBadge');
             if (badge) badge.style.display = 'block';
@@ -1018,7 +1010,7 @@ const UnifiedHeader = {
         if (user.password !== current) { alert('現在のパスワードが正しくありません。'); return; }
 
         try {
-            const isDemoMode = user.companyCode === 'TAMJ' || !!user.isDemoMode;
+            const isDemoMode = !!user.isDemoMode;
             if (isDemoMode) {
                 user.password = newPw;
                 user.isFirstLogin = false;

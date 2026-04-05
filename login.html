@@ -195,17 +195,11 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') doLogin();
 });
 
-// 既ログイン済みリダイレクト
-(function() {
-  try {
-    var u = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
-    if (u && u.role) {
-      var routes = {system_admin:'system-admin.html',company_admin:'master-top.html',
-        office_admin:'master-top.html',staff:'report.html',contractor:'contractor-dashboard.html'};
-      window.location.href = routes[u.role] || 'report.html';
-    }
-  } catch(e) {}
-})();
+// ログインページを開いた時点で前セッションを必ずクリア
+// （別アカウントへの切り替え・誤ったリダイレクト防止）
+sessionStorage.removeItem('currentUser');
+sessionStorage.removeItem('currentContractor');
+sessionStorage.removeItem('_savedAdminSession');
 
 // PWA
 if ('serviceWorker' in navigator) {
