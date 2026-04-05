@@ -1,660 +1,216 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン | ワンタッチ管理</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans CJK JP", sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-container {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid #e8e8e8;
-            padding: 48px 40px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
-
-        .logo h1 {
-            font-size: 22px;
-            color: #2a2a2a;
-            margin-bottom: 6px;
-            font-weight: 700;
-        }
-
-        .logo p {
-            font-size: 13px;
-            color: #999;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #666;
-            font-size: 12px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.2s;
-            background: #fff;
-            color: #2a2a2a;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #999;
-            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
-        }
-
-        .form-group input::placeholder {
-            color: #bbb;
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper input {
-            padding-right: 45px;
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            color: #999;
-            font-size: 18px;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: #111111;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn-login:hover {
-            background: #333;
-        }
-
-        .error-message {
-            background: #fef2f2;
-            color: #dc2626;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-            border-left: 3px solid #dc2626;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .info {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 12px;
-            color: #aaa;
-            line-height: 1.6;
-        }
-
-        .demo-info {
-            margin-top: 24px;
-            padding: 16px 20px;
-            background: #fafafa;
-            border-radius: 10px;
-            border: 1px solid #eee;
-        }
-
-        .demo-info-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .demo-info-header span {
-            font-size: 16px;
-        }
-
-        .demo-info-header strong {
-            font-size: 13px;
-            color: #555;
-        }
-
-        .demo-info-body {
-            font-size: 12px;
-            color: #888;
-            line-height: 1.8;
-        }
-
-        .demo-info-body strong {
-            color: #555;
-        }
-
-        .footer {
-            margin-top: 40px;
-            text-align: center;
-            color: #bbb;
-            font-size: 12px;
-        }
-
-        .footer-links {
-            margin-top: 12px;
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        .footer-links a {
-            color: #999;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover {
-            color: #333;
-            text-decoration: underline;
-        }
-
-        .footer-copyright {
-            margin-top: 16px;
-            color: #ccc;
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 40px 24px;
-            }
-        }
-        @keyframes demoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
-        }
-    </style>
-    <script src="error-handler.js"></script>
-    <script src="plan-gate.js"></script>
-    <meta name="theme-color" content="#111111">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ログイン | ワンタッチ管理</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Sans JP',sans-serif;background:#f7f7f7;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card{background:#fff;border:1px solid #d9d9d9;padding:48px 40px;width:100%;max-width:400px;}
+.logo{text-align:center;margin-bottom:32px;}
+.logo img{width:72px;height:72px;}
+.logo p{font-size:13px;color:#8a8a8a;margin-top:10px;letter-spacing:.05em;}
+.field{margin-bottom:20px;}
+.label{display:block;font-size:12px;font-weight:700;color:#2a2a2a;margin-bottom:6px;letter-spacing:.05em;}
+.input-wrap{position:relative;}
+input[type=text],input[type=password]{width:100%;padding:11px 14px;border:1px solid #d9d9d9;font-size:14px;color:#111;outline:none;font-family:'Noto Sans JP',sans-serif;background:#fff;transition:border .15s;}
+input:focus{border-color:#111;}
+.toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8a8a8a;padding:4px;line-height:0;}
+.err{background:#fff0ee;border:1px solid #d4380d;color:#d4380d;padding:10px 14px;font-size:13px;margin-bottom:20px;display:none;}
+.err.show{display:block;}
+.btn-login{width:100%;padding:14px;background:#111;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.1em;font-family:'Noto Sans JP',sans-serif;transition:opacity .15s;margin-top:4px;}
+.btn-login:hover{opacity:.85;}
+.register-link{text-align:center;margin-top:20px;font-size:13px;color:#8a8a8a;}
+.register-link a{color:#d4380d;text-decoration:none;font-weight:700;}
+.hint{text-align:center;font-size:12px;color:#8a8a8a;margin-top:12px;line-height:1.8;}
+.footer{text-align:center;margin-top:32px;font-size:11px;color:#8a8a8a;letter-spacing:.05em;}
+.footer a{color:#8a8a8a;margin:0 6px;}
+.footer a:hover{color:#d4380d;}
+</style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <img src="icon-192.png" alt="ワンタッチ管理" class="logo-icon">
-            <p>ワンタッチ管理システム</p>
-        </div>
-
-        <div class="error-message" id="errorMessage"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="userId">ログインID</label>
-                <input type="text" id="userId" name="userId" required autofocus placeholder="例：TAMJ-tanaka">
-            </div>
-
-            <div class="form-group">
-                <label for="password">パスワード</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" name="password" required placeholder="パスワードを入力">
-                    <button type="button" class="toggle-password" onclick="togglePassword()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-login">ログイン</button>
-        </form>
-    <div style="text-align:center;margin-top:16px;font-size:14px;color:#8a8a8a;">まだ登録していない方は<a href="register.html" style="color:#111111;font-weight:600;">こちらから会社登録</a></div>
-
-        <div class="info">
-            アカウントマスタで登録されたログインIDと<br>パスワードを入力してください
-        </div>
-
+<div>
+  <div class="card">
+    <div class="logo">
+      <img src="icon-192.png" alt="ワンタッチ管理">
+      <p>ワンタッチ管理システム</p>
     </div>
 
-    <div class="footer">
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;color:#999;font-size:12px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-            <span>SSL/TLS暗号化通信で保護されています</span>
-        </div>
-        <div class="footer-links">
-            <a href="https://tamjump.com/terms.html" target="_blank">利用規約</a>
-            <span style="color: #ddd;">|</span>
-            <a href="https://tamjump.com/privacy.html" target="_blank">プライバシーポリシー</a>
-        </div>
-        <div class="footer-copyright">
-            © TAMJ / OneTouch Management. All rights reserved.
-        </div>
+    <div class="err" id="errMsg"></div>
+
+    <div class="field">
+      <label class="label">ログインID</label>
+      <div class="input-wrap">
+        <input type="text" id="userId" placeholder="例：TAMJ-tanaka" autocomplete="username">
+      </div>
     </div>
 
-    <script>
-        // ===== QRログイン処理 =====
-        // URLパラメータ: ?qr=companyCode:userId:token
-        (function() {
-            var params = new URLSearchParams(window.location.search);
-            var qr = params.get('qr');
-            if (!qr) return;
-            
-            var parts = qr.split(':');
-            if (parts.length < 3) return;
-            
-            var companyCode = parts[0];
-            var userId = parts[1];
-            var token = parts[2];
-            
-            // 簡易トークン検証（companyCode + userId のハッシュ的チェック）
-            var expected = btoa(companyCode + ':' + userId).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
-            if (token !== expected) {
-                ErrorHandler.showSuccess('QRコードが無効です。管理者にお問い合わせください。');
-                return;
-            }
-            
-            // アカウントを検索
-            var accounts = [];
-            try { accounts = JSON.parse(sessionStorage.getItem('accounts') || '[]'); } catch(e) {}
-            try {
-                var localAccounts = JSON.parse(localStorage.getItem('accounts') || '[]');
-                localAccounts.forEach(function(a) {
-                    if (!accounts.find(function(x) { return x.id === a.id; })) accounts.push(a);
-                });
-            } catch(e) {}
-            
-            var user = accounts.find(function(a) {
-                return a.companyCode === companyCode && (a.userId === userId || a.id === userId) && a.role === 'staff';
-            });
-            
-            if (!user) {
-                ErrorHandler.showError('このQRコードに対応するアカウントが見つかりません。');
-                return;
-            }
-            
-            // 自動ログイン
-            var sessionUser = {
-                id: user.id,
-                userId: user.userId || user.id,
-                name: user.name || user.userName || 'スタッフ',
-                userName: user.name || user.userName || 'スタッフ',
-                role: 'staff',
-                companyCode: user.companyCode,
-                companyName: user.companyName || '',
-                officeCode: user.officeCode || '',
-                officeName: user.officeName || ''
-            };
-            sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
-            
-            // 通報画面に直行
-            window.location.replace('report.html');
-        })();
-        
-        // 監査ログ記録関数
-        function logEvent(type, detail = {}) {
-            try {
-                const logs = JSON.parse(localStorage.getItem('audit.logs') || '[]');
-                const logEntry = {
-                    timestamp: new Date().toISOString(),
-                    type: type,
-                    user: detail.userName || detail.userId || '',
-                    userId: detail.userId || '',
-                    companyCode: detail.companyCode || '',
-                    officeCode: detail.officeCode || '',
-                    detail: detail,
-                    page: 'login.html'
-                };
-                logs.unshift(logEntry);
-                if (logs.length > 500) logs.length = 500;
-                localStorage.setItem('audit.logs', JSON.stringify(logs));
-            } catch (e) {
-                console.warn('監査ログの記録に失敗:', e);
-            }
+    <div class="field">
+      <label class="label">パスワード</label>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="パスワードを入力" autocomplete="current-password">
+        <button class="toggle-pw" type="button" onclick="togglePw()">
+          <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
 
-        // パスワード表示切り替え
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleBtn = document.querySelector('.toggle-password');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-            } else {
-                passwordInput.type = 'password';
-                toggleBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-            }
+    <button class="btn-login" onclick="doLogin()">ログイン</button>
+
+    <div class="register-link">
+      まだ登録していない方は<a href="register.html">こちらから会社登録</a>
+    </div>
+    <div class="hint">アカウントマスタで登録されたログインIDと<br>パスワードを入力してください</div>
+  </div>
+
+  <div class="footer">
+    <a href="https://tamjump.com/terms.html" target="_blank">利用規約</a>
+    <a href="https://tamjump.com/privacy.html" target="_blank">プライバシーポリシー</a><br>
+    <span style="margin-top:8px;display:inline-block;">© TAMJ / OneTouch Management. All rights reserved.</span>
+  </div>
+</div>
+
+<script>
+function showErr(msg) {
+  var el = document.getElementById('errMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideErr() {
+  document.getElementById('errMsg').classList.remove('show');
+}
+function togglePw() {
+  var inp = document.getElementById('password');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function doLogin() {
+  hideErr();
+  var id  = document.getElementById('userId').value.trim();
+  var pw  = document.getElementById('password').value;
+
+  if (!id) { showErr('ログインIDを入力してください'); return; }
+  if (!pw) { showErr('パスワードを入力してください'); return; }
+
+  // システム管理者（固定）
+  if (id === 'admin' && pw === 'admin') {
+    login({ id:'admin', name:'システム管理者', role:'system_admin',
+            companyCode:'SYSTEM', companyName:'ワンタッチ管理運営',
+            officeCode:'', officeName:'', plan:'pro', isDemoMode:false });
+    return;
+  }
+
+  // 登録済みアカウント
+  var accounts = [];
+  try { accounts = JSON.parse(localStorage.getItem('accounts') || '[]'); } catch(e) {}
+
+  var user = findAccount(id, pw, accounts);
+
+  // 管理会社アカウント
+  if (!user) {
+    var partners = [];
+    try { partners = JSON.parse(localStorage.getItem('partners') || '[]'); } catch(e) {}
+    user = findPartner(id, pw, partners);
+  }
+
+  if (!user) {
+    showErr('ログインIDまたはパスワードが正しくありません');
+    return;
+  }
+
+  login(user);
+}
+
+function findAccount(id, pw, accounts) {
+  var dash = id.indexOf('-');
+  var cc   = dash > 0 ? id.substring(0, dash).toUpperCase() : '';
+  var un   = dash > 0 ? id.substring(dash + 1) : id;
+  return accounts.find(function(a) {
+    if (a.password !== pw) return false;
+    if (a.status && a.status !== 'active') return false;
+    if (cc) return a.companyCode === cc && (a.loginName === un || a.id === id);
+    return a.id === id || a.loginName === id;
+  }) || null;
+}
+
+function findPartner(id, pw, partners) {
+  for (var i = 0; i < partners.length; i++) {
+    var p = partners[i];
+    var cs = p.contacts || [];
+    if (cs.length > 0) {
+      for (var j = 0; j < cs.length; j++) {
+        if (cs[j].loginId === id && cs[j].password === pw) {
+          return { id:cs[j].loginId, name:cs[j].name, role:'contractor',
+            companyCode:p.partnerCode||p.id, companyName:p.name,
+            partnerId:p.id, partnerCode:p.partnerCode,
+            categories:p.categories||[], assignedCompanies:p.assignedCompanies||[],
+            plan:'free', isDemoMode:false };
         }
-
-        // ログイン処理
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const loginInput = document.getElementById('userId').value.trim();
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // adminの特別処理（会社コード不要）
-            if (loginInput === 'admin' && password === 'admin') {
-                const adminUser = {
-                    id: 'admin',
-                    userId: 'admin',
-                    password: 'admin',
-                    name: 'システム管理者',
-                    userName: 'システム管理者',
-                    role: 'system_admin',
-                    scope: 'system',
-                    companyCode: 'SYSTEM',
-                    companyName: 'ワンタッチ管理運営',
-                    officeCode: '',
-                    officeName: '',
-                    status: 'active',
-                    isDemoMode: false
-                };
-                
-                sessionStorage.setItem('currentUser', JSON.stringify(adminUser));
-                localStorage.setItem('currentAccount', JSON.stringify(adminUser));
-                localStorage.setItem('ONE_loggedIn', '1');
-                localStorage.setItem('ONE_userId', 'admin');
-                localStorage.setItem('ONE_userName', 'システム管理者');
-                logEvent('login', { userId: 'admin', role: 'system_admin' });
-                window.location.href = 'system-admin.html';
-                return;
-            }
-            
-            // ログインIDから会社コードとユーザー名を自動分離
-            // 形式: TAMJ-tanaka → companyCode=TAMJ, userId=tanaka
-            // ハイフンなし（例: demo-staff）はそのままIDとして全検索
-            var companyCode = '';
-            var userId = loginInput;
-            var dashIndex = loginInput.indexOf('-');
-            if (dashIndex > 0) {
-                companyCode = loginInput.substring(0, dashIndex).toUpperCase();
-                userId = loginInput.substring(dashIndex + 1);
-            }
-            
-            if (!loginInput) {
-                errorMessage.textContent = 'ログインIDを入力してください';
-                errorMessage.classList.add('show');
-                return;
-            }
-            
-            
-            // LocalStorageからアカウントデータを取得
-            let accounts = [];
-            try {
-                accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-            } catch (e) {
-                accounts = [];
-            }
-            
-            // 管理会社データを取得（新規追加）
-            let partners = [];
-            try {
-                partners = JSON.parse(localStorage.getItem('partners')) || [];
-                
-                // 既存データにDEMO管理会社が含まれていなければ先頭に追加（優先マッチ）
-                const mergedPartners = [];
-                partners.forEach(p => {
-                    if (!mergedPartners.find(dp => dp.id === p.id || dp.loginId === p.loginId)) {
-                        mergedPartners.push(p);
-                    }
-                });
-                partners = mergedPartners;
-                
-                // 管理会社データを認証用フォーマットに変換（複数担当者対応）
-                var partnerAccounts = [];
-                partners.forEach(function(p) {
-                    var contacts = p.contacts || [];
-                    if (contacts.length > 0) {
-                        // contacts配列がある場合は各担当者をアカウントとして展開
-                        contacts.forEach(function(c) {
-                            partnerAccounts.push({
-                                companyCode: p.partnerCode || p.companyCode,
-                                id: c.loginId,
-                                password: c.password,
-                                name: c.name,
-                                role: 'contractor',
-                                companyName: p.name,
-                                partnerId: p.id,
-                                categories: p.categories || [],
-                                status: p.status || 'active'
-                            });
-                        });
-                    } else {
-                        // 後方互換: contacts配列がない場合は従来通り
-                        partnerAccounts.push({
-                            companyCode: p.partnerCode || p.companyCode,
-                            id: p.loginId,
-                            password: p.password,
-                            name: p.contactName || p.name,
-                            role: 'contractor',
-                            companyName: p.name,
-                            partnerId: p.id,
-                            categories: p.categories || [],
-                            status: p.status || 'active'
-                        });
-                    }
-                });
-                partners = partnerAccounts;
-            } catch (e) {
-                partners = [];
-            }
-            
-            // 全アカウント（デモ + マスタ登録 + 管理会社）
-            const allAccounts = [...accounts, ...partners];
-            
-            // ログインIDとパスワードで認証
-            // 1. companyCode分離でマッチ試行（TAMJ-tanaka → companyCode=TAMJ, userId=tanaka）
-            // 2. 失敗したらfullId全体でマッチ（p002-sato → idそのままで検索）
-            const fullId = loginInput;
-            let user = null;
-            
-            // まずcompanyCode分離でマッチ試行
-            if (companyCode) {
-                user = allAccounts.find(account => {
-                    if (account.password !== password) return false;
-                    if (account.companyCode !== companyCode) return false;
-                    return account.id === userId || account.id === fullId || account.loginName === userId;
-                });
-            }
-            
-            // 見つからなければfullId全体でマッチ（管理会社のloginIdなど）
-            if (!user) {
-                user = allAccounts.find(account => {
-                    if (account.password !== password) return false;
-                    return account.id === fullId || account.loginName === fullId;
-                });
-            }
-            
-            if (user) {
-                // 初回のみデモデータ投入
-                // DEMOユーザー → スナップショット保存
-
-                // メンテナンスモードチェック（システム管理者以外はブロック）
-                if (localStorage.getItem('maintenanceMode') === 'true' && user.role !== 'system_admin') {
-                    const maintenanceMsg = localStorage.getItem('maintenanceMessage') || '現在システムメンテナンス中です。しばらくお待ちください。';
-                    errorMessage.textContent = '' + maintenanceMsg;
-                    errorMessage.classList.add('show');
-                    return;
-                }
-
-                // 在籍状況をチェック
-                const status = user.status || 'active';
-                
-                if (status === 'retired') {
-                    errorMessage.textContent = 'このアカウントは退職済みのため、ログインできません。';
-                    errorMessage.classList.add('show');
-                    return;
-                }
-                
-                // ログイン成功
-                // セッション情報を保存
-                try {
-                    const userInfo = {
-                        companyCode: user.companyCode || '',
-                        companyName: user.companyName || '',
-                        id: user.id,
-                        userId: user.id, // userIdも追加
-                        password: user.password, // パスワードを追加
-                        name: user.name,
-                        userName: user.name, // report.html用に追加
-                        role: user.role,
-                        scope: user.scope || 'office',
-                        officeCode: user.officeCode || '',
-                        officeName: user.officeName || '',
-                        isFirstLogin: user.isFirstLogin || false  // 初回ログインフラグ
-                    };
-                    
-                    // sessionStorage（新システム用）
-                    sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
-                    
-                    // localStorage（元のシステム用 - currentAccount）
-                    localStorage.setItem('currentAccount', JSON.stringify(userInfo));
-                    
-                    // LocalStorageにも保存（互換性のため）
-                    localStorage.setItem('ONE_loggedIn', '1');
-                    localStorage.setItem('ONE_userId', user.id);
-                    localStorage.setItem('ONE_userName', user.name);
-                    
-                    // 監査ログ記録
-                    logEvent('login', { 
-                        userId: user.id, 
-                        userName: user.name, 
-                        companyCode: user.companyCode,
-                        officeCode: user.officeCode || '',
-                        role: user.role 
-                    });
-                    
-                    // 身分によって振り分け
-                    if (user.role === 'contractor') {
-                        // 管理会社の場合は専用ダッシュボードへ
-                        // 契約テーブルから担当会社を取得（assignedCompaniesの代替）
-                        var partnerAssignedCompanies = [];
-                        if (typeof getPartnerCompanies === 'function') {
-                            partnerAssignedCompanies = getPartnerCompanies(user.partnerId || user.companyCode);
-                        }
-                        // 後方互換: 契約テーブルに未移行の場合はassignedCompaniesを参照
-                        if (partnerAssignedCompanies.length === 0) {
-                            partnerAssignedCompanies = user.assignedCompanies || [];
-                        }
-                        if (partnerAssignedCompanies.length === 0 && user.companyCode) {
-                            partnerAssignedCompanies = [user.companyCode];
-                        }
-                        sessionStorage.setItem('currentContractor', JSON.stringify({
-                            id: user.partnerId || user.id,
-                            partnerId: user.partnerId,
-                            partnerCode: user.companyCode,
-                            companyName: user.companyName,
-                            name: user.name || user.companyName,
-                            loginId: user.id,
-                            contactName: user.name,
-                            categories: user.categories || [],
-                            assignedCompanies: partnerAssignedCompanies,
-                            role: 'contractor'
-                        }));
-                        window.location.href = 'contractor-dashboard.html';
-                    } else if (user.role === 'system_admin') {
-                        window.location.href = 'system-admin.html';
-                    } else if (user.role === 'admin' || user.role === 'company_admin' || user.role === 'office_admin') {
-                        window.location.href = 'master-top.html';
-                    } else {
-                        window.location.href = 'report.html';
-                    }
-                } catch (e) {
-                    errorMessage.textContent = 'ログイン処理中にエラーが発生しました。';
-                    errorMessage.classList.add('show');
-                }
-            } else {
-                // ログイン失敗
-                errorMessage.textContent = 'ログイン名またはパスワードが正しくありません';
-                errorMessage.classList.add('show');
-                
-                setTimeout(() => {
-                    errorMessage.classList.remove('show');
-                }, 3000);
-            }
-        });
-
-        // 既にログイン済みの場合はリダイレクト
-        try {
-            const currentUser = sessionStorage.getItem('currentUser');
-            const currentContractor = sessionStorage.getItem('currentContractor');
-            
-            if (currentContractor) {
-                // 管理会社としてログイン済み
-                const contractor = JSON.parse(currentContractor);
-                window.location.href = 'contractor-dashboard.html';
-            } else if (currentUser) {
-                // 通常ユーザーとしてログイン済み
-                const user = JSON.parse(currentUser);
-                if (user.role === 'system_admin') {
-                    window.location.href = 'system-admin.html';
-                } else if (user.role === 'admin' || user.role === 'company_admin' || user.role === 'office_admin') {
-                    window.location.href = 'master-top.html';
-                } else {
-                    window.location.href = 'report.html';
-                }
-            }
-        } catch (e) {
-            // エラーは無視
-        }
+      }
+    } else if (p.loginId === id && p.password === pw) {
+      return { id:p.loginId, name:p.contactName||p.name, role:'contractor',
+        companyCode:p.partnerCode||p.id, companyName:p.name,
+        partnerId:p.id, partnerCode:p.partnerCode,
+        categories:p.categories||[], assignedCompanies:p.assignedCompanies||[],
+        plan:'free', isDemoMode:false };
     }
-    </script>
-    <script>
-    // PWA Service Worker登録
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(function() {});
+  }
+  return null;
+}
+
+function login(user) {
+  var info = {
+    id:user.id, userId:user.id, name:user.name, role:user.role,
+    companyCode:user.companyCode||'', companyName:user.companyName||'',
+    officeCode:user.officeCode||'', officeName:user.officeName||'',
+    partnerId:user.partnerId||'', partnerCode:user.partnerCode||'',
+    categories:user.categories||[], assignedCompanies:user.assignedCompanies||[],
+    plan:user.plan||'free', isDemoMode:false, isFirstLogin:!!user.isFirstLogin
+  };
+  sessionStorage.setItem('currentUser', JSON.stringify(info));
+  localStorage.setItem('ONE_loggedIn','1');
+  localStorage.setItem('ONE_userId', user.id);
+  if (user.role === 'contractor') {
+    sessionStorage.setItem('currentContractor', JSON.stringify(info));
+  }
+
+  var routes = {
+    system_admin:'system-admin.html',
+    company_admin:'master-top.html',
+    office_admin:'master-top.html',
+    staff:'report.html',
+    contractor:'contractor-dashboard.html'
+  };
+  window.location.href = routes[user.role] || 'report.html';
+}
+
+// Enterキー対応
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+// 既ログイン済みリダイレクト
+(function() {
+  try {
+    var u = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+    if (u && u.role) {
+      var routes = {system_admin:'system-admin.html',company_admin:'master-top.html',
+        office_admin:'master-top.html',staff:'report.html',contractor:'contractor-dashboard.html'};
+      window.location.href = routes[u.role] || 'report.html';
     }
-    </script>
+  } catch(e) {}
+})();
+
+// PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+</script>
 </body>
 </html>
