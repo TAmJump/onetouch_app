@@ -916,59 +916,7 @@ const UnifiedHeader = {
     },
 
     // ========== DEMO切替 ==========
-    _demoSwitch(roleOrId) {
-        // ドロップダウンを閉じる
-        var dd = document.getElementById('uhDropdown');
-        if (dd) dd.classList.remove('show');
-
-        // IDで直接検索、なければロール名でマッピング
-        var user =         if (!user &&             var roleMap = {
-                'staff': 'tamj-j1-staff1',
-                'office_admin': 'tamj-j1-admin',
-                'company_admin': 'TAMJ-H001',
-                'system_admin': 'admin',
-                'contractor': 'pn001-yamada'
-            };
-            var mappedId = roleMap[roleOrId];
-            if (mappedId) user =         }
-        if (!user) return;
-
-        // セッション切替
-        sessionStorage.removeItem('currentUser');
-        sessionStorage.removeItem('currentContractor');
-
-        // 新しいユーザー情報をセット
-        const userInfo = {
-            companyCode: user.companyCode, companyName: user.companyName,
-            id: user.id, userId: user.id, password: user.password,
-            name: user.name, userName: user.name, role: user.role,
-            scope: user.scope || '', officeCode: user.officeCode || '',
-            officeName: user.officeName || '', isFirstLogin: false, isDemoMode: true
-        };
-        sessionStorage.setItem('currentUser', JSON.stringify(userInfo));
-        localStorage.setItem('currentAccount', JSON.stringify(userInfo));
-        localStorage.setItem('ONE_loggedIn', '1');
-        localStorage.setItem('ONE_userId', user.id);
-        localStorage.setItem('ONE_userName', user.name);
-
-        // 管理会社の場合はcontractor情報も保存
-        if (user.role === 'contractor') {
-            sessionStorage.setItem('currentContractor', JSON.stringify({
-                id: user.partnerId, partnerId: user.partnerId,
-                partnerCode: user.partnerCode, companyName: user.companyName,
-                name: user.name, loginId: user.id, contactName: user.name,
-                categories: user.categories, assignedCompanies: user.assignedCompanies,
-                role: 'contractor'
-            }));
-            window.location.href = 'contractor-dashboard.html';
-        } else if (user.role === 'office_admin') {
-            window.location.href = 'master-top.html';
-        } else if (user.role === 'company_admin') {
-            window.location.href = 'master-top.html';
-        } else {
-            window.location.href = 'report.html';
-        }
-    },
+    _demoSwitch(roleOrId) { /* removed */ },
 
     // ========== 内部メソッド ==========
 
@@ -1152,3 +1100,4 @@ function sendNotification(options) {
         UnifiedHeader._renderNotifList();
     }
     return notif;
+}
