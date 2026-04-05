@@ -149,16 +149,14 @@
         const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
         if (!currentUser) {
             window.location.href = 'login.html';
-        } else if (currentUser.role !== 'company_admin' && currentUser.role !== 'office_admin' && currentUser.role !== 'system_admin') {
-            window.location.href = 'login.html';
-        }
-
-        // 初回ログイン時はセットアップウィザードへ
-        if (currentUser && currentUser.isFirstLogin) {
-            currentUser.isFirstLogin = false;
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-            window.location.href = 'setup-wizard.html';
-            return;
+        } else {
+            if (currentUser.role !== 'company_admin' && currentUser.role !== 'office_admin' && currentUser.role !== 'system_admin') {
+                window.location.href = 'login.html';
+            } else if (currentUser.isFirstLogin) {
+                currentUser.isFirstLogin = false;
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                window.location.href = 'setup-wizard.html';
+            }
         }
 
         // ロール別の表示制御
