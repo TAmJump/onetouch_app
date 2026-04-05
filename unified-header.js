@@ -14,23 +14,23 @@ const UnifiedHeader = {
 
     // ========== カラーテーマ（Blue系デザイン 2026-02-14） ==========
     colors: {
-        primary: '#2563eb',
-        primaryDark: '#1e3a5f',
-        primaryLight: '#eff6ff',
+        primary: '#d4380d',
+        primaryDark: '#111111',
+        primaryLight: '#f7f7f7',
         primaryShadow: 'rgba(37, 99, 235, 0.3)',
-        text: '#1e293b',
-        textLight: '#475569',
-        textMuted: '#94a3b8',
+        text: '#2a2a2a',
+        textLight: '#5a5a5a',
+        textMuted: '#8a8a8a',
         bg: '#f5f7fa',
         bgWhite: '#ffffff',
         border: '#e2e8f0',
-        borderLight: '#f1f5f9',
-        hoverBg: '#f8fafc',
+        borderLight: '#f7f7f7',
+        hoverBg: '#f7f7f7',
         // ステータスカラー（機能的な色分け）
         success: '#059669',
         warning: '#d97706',
         danger: '#dc2626',
-        info: '#2563eb',
+        info: '#d4380d',
     },
 
     // ========== 初期化 ==========
@@ -93,7 +93,7 @@ const UnifiedHeader = {
         style.textContent = `
             /* ========== 統一ヘッダー ========== */
             .unified-header {
-                background: #1e3a5f;
+                background: #111111;
                 padding: 16px 24px;
                 display: flex;
                 justify-content: space-between;
@@ -129,7 +129,7 @@ const UnifiedHeader = {
 
             /* 管理画面に戻るバー */
             .uh-admin-return-bar {
-                background: #2563eb;
+                background: #d4380d;
                 color: white;
                 padding: 8px 16px;
                 font-size: 13px;
@@ -141,7 +141,7 @@ const UnifiedHeader = {
                 justify-content: center;
                 gap: 8px;
             }
-            .uh-admin-return-bar:hover { background: #1d4ed8; }
+            .uh-admin-return-bar:hover { background: #d4380d; }
 
             /* ユーザーボタン */
             .uh-user-btn {
@@ -190,7 +190,7 @@ const UnifiedHeader = {
                 position: sticky; top: 0; background: #fff; z-index: 1;
                 border-radius: 12px 12px 0 0;
             }
-            .uh-notif-header-title { font-size: 14px; font-weight: 700; color: #1e293b; }
+            .uh-notif-header-title { font-size: 14px; font-weight: 700; color: #2a2a2a; }
             .uh-notif-clear { font-size: 12px; color: #888; cursor: pointer; background: none; border: none; }
             .uh-notif-clear:hover { color: #333; }
             .uh-notif-item {
@@ -200,7 +200,7 @@ const UnifiedHeader = {
             .uh-notif-item:hover { background: #fafafa; }
             .uh-notif-item.unread { background: #f8f9ff; }
             .uh-notif-item:last-child { border-bottom: none; }
-            .uh-notif-msg { font-size: 13px; color: #1e293b; line-height: 1.5; margin-bottom: 4px; }
+            .uh-notif-msg { font-size: 13px; color: #2a2a2a; line-height: 1.5; margin-bottom: 4px; }
             .uh-notif-time { font-size: 11px; color: #aaa; }
             .uh-notif-empty { text-align: center; padding: 32px 16px; color: #aaa; font-size: 13px; }
 
@@ -228,7 +228,7 @@ const UnifiedHeader = {
             .uh-divider { height: 1px; background: #e0e0e0; margin: 4px 0; }
             .uh-menu-item.uh-logout { color: #dc2626; }
             .uh-menu-item.uh-logout:hover { background: #ffebee; }
-            .uh-menu-item.uh-demo-active { background: #f0f7ff; font-weight: 700; color: #2563eb; }
+            .uh-menu-item.uh-demo-active { background: #f0f7ff; font-weight: 700; color: #d4380d; }
 
             /* パスワード変更モーダル */
             .uh-pw-overlay {
@@ -248,7 +248,7 @@ const UnifiedHeader = {
                 width: 100%; padding: 10px; border: 1px solid #e0e0e0;
                 border-radius: 6px; font-size: 14px; box-sizing: border-box;
             }
-            .uh-pw-input:focus { outline: none; border-color: var(--primary, #2563eb); box-shadow: 0 0 0 3px rgba(229,57,53,0.1); }
+            .uh-pw-input:focus { outline: none; border-color: var(--primary, #d4380d); box-shadow: 0 0 0 3px rgba(229,57,53,0.1); }
             .uh-pw-hint { font-size: 12px; color: #666; margin-top: 4px; }
             .uh-pw-actions { display: flex; gap: 12px; justify-content: flex-end; }
             .uh-pw-cancel {
@@ -257,15 +257,15 @@ const UnifiedHeader = {
             }
             .uh-pw-cancel:hover { background: #e0e0e0; }
             .uh-pw-submit {
-                padding: 10px 20px; background: var(--primary, #2563eb); border: none;
+                padding: 10px 20px; background: var(--primary, #d4380d); border: none;
                 border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: white;
             }
-            .uh-pw-submit:hover { background: var(--primary-dark, #1d4ed8); }
+            .uh-pw-submit:hover { background: var(--primary-dark, #d4380d); }
 
             /* 初回ログインバナー */
             .uh-first-login {
                 display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-                background: #1e3a5f;
+                background: #111111;
                 color: white; padding: 16px 24px; border-radius: 12px;
                 box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
                 z-index: 9999; max-width: 500px; width: 90%;
@@ -282,7 +282,7 @@ const UnifiedHeader = {
             }
             .uh-fl-actions { display: flex; gap: 8px; margin-top: 12px; }
             .uh-fl-btn-now {
-                flex: 1; padding: 8px 16px; background: white; color: #2563eb;
+                flex: 1; padding: 8px 16px; background: white; color: #d4380d;
                 border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;
             }
             .uh-fl-btn-later {
@@ -400,7 +400,7 @@ const UnifiedHeader = {
                 <a href="#" class="uh-menu-item${r.active ? ' uh-demo-active' : ''}" onclick="UnifiedHeader._demoSwitch('${r.key}'); return false;">
                     <div class="uh-menu-icon"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};"></span></div>
                     <span class="uh-menu-text">${r.label}</span>
-                    ${r.active ? '<span style="margin-left:auto;color:#2563eb;font-size:14px;">✓</span>' : ''}
+                    ${r.active ? '<span style="margin-left:auto;color:#d4380d;font-size:14px;">✓</span>' : ''}
                 </a>
             `).join('');
             demoSwitchMenu = `
@@ -725,7 +725,7 @@ const UnifiedHeader = {
         if (existing) existing.remove();
         var toast = document.createElement('div');
         toast.id = 'uhNotifToast';
-        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .4s;z-index:9999;pointer-events:none;max-width:90%;text-align:center;';
+        toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111111;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .4s;z-index:9999;pointer-events:none;max-width:90%;text-align:center;';
         toast.textContent = msg;
         document.body.appendChild(toast);
         setTimeout(function() { toast.style.transform='translateX(-50%) translateY(0)'; toast.style.opacity='1'; }, 50);

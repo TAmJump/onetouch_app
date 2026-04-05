@@ -6,7 +6,7 @@
     <title>契約管理 | ワンタッチ管理</title>
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -30,7 +30,7 @@
         .section-title {
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
+            color: #2a2a2a;
             margin-bottom: 20px;
         }
         .links-row {
@@ -56,6 +56,8 @@
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
 <script src="unified-header.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -64,7 +66,7 @@
         <!-- 関連リンク -->
         <div class="section">
             <div class="links-row">
-                <a href="docs.html#guide" class="link-btn" style="background:#f0f7ff; border:1px solid #bfdbfe; color:#1e3a5f;">
+                <a href="docs.html#guide" class="link-btn" style="background:#f0f7ff; border:1px solid #eeeeee; color:#111111;">
                     📖 インポート補助機能について
                 </a>
                 <a href="docs.html#howto" class="link-btn" style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534;">
@@ -94,19 +96,19 @@
                 <div class="section-title" style="margin-bottom:0;">契約一覧（インポート時の管理会社自動解決）</div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input type="text" id="contractFilter" placeholder="管理会社名で検索..." oninput="cm_currentPage=1;renderTable()" style="padding:8px 14px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; width:220px;">
-                    <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space:nowrap;">CSVエクスポート</button>
+                    <button onclick="downloadCSV()" style="padding: 8px 20px; background: #111111; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; white-space:nowrap;">CSVエクスポート</button>
                 </div>
             </div>
             <div style="overflow-x:hidden;">
                 <table style="width:100%; border-collapse:collapse; font-size:14px; table-layout:fixed;">
                     <thead>
                         <tr style="background:#f8f9fa; border-bottom:2px solid #e8e8e8;">
-                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b; width:90px;">管理会社コード</th>
-                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b;">管理会社名</th>
-                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b; width:120px;">契約会社</th>
-                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#64748b;">担当カテゴリ</th>
-                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#64748b; width:60px;">状態</th>
-                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#64748b; width:60px;">操作</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#8a8a8a; width:90px;">管理会社コード</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#8a8a8a;">管理会社名</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#8a8a8a; width:120px;">契約会社</th>
+                            <th style="padding:10px 12px; text-align:left; font-weight:600; color:#8a8a8a;">担当カテゴリ</th>
+                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#8a8a8a; width:60px;">状態</th>
+                            <th style="padding:10px 12px; text-align:center; font-weight:600; color:#8a8a8a; width:60px;">操作</th>
                         </tr>
                     </thead>
                     <tbody id="contractBody">
@@ -123,18 +125,18 @@
     <div id="contractEditModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999;">
         <div style="background:#fff; border-radius:14px; padding:28px; max-width:500px; width:90%; margin:auto; position:relative; top:50%; transform:translateY(-50%);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="font-size:16px; font-weight:700; color:#1e293b;" id="contractEditTitle">契約編集</h3>
+                <h3 style="font-size:16px; font-weight:700; color:#2a2a2a;" id="contractEditTitle">契約編集</h3>
                 <button onclick="closeContractEdit()" style="background:none; border:none; font-size:20px; color:#999; cursor:pointer;">✕</button>
             </div>
             <input type="hidden" id="editContractId">
             
             <div style="margin-bottom:16px;">
-                <label style="display:block; font-size:13px; font-weight:600; color:#64748b; margin-bottom:6px;">担当カテゴリ</label>
+                <label style="display:block; font-size:13px; font-weight:600; color:#8a8a8a; margin-bottom:6px;">担当カテゴリ</label>
                 <div id="editCategoryCheckboxes" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
             </div>
             
             <div style="margin-bottom:20px;">
-                <label style="display:block; font-size:13px; font-weight:600; color:#64748b; margin-bottom:6px;">状態</label>
+                <label style="display:block; font-size:13px; font-weight:600; color:#8a8a8a; margin-bottom:6px;">状態</label>
                 <select id="editContractStatus" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:8px; font-size:14px;">
                     <option value="active">有効</option>
                     <option value="inactive">停止</option>
@@ -142,8 +144,8 @@
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button onclick="closeContractEdit()" style="flex:1; padding:12px; background:#f1f5f9; color:#334155; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">キャンセル</button>
-                <button onclick="saveContractEdit()" style="flex:1; padding:12px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">保存</button>
+                <button onclick="closeContractEdit()" style="flex:1; padding:12px; background:#f7f7f7; color:#5a5a5a; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">キャンセル</button>
+                <button onclick="saveContractEdit()" style="flex:1; padding:12px; background:#d4380d; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">保存</button>
             </div>
         </div>
     </div>
@@ -157,7 +159,7 @@
         html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
         html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
         var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
-        for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+        for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#d4380d':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#d4380d':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
         html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
         container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
     }
@@ -288,7 +290,7 @@
                 + '<td style="padding:10px 12px;">' + getCompanyName(c.companyCode) + '</td>'
                 + '<td style="padding:10px 12px;">' + (cats || '<span style="color:#ccc;">未設定</span>') + '</td>'
                 + '<td style="padding:10px 12px; text-align:center; white-space:nowrap;"><span style="display:inline-block;padding:3px 12px;border-radius:10px;font-size:12px;font-weight:600;color:#fff;background:' + statusColor + ';">' + statusText + '</span></td>'
-                + '<td style="padding:10px 12px; text-align:center; white-space:nowrap;"><button onclick="openContractEdit(\'' + c.id + '\')" style="padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">編集</button></td>'
+                + '<td style="padding:10px 12px; text-align:center; white-space:nowrap;"><button onclick="openContractEdit(\'' + c.id + '\')" style="padding:6px 14px;background:#d4380d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">編集</button></td>'
                 + '</tr>';
         }).join('');
         document.getElementById('contractCount').textContent = '';
@@ -310,8 +312,8 @@
         var latestCategories = getContractCategories();
         document.getElementById('editCategoryCheckboxes').innerHTML = latestCategories.map(function(cat) {
             var checked = currentCats.indexOf(cat) >= 0 ? 'checked' : '';
-            return '<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:' + (checked ? '#eff6ff' : '#f8f9fa') + ';border:1px solid ' + (checked ? '#2563eb' : '#e5e7eb') + ';border-radius:6px;cursor:pointer;font-size:13px;">'
-                + '<input type="checkbox" name="editCat" value="' + cat + '" ' + checked + ' style="accent-color:#2563eb;">'
+            return '<label style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:' + (checked ? '#f7f7f7' : '#f8f9fa') + ';border:1px solid ' + (checked ? '#d4380d' : '#e5e7eb') + ';border-radius:6px;cursor:pointer;font-size:13px;">'
+                + '<input type="checkbox" name="editCat" value="' + cat + '" ' + checked + ' style="accent-color:#d4380d;">'
                 + cat + '</label>';
         }).join('');
         document.getElementById('contractEditModal').style.display = 'block';
@@ -345,7 +347,7 @@
             renderTable();
             var toast = document.createElement('div');
             toast.textContent = '契約を更新しました';
-            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;';
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#111111;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;';
             document.body.appendChild(toast);
             setTimeout(function() { toast.remove(); }, 2000);
         }

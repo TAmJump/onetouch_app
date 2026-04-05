@@ -138,13 +138,13 @@ function showUpgradeModal(feature) {
   modal.innerHTML =
     '<div style="background:#fff;border-radius:16px;padding:40px 28px;max-width:380px;width:90%;text-align:center;">' +
     '<div style="font-size:44px;margin-bottom:14px;">🔒</div>' +
-    '<div style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:10px;">Proプランが必要です</div>' +
-    '<div style="font-size:14px;color:#64748b;margin-bottom:26px;line-height:1.7;">' +
+    '<div style="font-size:18px;font-weight:700;color:#2a2a2a;margin-bottom:10px;">Proプランが必要です</div>' +
+    '<div style="font-size:14px;color:#8a8a8a;margin-bottom:26px;line-height:1.7;">' +
     '「' + name + '」はProプランの機能です。<br>アップグレードで全機能をご利用いただけます。</div>' +
     '<div style="display:flex;gap:10px;justify-content:center;">' +
     '<button onclick="document.getElementById(\'_pgModal\').remove()" ' +
-    'style="padding:10px 22px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;color:#334155;">閉じる</button>' +
-    '<a href="upgrade.html" style="padding:10px 22px;background:#1e3a5f;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Proにアップグレード</a>' +
+    'style="padding:10px 22px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;color:#5a5a5a;">閉じる</button>' +
+    '<a href="upgrade.html" style="padding:10px 22px;background:#111111;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Proにアップグレード</a>' +
     '</div></div>';
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
@@ -157,7 +157,7 @@ function showLimitBanner(resource) {
   var banner = document.createElement('div');
   banner.style.cssText = 'background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;';
   banner.innerHTML = '<span style="color:#92400e;">' + r.message + '</span>' +
-    '<a href="upgrade.html" style="background:#1e3a5f;color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;">アップグレード</a>';
+    '<a href="upgrade.html" style="background:#111111;color:#fff;padding:6px 14px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;white-space:nowrap;">アップグレード</a>';
   var c = document.querySelector('.container, main, #main, body');
   if (c && c.firstChild) c.insertBefore(banner, c.firstChild);
 }
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (t && !document.getElementById('_proBadge')) {
         var b = document.createElement('span');
         b.id = '_proBadge';
-        b.style.cssText = 'display:inline-block;background:#1e3a5f;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;';
+        b.style.cssText = 'display:inline-block;background:#111111;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;';
         b.textContent = 'PRO';
         t.appendChild(b);
       }

@@ -20,7 +20,7 @@
         }
         body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 .btn-add {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -35,7 +35,7 @@
         }
 
         .btn-add:hover {
-            background: #2d4a7a;
+            background: #111111;
         }
 
         .container {
@@ -66,13 +66,13 @@
 
         .search-input:focus {
             outline: none;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
         
         .btn-search {
             background: #fff;
             border: 1px solid #e8e8e8;
-            color: #1e293b;
+            color: #2a2a2a;
             border: none;
             padding: 12px 24px;
             border-radius: 6px;
@@ -94,7 +94,7 @@
             border-radius: 6px;
             margin-bottom: 20px;
             font-size: 14px;
-            color: #1e293b;
+            color: #2a2a2a;
         }
 
         .table-container {
@@ -144,7 +144,7 @@
         .status-active {
             background: #fff;
             border: 1px solid #e8e8e8;
-            color: #1e293b;
+            color: #2a2a2a;
         }
 
         .status-inactive {
@@ -242,7 +242,7 @@
 
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
 
         .form-buttons {
@@ -262,12 +262,12 @@
         }
 
         .btn-primary {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #1e3a5f;
+            background: #111111;
         }
 
         .btn-secondary {
@@ -304,9 +304,11 @@
             }
         }
     </style>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 統一ヘッダー -->
@@ -322,7 +324,7 @@
 
         <div class="result-info" id="resultInfo" style="display:flex;align-items:center;justify-content:space-between;">
             <span>検索結果: 0件 / 全 0件</span>
-            <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
+            <button onclick="downloadCSV()" style="padding: 8px 20px; background: #111111; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
         </div>
 
         <div class="table-container">
@@ -387,8 +389,8 @@
                     </select>
                 </div>
 
-                <div id="honsha-info" style="background: #fff; padding: 16px; border-radius: 6px; margin-top: 20px; border-left: 4px solid #2563eb;">
-                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">本社管理者アカウント自動生成</div>
+                <div id="honsha-info" style="background: #fff; padding: 16px; border-radius: 6px; margin-top: 20px; border-left: 4px solid #d4380d;">
+                    <div style="font-weight: 600; color: #2a2a2a; margin-bottom: 8px;">本社管理者アカウント自動生成</div>
                     <div style="font-size: 13px; color: #555; line-height: 1.6;">
                         会社登録時に、本社管理者アカウントが自動的に作成されます。<br>
                         • ユーザーID: <strong id="preview-id">会社コード-H001</strong><br>
@@ -412,7 +414,7 @@
                 <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#e8f5e9;border-radius:50%;margin-bottom:12px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
                 </div>
-                <h3 style="font-size:18px;color:#1e293b;margin:0;">会社を登録しました</h3>
+                <h3 style="font-size:18px;color:#2a2a2a;margin:0;">会社を登録しました</h3>
             </div>
             <div id="companyLoginInfoContent" style="background:#f8f9fa;border-radius:8px;padding:20px;font-family:monospace;font-size:13px;line-height:2;white-space:pre-wrap;color:#333;border:1px solid #e5e7eb;"></div>
             <div style="display:flex;gap:8px;margin-top:20px;">

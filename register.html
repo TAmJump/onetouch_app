@@ -6,57 +6,59 @@
 <title>会社登録 | ワンタッチ管理</title>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e3a5f">
+<meta name="theme-color" content="#111111">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans','Noto Sans CJK JP',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;}
-.top-bar{background:#1e3a5f;padding:16px 24px;display:flex;align-items:center;gap:12px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans','Noto Sans CJK JP',sans-serif;background:#f7f7f7;min-height:100vh;display:flex;flex-direction:column;}
+.top-bar{background:#111111;padding:16px 24px;display:flex;align-items:center;gap:12px;}
 .top-bar img{width:32px;height:32px;border-radius:6px;}
 .top-bar span{color:#fff;font-size:16px;font-weight:700;letter-spacing:.01em;}
 .wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 16px;}
 .card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:40px 36px;width:100%;max-width:520px;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
-.card-title{font-size:22px;font-weight:700;color:#1e293b;margin-bottom:6px;}
-.card-sub{font-size:14px;color:#64748b;margin-bottom:32px;}
+.card-title{font-size:22px;font-weight:700;color:#2a2a2a;margin-bottom:6px;}
+.card-sub{font-size:14px;color:#8a8a8a;margin-bottom:32px;}
 .step-row{display:flex;gap:0;margin-bottom:32px;}
 .step{flex:1;text-align:center;position:relative;}
 .step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0;}
-.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#94a3b8;position:relative;z-index:1;}
-.step.active .step-dot{border-color:#1e3a5f;color:#1e3a5f;}
-.step.done .step-dot{background:#1e3a5f;border-color:#1e3a5f;color:#fff;}
-.step-label{font-size:11px;color:#94a3b8;margin-top:4px;}
-.step.active .step-label{color:#1e3a5f;font-weight:600;}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#8a8a8a;position:relative;z-index:1;}
+.step.active .step-dot{border-color:#111111;color:#111111;}
+.step.done .step-dot{background:#111111;border-color:#111111;color:#fff;}
+.step-label{font-size:11px;color:#8a8a8a;margin-top:4px;}
+.step.active .step-label{color:#111111;font-weight:600;}
 .section{display:none;}
 .section.active{display:block;}
 .field{margin-bottom:18px;}
 .label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;}
 .label .req{color:#ef4444;margin-left:3px;}
-input,select{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;color:#1e293b;background:#fff;outline:none;transition:border .15s;}
-input:focus,select:focus{border-color:#1e3a5f;}
-.hint{font-size:12px;color:#94a3b8;margin-top:4px;}
+input,select{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;color:#2a2a2a;background:#fff;outline:none;transition:border .15s;}
+input:focus,select:focus{border-color:#111111;}
+.hint{font-size:12px;color:#8a8a8a;margin-top:4px;}
 .plan-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
 .plan-card{border:2px solid #e2e8f0;border-radius:10px;padding:16px 14px;cursor:pointer;transition:border .15s;}
-.plan-card.selected{border-color:#1e3a5f;background:#f0f4ff;}
+.plan-card.selected{border-color:#111111;background:#f0f4ff;}
 .plan-card input{display:none;}
-.plan-name{font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px;}
-.plan-price{font-size:22px;font-weight:800;color:#1e3a5f;margin-bottom:8px;}
-.plan-price span{font-size:13px;font-weight:400;color:#64748b;}
-.plan-feat{font-size:12px;color:#64748b;line-height:1.7;}
+.plan-name{font-size:15px;font-weight:700;color:#2a2a2a;margin-bottom:4px;}
+.plan-price{font-size:22px;font-weight:800;color:#111111;margin-bottom:8px;}
+.plan-price span{font-size:13px;font-weight:400;color:#8a8a8a;}
+.plan-feat{font-size:12px;color:#8a8a8a;line-height:1.7;}
 .btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
 .btn{padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
 .btn:disabled{opacity:.5;cursor:not-allowed;}
-.btn-primary{background:#1e3a5f;color:#fff;}
+.btn-primary{background:#111111;color:#fff;}
 .btn-primary:not(:disabled):hover{opacity:.88;}
-.btn-outline{background:#fff;color:#475569;border:1px solid #e2e8f0;}
-.btn-outline:hover{background:#f8fafc;}
+.btn-outline{background:#fff;color:#5a5a5a;border:1px solid #e2e8f0;}
+.btn-outline:hover{background:#f7f7f7;}
 .msg{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
 .msg.error{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;}
 .msg.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
-.divider{text-align:center;color:#94a3b8;font-size:13px;margin:20px 0;position:relative;}
+.divider{text-align:center;color:#8a8a8a;font-size:13px;margin:20px 0;position:relative;}
 .divider::before{content:'';position:absolute;top:50%;left:0;width:100%;height:1px;background:#e2e8f0;}
 .divider span{background:#fff;padding:0 12px;position:relative;}
-.login-link{text-align:center;font-size:14px;color:#64748b;}
-.login-link a{color:#1e3a5f;font-weight:600;text-decoration:none;}
+.login-link{text-align:center;font-size:14px;color:#8a8a8a;}
+.login-link a{color:#111111;font-weight:600;text-decoration:none;}
 </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="top-bar">

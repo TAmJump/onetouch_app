@@ -33,7 +33,7 @@
         .section-title {
             font-size: 16px;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #111111;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -64,8 +64,8 @@
         }
 
         .status-tab.active {
-            background: #1e3a5f;
-            border-color: #1e3a5f;
+            background: #111111;
+            border-color: #111111;
         }
 
         .status-tab-label {
@@ -82,7 +82,7 @@
         .status-tab-count {
             font-size: 28px;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #111111;
         }
 
         .status-tab.active .status-tab-count {
@@ -116,7 +116,7 @@
         .request-title {
             font-size: 15px;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #111111;
         }
 
         .priority-badge {
@@ -210,7 +210,7 @@
         .modal-title {
             font-size: 17px;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #111111;
         }
 
         .modal-close {
@@ -249,7 +249,7 @@
 
         .detail-value {
             font-size: 14px;
-            color: #1e3a5f;
+            color: #111111;
             padding: 8px 0;
         }
 
@@ -297,7 +297,7 @@
         }
 
         .btn-primary {
-            background: #1e3a5f;
+            background: #111111;
             color: #fff;
             border: none;
             padding: 12px 24px;
@@ -310,7 +310,7 @@
         }
 
         .btn-primary:hover {
-            background: #1e3a5f;
+            background: #111111;
         }
 
         .comment-history {
@@ -333,7 +333,7 @@
 
         .comment-text {
             font-size: 14px;
-            color: #1e3a5f;
+            color: #111111;
         }
 
         /* タイムライン */
@@ -344,15 +344,15 @@
         .timeline-date { font-size: 11px; color: #888; line-height: 1.4; }
         .timeline-dot-line { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; flex-shrink: 0; margin-top: 4px; }
-        .timeline-dot.status-change { background: #1e3a5f; width: 12px; height: 12px; }
+        .timeline-dot.status-change { background: #111111; width: 12px; height: 12px; }
         .timeline-dot.st-pending { background: #d97706; }
-        .timeline-dot.st-progress { background: #2563eb; }
+        .timeline-dot.st-progress { background: #d4380d; }
         .timeline-dot.st-complete { background: #16a34a; }
         .timeline-dot.st-unavailable { background: #dc2626; }
         .timeline-line { width: 1px; background: #e0e0e0; flex-grow: 1; margin-top: 4px; }
         .timeline-item:last-child .timeline-line { display: none; }
         .timeline-content { flex: 1; min-width: 0; padding-top: 0; }
-        .timeline-status { font-size: 13px; font-weight: 600; color: #1e3a5f; margin-bottom: 2px; }
+        .timeline-status { font-size: 13px; font-weight: 600; color: #111111; margin-bottom: 2px; }
         .timeline-comment { font-size: 13px; color: #666; line-height: 1.5; }
         
         /* トーストアニメーション */
@@ -395,9 +395,11 @@
             .timeline-date { font-size: 10px; min-width: 40px; }
         }
     </style>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 統一ヘッダー -->
@@ -898,7 +900,7 @@
                 bottom: 30px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: #1e3a5f;
+                background: #111111;
                 color: white;
                 padding: 16px 24px;
                 border-radius: 8px;

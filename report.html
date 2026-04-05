@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1e3a5f">
+  <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
   <title>通報 | ワンタッチ管理</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
   <script src="unified-header.js"></script>
@@ -37,7 +37,7 @@
   <!-- core.js は統合済み・不要 -->
   <script>if(!ONE.isLoggedIn())location.replace("login.html");</script>
   <style>
-    :root{--bg:#f5f5f5;--card:#fff;--border:#e8e8e8;--border-light:#ddd;--text:#1e293b;--text-dim:#888;--text-muted:#aaa;--danger:#dc2626;}
+    :root{--bg:#f5f5f5;--card:#fff;--border:#e8e8e8;--border-light:#ddd;--text:#2a2a2a;--text-dim:#888;--text-muted:#aaa;--danger:#dc2626;}
     *{margin:0;padding:0;box-sizing:border-box;}
     html{overflow-x:hidden;}
     body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
@@ -71,7 +71,7 @@
     .modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
     .mbtn{border:none;border-radius:10px;padding:16px 24px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;min-height:56px;}
     .mbtn-cancel{background:#f0f0f0;color:#666;}
-    .mbtn-send{background:#1e3a5f;color:#fff;}
+    .mbtn-send{background:#111111;color:#fff;}
     .mbtn-danger{background:var(--danger);color:#fff;}
 
     /* 写真添付 */
@@ -86,10 +86,10 @@
     .photo-thumb .remove-photo{position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.6);border:none;border-radius:50%;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
     /* 送信結果 */
-    .result{margin-top:16px;padding:14px;border-radius:10px;background:#e8f0fe;border:1px solid #93b4f5;font-size:16px;display:none;color:#1e3a5f;}
+    .result{margin-top:16px;padding:14px;border-radius:10px;background:#e8f0fe;border:1px solid #93b4f5;font-size:16px;display:none;color:#111111;}
 
     /* トースト */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:12px;font-size:16px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .4s;z-index:9999;pointer-events:none;white-space:nowrap;}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111111;color:#fff;padding:12px 24px;border-radius:12px;font-size:16px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .4s;z-index:9999;pointer-events:none;white-space:nowrap;}
     .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
     /* 送信完了オーバーレイ */
@@ -105,7 +105,7 @@
     .status-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
     .status-tab{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 8px;cursor:pointer;transition:all .2s;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.03);}
     .status-tab:hover{border-color:#ccc;}
-    .status-tab.active{background:#1e3a5f;border-color:#1e3a5f;}
+    .status-tab.active{background:#111111;border-color:#111111;}
     .status-tab-label{font-size:14px;color:var(--text-dim);margin-bottom:4px;}
     .status-tab.active .status-tab-label{color:rgba(255,255,255,.7);font-weight:600;}
     .status-tab-count{font-size:24px;font-weight:700;color:var(--text);}
@@ -120,14 +120,14 @@
     .history-id{font-size:14px;color:var(--text-muted);}
     .status-badge{padding:4px 12px;border-radius:8px;font-size:14px;font-weight:600;}
     .status-pending{background:#fef3c7;color:#b45309;}
-    .status-progress{background:#dbeafe;color:#1d4ed8;}
-    .status-complete{background:#e8f0fe;color:#1e3a5f;}
+    .status-progress{background:#f7f7f7;color:#d4380d;}
+    .status-complete{background:#e8f0fe;color:#111111;}
     .status-unavailable{background:#fee2e2;color:#dc2626;}
     .history-info{display:flex;flex-wrap:wrap;gap:12px;font-size:14px;color:var(--text-dim);margin-bottom:8px;}
     .history-info span{display:flex;align-items:center;gap:4px;}
-    .history-partner{font-size:14px;color:#1d4ed8;font-weight:600;margin-bottom:8px;padding:4px 10px;background:#eff6ff;border-radius:6px;display:inline-block;}
+    .history-partner{font-size:14px;color:#d4380d;font-weight:600;margin-bottom:8px;padding:4px 10px;background:#f7f7f7;border-radius:6px;display:inline-block;}
     .history-comment{background:#fafafa;padding:8px 12px;border-radius:6px;font-size:16px;color:var(--text);margin-top:8px;border-left:3px solid #ddd;}
-    .history-duration{font-size:14px;color:#2563eb;font-weight:600;margin-top:4px;}
+    .history-duration{font-size:14px;color:#d4380d;font-weight:600;margin-top:4px;}
 
     /* 通報詳細モーダル */
     .detail-modal{max-width:500px;}
@@ -147,15 +147,15 @@
     .timeline-date{font-size:14px;color:#888;line-height:1.4;}
     .timeline-dot-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
     .timeline-dot{width:10px;height:10px;border-radius:50%;background:#ddd;flex-shrink:0;margin-top:4px;}
-    .timeline-dot.status-change{background:#1e3a5f;width:12px;height:12px;}
+    .timeline-dot.status-change{background:#111111;width:12px;height:12px;}
     .timeline-dot.st-pending{background:#d97706;}
-    .timeline-dot.st-progress{background:#2563eb;}
-    .timeline-dot.st-complete{background:#1e3a5f;}
+    .timeline-dot.st-progress{background:#d4380d;}
+    .timeline-dot.st-complete{background:#111111;}
     .timeline-dot.st-unavailable{background:#dc2626;}
     .timeline-line{width:1px;background:#e0e0e0;flex-grow:1;margin-top:4px;}
     .timeline-item:last-child .timeline-line{display:none;}
     .timeline-content{flex:1;min-width:0;padding-top:0;}
-    .timeline-status{font-size:16px;font-weight:600;color:#1e293b;margin-bottom:2px;}
+    .timeline-status{font-size:16px;font-weight:600;color:#2a2a2a;margin-bottom:2px;}
     .timeline-comment{font-size:16px;color:#666;line-height:1.5;}
   </style>
 </head>
@@ -166,7 +166,7 @@
 
   <div class="main">
     <button class="report-btn" onclick="openForm('report')" style="max-width: 360px; padding: 32px 24px;">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4380d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       <h2 style="font-size:20px;">故障などの通報</h2>
       <p style="font-size:16px;">自動で担当に届きます</p>
     </button>
@@ -263,7 +263,7 @@
       <!-- 写真添付 -->
       <div class="photo-section">
         <div class="photo-label">写真（最大3枚）</div>
-        <div style="font-size:13px;color:#2563eb;margin-bottom:8px;">📷 写真があると管理会社に伝わりやすくなります</div>
+        <div style="font-size:13px;color:#d4380d;margin-bottom:8px;">📷 写真があると管理会社に伝わりやすくなります</div>
         <!-- カメラ直接起動（スマホ背面カメラ） -->
         <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotos(this)">
         <!-- ギャラリー・ファイル選択 -->
@@ -503,8 +503,8 @@
         var count = cats[c] || 0;
         var label = (typeof window.getCategoryDisplayName === 'function') ? window.getCategoryDisplayName(officeCode, c) : c;
         h += '<button onclick="filterCategory(\'' + c.replace(/'/g, "\\'") + '\')" class="cat-tab" data-cat-status="on" style="' + btnBase + '#ddd;background:#fafafa;color:#333;cursor:pointer;">';
-        h += '<span style="display:block;font-size:15px;font-weight:700;color:#1e293b;">' + label + '</span>';
-        h += '<span style="display:block;font-size:13px;font-weight:700;color:#2563eb;margin-top:4px;">(' + count + ')</span>';
+        h += '<span style="display:block;font-size:15px;font-weight:700;color:#2a2a2a;">' + label + '</span>';
+        h += '<span style="display:block;font-size:13px;font-weight:700;color:#d4380d;margin-top:4px;">(' + count + ')</span>';
         h += '</button>';
       });
 
@@ -546,7 +546,7 @@
           }
         }
         if (isActive) {
-          btn.style.background = '#eff6ff'; btn.style.borderColor = '#2563eb'; btn.style.boxShadow = '0 0 0 1px #2563eb';
+          btn.style.background = '#f7f7f7'; btn.style.borderColor = '#d4380d'; btn.style.boxShadow = '0 0 0 1px #d4380d';
         } else {
           btn.style.background = '#fafafa'; btn.style.borderColor = '#ddd'; btn.style.boxShadow = 'none';
         }
@@ -1148,7 +1148,7 @@
       content += '<div class="detail-row">';
       content += '<div class="detail-label">割当管理会社</div>';
       if (r.assignedPartnerName) {
-        content += '<div class="detail-value" style="color:#1e40af;font-weight:600;">' + esc(r.assignedPartnerName) + '</div>';
+        content += '<div class="detail-value" style="color:#d4380d;font-weight:600;">' + esc(r.assignedPartnerName) + '</div>';
       } else {
         content += '<div class="detail-value" style="color:#ef4444;">管理会社未割当</div>';
       }
@@ -1311,10 +1311,10 @@
       ov.innerHTML='<div class="sent-ok-card">'
         +'<div class="sent-ok-icon">✓</div>'
         +'<div class="sent-ok-title">送信ありがとうございました</div>'
-        +(reportId ? '<div style="font-size:14px;color:#94a3b8;margin-bottom:8px;">受付番号：'+esc(reportId)+'</div>' : '')
+        +(reportId ? '<div style="font-size:14px;color:#8a8a8a;margin-bottom:8px;">受付番号：'+esc(reportId)+'</div>' : '')
         +'<div class="sent-ok-sub">内容は自動で担当者に届いています。<br>施設管理者への個別連絡は不要です。</div>'
         +'<div style="display:flex;flex-direction:column;gap:10px;margin-top:24px;">'
-        +'<button onclick="this.closest(\'.sent-ok\').remove();document.getElementById(\'historyArea\').scrollIntoView({behavior:\'smooth\'});" style="padding:14px 24px;background:#1e3a5f;color:white;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;min-height:50px;">履歴を見る</button>'
+        +'<button onclick="this.closest(\'.sent-ok\').remove();document.getElementById(\'historyArea\').scrollIntoView({behavior:\'smooth\'});" style="padding:14px 24px;background:#111111;color:white;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;min-height:50px;">履歴を見る</button>'
         +'<button onclick="this.closest(\'.sent-ok\').remove();" style="padding:14px 24px;background:#f0f0f0;color:#333;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;min-height:50px;">もう一件送る</button>'
         +'</div>'
         +'</div>';

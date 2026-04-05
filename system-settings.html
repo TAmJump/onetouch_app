@@ -88,7 +88,7 @@
 
         .link-item:hover {
             background: #f0f0f0;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
 
         .link-item-left {
@@ -190,9 +190,11 @@
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
     <script src="unified-header.js"></script>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 統一ヘッダー -->
@@ -355,7 +357,7 @@
                 <div class="info-label">会社ロゴ</div>
                 <div class="info-value">
                     <div style="display: flex; align-items: center; gap: 16px;">
-                        <div id="currentLogo" style="width: 60px; height: 60px; background: #1e3a5f; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+                        <div id="currentLogo" style="width: 60px; height: 60px; background: #111111; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
                             T
                         </div>
                         <div>
@@ -1075,7 +1077,7 @@
             if (isCustom) {
                 h += '<input type="text" data-custom-idx="' + customIdx + '" value="' + (name || '') + '" maxlength="' + maxLen + '" placeholder="名称を入力" onchange="onCustomCatNameChange(this)" style="width:150px;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-weight:600;background:white;">';
             } else {
-                h += '<span style="font-size:14px;font-weight:600;color:' + (isOn ? '#334155' : '#999') + ';min-width:80px;white-space:nowrap;">' + name + '</span>';
+                h += '<span style="font-size:14px;font-weight:600;color:' + (isOn ? '#5a5a5a' : '#999') + ';min-width:80px;white-space:nowrap;">' + name + '</span>';
             }
 
             // 表示名
@@ -1090,7 +1092,7 @@
             // ONバッジ
             if (name || !isCustom) {
                 if (isOn) {
-                    h += '<span style="font-size:10px;background:#64748b;color:white;padding:2px 6px;border-radius:8px;">ON</span>';
+                    h += '<span style="font-size:10px;background:#8a8a8a;color:white;padding:2px 6px;border-radius:8px;">ON</span>';
                 } else {
                     h += '<span style="font-size:10px;background:#ccc;color:white;padding:2px 6px;border-radius:8px;">OFF</span>';
                 }
@@ -1105,7 +1107,7 @@
                 var catKey = name;
                 h += '<label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;margin-left:4px;">';
                 h += '<input type="checkbox" data-cat="' + catKey + '" ' + (isOn ? 'checked' : '') + ' onchange="updateCatToggleUI(this)" style="opacity:0;width:0;height:0;">';
-                h += '<span style="position:absolute;top:0;left:0;right:0;bottom:0;background:' + (isOn ? '#64748b' : '#ccc') + ';border-radius:24px;transition:background .2s;"></span>';
+                h += '<span style="position:absolute;top:0;left:0;right:0;bottom:0;background:' + (isOn ? '#8a8a8a' : '#ccc') + ';border-radius:24px;transition:background .2s;"></span>';
                 h += '<span style="position:absolute;top:3px;left:' + (isOn ? '23px' : '3px') + ';width:18px;height:18px;background:white;border-radius:50%;transition:left .2s;box-shadow:0 1px 2px rgba(0,0,0,.2);"></span>';
                 h += '</label>';
             }

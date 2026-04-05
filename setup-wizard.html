@@ -49,11 +49,11 @@
             transition: all 0.3s;
         }
         .step-dot.done { background: #16a34a; color: #fff; }
-        .step-dot.current { background: #2563eb; color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
+        .step-dot.current { background: #d4380d; color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
         .step-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .step-label { font-size: 11px; color: #999; font-weight: 500; white-space: nowrap; }
         .step-item.done .step-label { color: #16a34a; }
-        .step-item.current .step-label { color: #2563eb; font-weight: 700; }
+        .step-item.current .step-label { color: #d4380d; font-weight: 700; }
         .step-connector {
             width: 40px;
             height: 2px;
@@ -79,7 +79,7 @@
         .wizard-card-title {
             font-size: 18px;
             font-weight: 700;
-            color: #1e293b;
+            color: #2a2a2a;
             margin-bottom: 6px;
         }
         .wizard-card-sub {
@@ -110,13 +110,13 @@
             border-radius: 10px;
             font-size: 16px;
             font-family: inherit;
-            color: #1e293b;
+            color: #2a2a2a;
             background: #fff;
             transition: border-color 0.2s;
         }
         .form-input:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: #d4380d;
             box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
         .form-input::placeholder { color: #bbb; }
@@ -168,7 +168,7 @@
             transition: all 0.2s;
         }
         .btn-primary {
-            background: #1e3a5f;
+            background: #111111;
             color: #fff;
             flex: 1;
         }
@@ -181,10 +181,10 @@
         .btn-secondary:hover { background: #e5e5e5; }
         .btn-save {
             background: #fff;
-            color: #2563eb;
-            border: 1px solid #2563eb;
+            color: #d4380d;
+            border: 1px solid #d4380d;
         }
-        .btn-save:hover { background: #eff6ff; }
+        .btn-save:hover { background: #f7f7f7; }
 
         /* トースト */
         .toast {
@@ -192,7 +192,7 @@
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(80px);
-            background: #1e3a5f;
+            background: #111111;
             color: #fff;
             padding: 12px 24px;
             border-radius: 12px;
@@ -231,9 +231,11 @@
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
     <script src="unified-header.js"></script>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -696,7 +698,7 @@
                 setupData.offices.forEach(function(o, i) {
                     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
                         + '<div>'
-                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(o.name) + '</div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#2a2a2a;">' + esc(o.name) + '</div>'
                         + '<div style="font-size:13px;color:#888;">' + esc(o.code) + '　' + esc(o.serviceType || '') + '</div>'
                         + '</div>'
                         + '<button onclick="removeOffice(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
@@ -910,7 +912,7 @@
                 setupData.accounts.forEach(function(a, i) {
                     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
                         + '<div>'
-                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(a.name) + '</div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#2a2a2a;">' + esc(a.name) + '</div>'
                         + '<div style="font-size:13px;color:#888;">' + esc(a.id) + '　' + (roleNames[a.role] || a.role) + '　' + esc(a.officeName || '') + '</div>'
                         + '</div>'
                         + '<button onclick="removeAccount(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
@@ -952,7 +954,7 @@
                 + '  <label class="form-label">ログイン名<span class="required">*</span></label>'
                 + '  <input type="text" class="form-input" id="acctLogin" placeholder="例：tanaka" oninput="previewAccountId()">'
                 + '  <div class="form-hint">半角英数。ユーザーIDは「' + esc(setupData.companyCode) + '-ログイン名」になります</div>'
-                + '  <div id="acctIdPreview" style="display:none;margin-top:4px;font-size:14px;color:#2563eb;"></div>'
+                + '  <div id="acctIdPreview" style="display:none;margin-top:4px;font-size:14px;color:#d4380d;"></div>'
                 + '  <div class="form-error" id="acctLoginError"></div>'
                 + '</div>'
                 + officeField
@@ -1129,8 +1131,8 @@
                     }
                     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
                         + '<div>'
-                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(officeName) + '</div>'
-                        + '<div style="font-size:12px;color:#2563eb;margin-top:2px;">' + (c.categories || []).join(', ') + '</div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#2a2a2a;">' + esc(officeName) + '</div>'
+                        + '<div style="font-size:12px;color:#d4380d;margin-top:2px;">' + (c.categories || []).join(', ') + '</div>'
                         + '</div>'
                         + '<button onclick="removeContract(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
                         + '</div>';
@@ -1141,7 +1143,7 @@
             html += '<div class="wizard-card">'
                 + '<div class="wizard-card-title">ステップ 4：契約設定</div>'
                 + '<div class="wizard-card-sub">「' + esc(setupData.partnerName) + '」が担当するカテゴリを設定してください</div>'
-                + '<div style="padding:10px 14px;background:#f0f7ff;border-radius:8px;font-size:13px;color:#1e3a5f;margin-bottom:16px;">登録済みの全事業所に適用されます（事業所ごとの変更は後から契約管理画面で行えます）</div>'
+                + '<div style="padding:10px 14px;background:#f0f7ff;border-radius:8px;font-size:13px;color:#111111;margin-bottom:16px;">登録済みの全事業所に適用されます（事業所ごとの変更は後から契約管理画面で行えます）</div>'
                 + '<div class="form-group">'
                 + '  <label class="form-label">担当カテゴリ<span class="required">*</span></label>'
                 + '  <div id="contractCatChecks" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>'
@@ -1415,7 +1417,7 @@
                 setupData.items.forEach(function(item, i) {
                     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#f8f9fa;border-radius:8px;margin-bottom:6px;">'
                         + '<div>'
-                        + '<div style="font-size:15px;font-weight:600;color:#1e293b;">' + esc(item.name) + '</div>'
+                        + '<div style="font-size:15px;font-weight:600;color:#2a2a2a;">' + esc(item.name) + '</div>'
                         + '<div style="font-size:13px;color:#888;">' + esc(item.category || '') + '　' + esc(item.partnerName || '管理会社未設定') + '</div>'
                         + '</div>'
                         + '<button onclick="removeItem(' + i + ')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:13px;padding:4px 8px;">削除</button>'
@@ -1480,7 +1482,7 @@
                 + '<button class="btn btn-save" onclick="addItem()" style="width:100%;margin-top:8px;">＋ この商品を追加</button>'
                 + '</div>';
 
-            html += '<div style="text-align:center;padding:12px;font-size:14px;color:#666;">商品が多い場合は、セットアップ完了後に<a href="import.html" style="color:#2563eb;">インポート機能</a>で一括登録できます</div>';
+            html += '<div style="text-align:center;padding:12px;font-size:14px;color:#666;">商品が多い場合は、セットアップ完了後に<a href="import.html" style="color:#d4380d;">インポート機能</a>で一括登録できます</div>';
 
             html += '<div class="btn-row">'
                 + '<button class="btn btn-secondary" onclick="goToStep(5)">前へ</button>'

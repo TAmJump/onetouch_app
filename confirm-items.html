@@ -102,7 +102,7 @@
     }
     table input:focus, table select:focus {
       outline: none;
-      border-color: #2563eb;
+      border-color: #d4380d;
       box-shadow: 0 0 0 2px rgba(229,57,53,0.1);
     }
     table input[type="number"] { text-align: right; }
@@ -142,7 +142,7 @@
       box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
     }
     .bottom-summary { font-size: 15px; color: #333; }
-    .bottom-summary strong { color: #2563eb; font-size: 20px; }
+    .bottom-summary strong { color: #d4380d; font-size: 20px; }
     .bottom-actions { display: flex; gap: 8px; }
     .btn-cancel {
       padding: 10px 20px; border: 1px solid #ddd; border-radius: 6px;
@@ -151,10 +151,10 @@
     .btn-cancel:hover { background: #f5f5f5; }
     .btn-confirm {
       padding: 10px 24px; border: none; border-radius: 6px;
-      background: #2563eb; color: white; font-size: 14px;
+      background: #d4380d; color: white; font-size: 14px;
       font-weight: 600; cursor: pointer; transition: background 0.15s;
     }
-    .btn-confirm:hover { background: #1d4ed8; }
+    .btn-confirm:hover { background: #d4380d; }
     .btn-confirm:disabled { background: #ccc; cursor: not-allowed; }
 
     /* 空状態 */
@@ -177,6 +177,8 @@
       .bottom-bar { padding: 10px 16px; flex-direction: column; gap: 8px; }
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="unified-header-mount"></div>

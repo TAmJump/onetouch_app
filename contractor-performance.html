@@ -22,7 +22,7 @@
         .summary-card.highlight .value { color:#4361ee; }
 
         /* セクション */
-        .section-title { font-size:16px; font-weight:700; color:#1e293b; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .section-title { font-size:16px; font-weight:700; color:#2a2a2a; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 
         /* 期間フィルタ */
         .period-filter { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
@@ -44,7 +44,7 @@
         .history-table td { padding:10px 12px; border-bottom:1px solid #f3f4f6; color:#333; }
         .status-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
         .status-badge.completed { background:#ecfdf5; color:#059669; }
-        .status-badge.in-progress { background:#eff6ff; color:#2563eb; }
+        .status-badge.in-progress { background:#f7f7f7; color:#d4380d; }
         .status-badge.rejected { background:#fef2f2; color:#dc2626; }
 
         /* 空状態 */
@@ -52,6 +52,8 @@
         .empty-state .icon { font-size:48px; margin-bottom:12px; }
     </style>
     <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -274,7 +276,7 @@
         html += '<span style="font-size:13px;color:#666;margin-right:8px;">全 ' + totalItems + ' 件</span>';
         html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
         var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
-        for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+        for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#d4380d':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#d4380d':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
         html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
         container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
     }

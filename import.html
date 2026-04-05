@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
   <title>データインポート | ワンタッチ管理</title>
-  <meta name="theme-color" content="#1e3a5f">
+  <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- 新システムのスクリプト -->
@@ -123,7 +123,7 @@
   <script src="document-storage.js"></script>
   <!-- Tesseract.js 削除: OCR処理はサーバ側 GCP Vision API で実行 -->
   <style>
-    :root{--bg:#fff;--bg2:#f8f9fa;--text:#1e293b;--muted:#666;--accent:#1e3a5f;--yellow:#E9A825;--border:#e5e7eb;--ok:#2563eb;--err:#ef4444;--warn:#f59e0b;}
+    :root{--bg:#fff;--bg2:#f8f9fa;--text:#2a2a2a;--muted:#666;--accent:#111111;--yellow:#E9A825;--border:#e5e7eb;--ok:#d4380d;--err:#ef4444;--warn:#f59e0b;}
     *{margin:0;padding:0;box-sizing:border-box;}
     html{overflow-x:hidden;}
     body{font-family:'Noto Sans JP',sans-serif;background:var(--bg2);min-height:100vh;overflow-x:hidden;}
@@ -169,8 +169,8 @@
     .fcard-meta{font-size:0.78rem;color:var(--muted);margin-top:2px;}
     .fcard-badge{font-size:0.78rem;padding:3px 10px;border-radius:99px;font-weight:600;flex-shrink:0;}
     .fcard-badge.parsing{background:#fef3c7;color:#d97706;}
-    .fcard-badge.ready{background:#dbeafe;color:#2563eb;}
-    .fcard-badge.ok{background:#e8f0fe;color:#1e3a5f;}
+    .fcard-badge.ready{background:#f7f7f7;color:#d4380d;}
+    .fcard-badge.ok{background:#e8f0fe;color:#111111;}
     .fcard-badge.err{background:#fee2e2;color:#dc2626;}
     .fcard-stats{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0;font-size:0.82rem;}
     .fcard-stat{display:flex;align-items:center;gap:4px;}
@@ -247,7 +247,7 @@
     .hdr-cand-rank{background:var(--yellow);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;flex-shrink:0;}
     .hdr-cand-cells{flex:1;display:flex;gap:6px;flex-wrap:wrap;min-width:0;}
     .hdr-cand-cell{background:var(--bg2);padding:2px 8px;border-radius:4px;font-size:0.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}
-    .hdr-cand-cell.match{background:#e8f0fe;color:#1e3a5f;font-weight:600;}
+    .hdr-cand-cell.match{background:#e8f0fe;color:#111111;font-weight:600;}
     .hdr-cand-score{font-size:0.72rem;color:var(--muted);flex-shrink:0;min-width:50px;text-align:right;}
 
     /*  ピッカー モード切替ツールバー */
@@ -261,7 +261,7 @@
     /*  設定サマリー */
     .pk-summary{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0;font-size:0.78rem;}
     .pk-sum-item{padding:5px 10px;border-radius:6px;display:flex;align-items:center;gap:5px;}
-    .pk-sum-item.set{background:#e8f0fe;color:#1e3a5f;}
+    .pk-sum-item.set{background:#e8f0fe;color:#111111;}
     .pk-sum-item.unset{background:var(--bg2);color:var(--muted);}
 
     /*  テーブル拡張（ゾーン色分け） */
@@ -280,18 +280,18 @@
     /* フッターより下のゾーン */
     .hdr-raw-table tr.pk-below-ftr{opacity:.35;pointer-events:none;}
     /* ヘッダーより上（販売会社ゾーン） */
-    .hdr-raw-table tr.pk-above{background:#eff6ff;}
+    .hdr-raw-table tr.pk-above{background:#f7f7f7;}
     /* データゾーン */
     .hdr-raw-table tr.pk-data{}
     /* 販売会社セル */
-    .hdr-raw-table td.pk-vendor-cell{background:#dbeafe;outline:2px solid #3b82f6;outline-offset:-1px;border-radius:3px;}
+    .hdr-raw-table td.pk-vendor-cell{background:#f7f7f7;outline:2px solid #d4380d;outline-offset:-1px;border-radius:3px;}
     /* 列ロールヘッダー */
     .hdr-raw-table td.pk-col-assigned{position:relative;}
     .pk-col-tag{position:absolute;top:1px;right:2px;font-size:0.6rem;font-weight:700;color:#fff;padding:1px 4px;border-radius:3px;z-index:1;line-height:1.1;}
-    .pk-col-tag.name{background:#1e3a5f;}
+    .pk-col-tag.name{background:#111111;}
     .pk-col-tag.model{background:#7c3aed;}
     .pk-col-tag.unitPrice{background:#dc2626;}
-    .pk-col-tag.qty{background:#2563eb;}
+    .pk-col-tag.qty{background:#d4380d;}
     .pk-col-tag.amount{background:#d97706;}
     .pk-col-tag.maker{background:#0891b2;}
     .pk-col-tag.category{background:#6b7280;}
@@ -299,7 +299,7 @@
 
     /* セルクリック時のハイライト */
     .pk-mode-col .hdr-raw-table tr.pk-hdr td:hover{outline:2px solid var(--accent);outline-offset:-1px;cursor:crosshair;}
-    .pk-mode-vendor .hdr-raw-table tr.pk-above td:hover{outline:2px solid #3b82f6;outline-offset:-1px;cursor:crosshair;}
+    .pk-mode-vendor .hdr-raw-table tr.pk-above td:hover{outline:2px solid #d4380d;outline-offset:-1px;cursor:crosshair;}
 
     /*  列ロール選択ポップアップ */
     .pk-role-popup{position:fixed;z-index:1200;background:var(--bg);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:8px 0;min-width:160px;}
@@ -310,7 +310,7 @@
     .pk-role-popup .pk-role-opt.clear{color:var(--err);}
     .hdr-picker-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
     .hdr-info-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;padding:4px 10px;border-radius:6px;margin-bottom:12px;}
-    .hdr-info-badge.auto{background:#e8f0fe;color:#1e3a5f;}
+    .hdr-info-badge.auto{background:#e8f0fe;color:#111111;}
     .hdr-info-badge.manual{background:#fef3c7;color:#d97706;}
     .hdr-info-badge.low{background:#fee2e2;color:#dc2626;}
 
@@ -342,7 +342,7 @@
 
     /* 信頼度バッジ */
     .conf-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:6px;margin-left:6px;}
-    .conf-badge.high{background:#e8f0fe;color:#1e3a5f;}
+    .conf-badge.high{background:#e8f0fe;color:#111111;}
     .conf-badge.mid{background:#fef3c7;color:#d97706;}
     .conf-badge.low{background:#fee2e2;color:#dc2626;}
     .fcard-conf{display:flex;align-items:center;gap:6px;margin:8px 0;font-size:0.78rem;color:var(--muted);}
@@ -454,7 +454,7 @@
           <tbody>
             <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;font-weight:600;">商品No.</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;"><span style="color:#b45309;">上書き時のみ</span></td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">商品No, 商品ナンバー, 品番</td></tr>
             <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;font-weight:600;">商品名</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;"><span style="color:#dc2626;font-weight:600;">必須</span></td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">商品名, 品名, 名称, 摘要</td></tr>
-            <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;font-weight:600;">担当管理会社</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;"><span style="color:#2563eb;font-weight:600;">任意（自動判定）</span></td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">担当管理会社, 管理会社名, 業者名, 取引先, 外注先</td></tr>
+            <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;font-weight:600;">担当管理会社</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;"><span style="color:#d4380d;font-weight:600;">任意（自動判定）</span></td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">担当管理会社, 管理会社名, 業者名, 取引先, 外注先</td></tr>
             <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;">メーカー</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#999;">任意</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">メーカー, 製造元</td></tr>
             <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;">型番</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#999;">任意</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">型番, 品番, 型式, 規格</td></tr>
             <tr><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;">数量</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#999;">任意</td><td style="padding:6px 8px;border-bottom:1px solid #f3f4f6;color:#666;">数量, 個数</td></tr>
@@ -467,7 +467,7 @@
         </table>
       </div>
 
-      <div style="background:#eef3ff;border:1px solid #2563eb;border-radius:8px;padding:14px;font-size:13px;line-height:1.7;color:#1e3a5f;">
+      <div style="background:#eef3ff;border:1px solid #d4380d;border-radius:8px;padding:14px;font-size:13px;line-height:1.7;color:#111111;">
         <div style="font-weight:700;margin-bottom:4px;">ヒント</div>
         ヘッダー名が自動認識されない場合は、プレビュー画面の「列の割当」で手動変更できます。<br>
         商品マスタからCSVエクスポートしたファイルはそのままインポート可能です。
@@ -556,7 +556,7 @@
           <span class="pk-dot" style="background:#7c3aed;"></span>③ 列の役割
         </button>
         <button class="pk-mode" data-pk-mode="vendor" onclick="setPkMode('vendor')">
-          <span class="pk-dot" style="background:#3b82f6;"></span>④ 販売会社
+          <span class="pk-dot" style="background:#d4380d;"></span>④ 販売会社
         </button>
       </div>
 
@@ -1664,7 +1664,7 @@
             methodHtml='<span class="fcard-method">'+(methodLabels[currentFile._evidence.method]||currentFile._evidence.method)+'</span>';
             //  テンプレ適用バッジ
             if(currentFile._evidence.template_used){
-              methodHtml+=' <span class="fcard-method" style="background:#dbeafe;color:#1e40af;"> テンプレ適用済</span>';
+              methodHtml+=' <span class="fcard-method" style="background:#f7f7f7;color:#d4380d;"> テンプレ適用済</span>';
             }
           }
           body='<div class="fcard-stats">'
@@ -2101,10 +2101,10 @@
         if(matched){
           matchCount++;
           h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;margin-bottom:4px;background:#eef3ff;border-radius:6px;font-size:13px;">';
-          h+='<span style="color:#2563eb;font-weight:600;">✓</span>';
+          h+='<span style="color:#d4380d;font-weight:600;">✓</span>';
           h+='<span style="flex:1;">'+esc(name)+'</span>';
           h+='<span style="color:#888;font-size:12px;">'+count+'件</span>';
-          h+='<span style="color:#2563eb;font-size:12px;">→ '+esc(matched.id)+'</span>';
+          h+='<span style="color:#d4380d;font-size:12px;">→ '+esc(matched.id)+'</span>';
           h+='</div>';
         }else{
           unmatchCount++;
@@ -2454,11 +2454,11 @@
     };
 
     var PK_ROLES=[
-      {key:'name',    label:'商品名 ',color:'#1e3a5f',req:true},
+      {key:'name',    label:'商品名 ',color:'#111111',req:true},
       {key:'assignedPartnerName',label:'担当管理会社 ',color:'#ea580c',req:true},
       {key:'model',   label:'型番',    color:'#7c3aed',req:false},
       {key:'unitPrice',label:'単価',   color:'#dc2626',req:false},
-      {key:'qty',     label:'数量',    color:'#2563eb',req:false},
+      {key:'qty',     label:'数量',    color:'#d4380d',req:false},
       {key:'amount',  label:'金額',    color:'#d97706',req:false},
       {key:'maker',   label:'メーカー',color:'#0891b2',req:false},
       {key:'category',label:'カテゴリ',color:'#6b7280',req:false},

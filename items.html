@@ -254,7 +254,7 @@
         }
         
         .demo-badge {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
             padding: 6px 16px;
             border-radius: 20px;
@@ -288,7 +288,7 @@
 
         .back-btn:hover {
             background: #f5f5f5;
-            color: #1e293b;
+            color: #2a2a2a;
         }
 
         .header-icon {
@@ -329,7 +329,7 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: #1e3a5f;
+            background: #111111;
             color: white;
             display: flex;
             align-items: center;
@@ -455,7 +455,7 @@
 
         .search-input:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: #d4380d;
             box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
 
@@ -478,13 +478,13 @@
         }
 
         .btn-primary {
-            background: #1e3a5f;
+            background: #111111;
             border: none;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #2d4a7a;
+            background: #111111;
         }
 
         .btn-secondary {
@@ -498,7 +498,7 @@
         }
 
         .btn-save {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
         }
 
@@ -529,7 +529,7 @@
 
         .filter-select:focus {
             outline: none;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
 
         .container {
@@ -558,7 +558,7 @@
         .stat-value {
             font-size: 24px;
             font-weight: 700;
-            color: #1e293b;
+            color: #2a2a2a;
             margin-left: 8px;
         }
 
@@ -582,11 +582,11 @@
         }
 
         .items-table thead th {
-            background: #f8fafc;
+            background: #f7f7f7;
             padding: 10px 14px;
             text-align: left;
             font-weight: 600;
-            color: #475569;
+            color: #5a5a5a;
             border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
             position: sticky;
@@ -595,18 +595,18 @@
         }
 
         .items-table tbody tr {
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f7f7f7;
             transition: background 0.15s;
             cursor: pointer;
         }
 
         .items-table tbody tr:hover {
-            background: #f1f5f9;
+            background: #f7f7f7;
         }
 
         .items-table td {
             padding: 10px 14px;
-            color: #334155;
+            color: #5a5a5a;
             vertical-align: middle;
         }
 
@@ -620,7 +620,7 @@
 
         .items-table .col-price {
             font-weight: 600;
-            color: #1e293b;
+            color: #2a2a2a;
             text-align: right;
             white-space: nowrap;
         }
@@ -661,8 +661,8 @@
         .badge-category {
             display: inline-block;
             padding: 2px 6px;
-            background: #f1f5f9;
-            color: #475569;
+            background: #f7f7f7;
+            color: #5a5a5a;
             border-radius: 4px;
             font-size: 11px;
         }
@@ -741,7 +741,7 @@
 
         .form-label.required::after {
             content: " *";
-            color: #2563eb;
+            color: #d4380d;
         }
 
         .form-input, .form-textarea {
@@ -755,7 +755,7 @@
 
         .form-input:focus, .form-textarea:focus {
             outline: none;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
 
         .form-textarea {
@@ -834,13 +834,13 @@
         
         .pagination-btn:hover:not(:disabled) {
             background: #f5f5f5;
-            border-color: #1e3a5f;
+            border-color: #111111;
         }
         
         .pagination-btn.active {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
-            border-color: #1e3a5f;
+            border-color: #111111;
             font-weight: 600;
         }
         
@@ -849,9 +849,11 @@
             cursor: not-allowed;
         }
     </style>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 統一ヘッダー -->
@@ -896,9 +898,9 @@
 
     <div class="container">
         <!-- スマホ向け案内 -->
-        <div id="mobileNotice" style="display:none; background:#e8f0fe; border:1px solid #93b4f5; border-radius:10px; padding:14px 18px; margin-bottom:16px; font-size:13px; color:#1e3a5f;">
+        <div id="mobileNotice" style="display:none; background:#e8f0fe; border:1px solid #93b4f5; border-radius:10px; padding:14px 18px; margin-bottom:16px; font-size:13px; color:#111111;">
             <div style="font-weight:600; margin-bottom:4px;">この画面はPC表示に最適化されています</div>
-            <div style="color:#475569;">横スクロールで全項目を確認できます。一括登録は<a href="import.html" style="color:#2563eb; font-weight:600;">インポート機能</a>が便利です。</div>
+            <div style="color:#5a5a5a;">横スクロールで全項目を確認できます。一括登録は<a href="import.html" style="color:#d4380d; font-weight:600;">インポート機能</a>が便利です。</div>
         </div>
         <script>
             if (window.innerWidth <= 768) {
@@ -2209,13 +2211,13 @@
             
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button onclick="closePasswordChangeModal()" style="padding: 10px 20px; background: #f5f5f5; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: #666;">キャンセル</button>
-                <button onclick="changePassword()" style="padding: 10px 20px; background: #1e3a5f; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: white;">変更する</button>
+                <button onclick="changePassword()" style="padding: 10px 20px; background: #111111; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: white;">変更する</button>
             </div>
         </div>
     </div>
     
     <!-- 初回ログイン推奨バナー -->
-    <div id="firstLoginBanner" style="display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #1e3a5f; color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3); z-index: 9999; max-width: 500px; width: 90%;">
+    <div id="firstLoginBanner" style="display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: #111111; color: white; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3); z-index: 9999; max-width: 500px; width: 90%;">
         <div style="display: flex; align-items: center; gap: 16px;">
             <div style="font-size: 32px;"></div>
             <div style="flex: 1;">
@@ -2225,7 +2227,7 @@
             <button onclick="dismissFirstLoginBanner()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 20px; line-height: 1;">×</button>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
-            <button onclick="openPasswordChangeFromBanner()" style="flex: 1; padding: 8px 16px; background: white; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">今すぐ変更</button>
+            <button onclick="openPasswordChangeFromBanner()" style="flex: 1; padding: 8px 16px; background: white; color: #2a2a2a; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">今すぐ変更</button>
             <button onclick="dismissFirstLoginBanner()" style="flex: 1; padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">後で変更</button>
         </div>
     </div>

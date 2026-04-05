@@ -6,41 +6,43 @@
 <title>Proプランにアップグレード | ワンタッチ管理</title>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e3a5f">
+<meta name="theme-color" content="#111111">
 <script src="plan-gate.js"></script>
 <script src="unified-header.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans','Noto Sans CJK JP',sans-serif;background:#f1f5f9;min-height:100vh;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Hiragino Sans','Noto Sans CJK JP',sans-serif;background:#f7f7f7;min-height:100vh;}
 .container{max-width:760px;margin:0 auto;padding:24px 16px;}
-.hero{background:#1e3a5f;color:#fff;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:24px;}
+.hero{background:#111111;color:#fff;border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:24px;}
 .hero h1{font-size:26px;font-weight:800;margin-bottom:10px;}
 .hero p{font-size:15px;opacity:.85;line-height:1.7;}
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
 .plan-card{background:#fff;border-radius:14px;border:2px solid #e2e8f0;padding:28px 24px;}
-.plan-card.pro{border-color:#1e3a5f;}
+.plan-card.pro{border-color:#111111;}
 .plan-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin-bottom:12px;}
-.plan-badge.free{background:#f1f5f9;color:#64748b;}
-.plan-badge.pro{background:#1e3a5f;color:#fff;}
-.plan-price{font-size:28px;font-weight:800;color:#1e293b;margin-bottom:6px;}
-.plan-price span{font-size:14px;font-weight:400;color:#64748b;}
+.plan-badge.free{background:#f7f7f7;color:#8a8a8a;}
+.plan-badge.pro{background:#111111;color:#fff;}
+.plan-price{font-size:28px;font-weight:800;color:#2a2a2a;margin-bottom:6px;}
+.plan-price span{font-size:14px;font-weight:400;color:#8a8a8a;}
 .plan-price.current-price{color:#059669;}
 .feature-list{list-style:none;margin-top:16px;}
-.feature-list li{padding:7px 0;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;}
+.feature-list li{padding:7px 0;font-size:13px;color:#374151;border-bottom:1px solid #f7f7f7;display:flex;align-items:center;gap:8px;}
 .feature-list li:last-child{border:none;}
 .check{color:#059669;font-weight:700;}
 .cross{color:#cbd5e1;}
 .cta-card{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:28px 24px;margin-bottom:24px;text-align:center;}
-.cta-card h2{font-size:18px;font-weight:700;color:#1e293b;margin-bottom:8px;}
-.cta-card p{font-size:14px;color:#64748b;margin-bottom:20px;line-height:1.7;}
+.cta-card h2{font-size:18px;font-weight:700;color:#2a2a2a;margin-bottom:8px;}
+.cta-card p{font-size:14px;color:#8a8a8a;margin-bottom:20px;line-height:1.7;}
 .btn-cta{display:inline-block;background:#059669;color:#fff;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:opacity .15s;}
 .btn-cta:hover{opacity:.88;}
 .contact-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
-.contact-card{background:#f8fafc;border-radius:10px;padding:16px;text-align:center;font-size:13px;color:#64748b;}
-.contact-card a{color:#1e3a5f;font-weight:600;text-decoration:none;}
+.contact-card{background:#f7f7f7;border-radius:10px;padding:16px;text-align:center;font-size:13px;color:#8a8a8a;}
+.contact-card a{color:#111111;font-weight:600;text-decoration:none;}
 .current-plan{background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:14px;color:#92400e;display:flex;align-items:center;gap:10px;}
 @media(max-width:600px){.compare{grid-template-columns:1fr;}.contact-row{grid-template-columns:1fr;}}
 </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="unified-header-mount"></div>

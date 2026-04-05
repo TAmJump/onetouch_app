@@ -30,7 +30,7 @@
         /* 旧ヘッダーCSS削除済み */
 
         .btn-add {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -45,7 +45,7 @@
         }
 
         .btn-add:hover {
-            background: #2d4a7a;
+            background: #111111;
         }
 
         .btn-add::before {
@@ -95,7 +95,7 @@
         }
 
         .btn-search {
-            background: #2563eb;
+            background: #d4380d;
             color: white;
             border: none;
             padding: 10px 32px;
@@ -107,12 +107,12 @@
         }
 
         .btn-search:hover {
-            background: #1d4ed8;
+            background: #d4380d;
         }
 
         .btn-clear {
-            background: #f1f5f9;
-            color: #334155;
+            background: #f7f7f7;
+            color: #5a5a5a;
             border: 1px solid #e2e8f0;
             padding: 10px 32px;
             border-radius: 6px;
@@ -127,11 +127,11 @@
         }
 
         .result-header {
-            background: #f8fafc;
+            background: #f7f7f7;
             padding: 12px 20px;
             border-radius: 14px 14px 0 0;
             font-weight: 600;
-            color: #1e293b;
+            color: #2a2a2a;
             border: 1px solid #e8e8e8;
             border-bottom: none;
         }
@@ -159,14 +159,14 @@
         }
 
         thead {
-            background: #f8fafc;
+            background: #f7f7f7;
         }
 
         th {
             padding: 8px 10px; font-size: 12px;
             text-align: left;
             font-weight: 600;
-            color: #64748b;
+            color: #8a8a8a;
             border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
             overflow: hidden;
@@ -191,7 +191,7 @@
             font-size: 14px;
             font-weight: 600;
             transition: all 0.2s;
-            background: #1e3a5f;
+            background: #111111;
             color: white;
         }
 
@@ -297,7 +297,7 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: #d4380d;
             box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
 
@@ -315,7 +315,7 @@
         }
 
         .btn-primary {
-            background: #2563eb;
+            background: #d4380d;
             color: white;
             border: none;
             padding: 12px 32px;
@@ -326,12 +326,12 @@
         }
 
         .btn-primary:hover {
-            background: #1d4ed8;
+            background: #d4380d;
         }
 
         .btn-secondary {
-            background: #f1f5f9;
-            color: #334155;
+            background: #f7f7f7;
+            color: #5a5a5a;
             border: 1px solid #e2e8f0;
             padding: 12px 32px;
             border-radius: 6px;
@@ -353,8 +353,8 @@
         }
 
         .status-active {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: #f7f7f7;
+            color: #d4380d;
         }
 
         .status-inactive {
@@ -381,9 +381,11 @@
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
     <script src="unified-header.js"></script>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- 統一ヘッダー -->
@@ -423,7 +425,7 @@
         <div class="results-section" id="resultsSection">
             <div class="result-header" style="display:flex;align-items:center;justify-content:space-between;">
                 <span>検索結果: <span id="displayCount">0</span>件 / 全 <span id="totalCount">0</span>件</span>
-                <button onclick="downloadCSV()" style="padding: 8px 20px; background: #1e3a5f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
+                <button onclick="downloadCSV()" style="padding: 8px 20px; background: #111111; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">CSVエクスポート</button>
             </div>
             <div class="table-container">
                 <table>
@@ -623,7 +625,7 @@
             html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
             html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
             var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
-            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#d4380d':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#d4380d':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
             html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
             container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
         }
@@ -710,7 +712,7 @@
             var html = '';
             categories.forEach(function(cat) {
                 html += '<div style="display:flex;align-items:center;gap:8px;">';
-                html += '<div style="min-width:130px;font-size:13px;font-weight:500;color:#334155;">' + cat + '</div>';
+                html += '<div style="min-width:130px;font-size:13px;font-weight:500;color:#5a5a5a;">' + cat + '</div>';
                 html += '<select id="cp_' + cat.replace(/[\/]/g, '_') + '" style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;">';
                 html += '<option value="">未設定</option>';
                 filtered.forEach(function(p) {

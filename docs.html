@@ -38,12 +38,12 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            color: #64748b;
+            color: #8a8a8a;
             transition: all 0.2s;
             white-space: nowrap;
         }
-        .doc-tab:hover { background: #f1f5f9; }
-        .doc-tab.active { background: #1e3a5f; color: white; }
+        .doc-tab:hover { background: #f7f7f7; }
+        .doc-tab.active { background: #111111; color: white; }
         .doc-tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
 
         /* コンテンツ */
@@ -59,19 +59,19 @@
         }
         .doc-card h2 {
             font-size: 18px;
-            color: #1e293b;
+            color: #2a2a2a;
             margin-bottom: 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #2563eb;
+            border-bottom: 2px solid #d4380d;
         }
         .doc-card h3 {
             font-size: 15px;
-            color: #334155;
+            color: #5a5a5a;
             margin: 16px 0 8px;
         }
         .doc-card p, .doc-card li {
             font-size: 14px;
-            color: #475569;
+            color: #5a5a5a;
             line-height: 1.8;
         }
         .doc-card ul, .doc-card ol {
@@ -82,16 +82,16 @@
 
         /* ステップガイド */
         .step-guide {
-            background: #f8fafc;
+            background: #f7f7f7;
             border-radius: 10px;
             padding: 16px;
             margin: 12px 0;
-            border-left: 4px solid #2563eb;
+            border-left: 4px solid #d4380d;
         }
         .step-guide .step-num {
             display: inline-block;
             width: 24px; height: 24px;
-            background: #2563eb;
+            background: #d4380d;
             color: white;
             border-radius: 50%;
             text-align: center;
@@ -102,36 +102,36 @@
         }
         .step-guide .step-title {
             font-weight: 700;
-            color: #1e293b;
+            color: #2a2a2a;
             font-size: 14px;
         }
         .step-guide .step-desc {
             font-size: 13px;
-            color: #64748b;
+            color: #8a8a8a;
             margin-top: 4px;
             margin-left: 32px;
         }
 
         /* FAQ */
         .faq-item {
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f7f7f7;
             padding: 14px 0;
         }
         .faq-item:last-child { border-bottom: none; }
         .faq-q {
             font-weight: 700;
-            color: #1e293b;
+            color: #2a2a2a;
             font-size: 14px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .faq-q::after { content: '▼'; font-size: 10px; color: #94a3b8; transition: transform 0.2s; }
+        .faq-q::after { content: '▼'; font-size: 10px; color: #8a8a8a; transition: transform 0.2s; }
         .faq-q.open::after { transform: rotate(180deg); }
         .faq-a {
             font-size: 14px;
-            color: #475569;
+            color: #5a5a5a;
             margin-top: 8px;
             display: none;
             line-height: 1.7;
@@ -151,7 +151,7 @@
             text-align: center;
         }
         .perm-table th {
-            background: #1e3a5f;
+            background: #111111;
             color: white;
             font-weight: 600;
         }
@@ -169,15 +169,15 @@
             margin: 12px 0;
         }
         .flow-item {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
+            background: #f7f7f7;
+            border: 1px solid #eeeeee;
             border-radius: 8px;
             padding: 8px 14px;
             font-size: 13px;
             font-weight: 600;
-            color: #1e40af;
+            color: #d4380d;
         }
-        .flow-arrow { color: #94a3b8; font-size: 18px; }
+        .flow-arrow { color: #8a8a8a; font-size: 18px; }
 
         /* 注意書き */
         .doc-note {
@@ -218,10 +218,12 @@
             background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 14px center no-repeat;
             margin-bottom: 16px;
         }
-        .doc-search:focus { outline: none; border-color: #2563eb; }
+        .doc-search:focus { outline: none; border-color: #d4380d; }
         .highlight { background: #fef08a; padding: 1px 2px; border-radius: 2px; }
     </style>
     <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -410,14 +412,14 @@
             <div class="doc-card">
                 <h2>画面一覧と役割</h2>
                 <table style="width:100%; border-collapse:collapse; font-size:14px;">
-                    <tr style="background:#f1f5f9;"><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">画面名</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">用途</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">使う人</th></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">通報画面</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">設備トラブルを通報+履歴確認</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">スタッフ</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社ダッシュボード</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">対応依頼の確認・ステータス更新</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">マスタ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">アカウント・事業所・管理会社・商品の管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理者全般</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">通報履歴</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">全通報の確認・検索・CSV出力</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理者全般</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">セットアップウィザード</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">新規施設の一括登録</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム管理者</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">契約管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">管理会社×会社×カテゴリの紐づけ</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム管理者</td></tr>
-                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">システム設定</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">ロゴ・カテゴリ・データ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">本社管理者以上（事業所管理者は閲覧のみ）</td></tr>
+                    <tr style="background:#f7f7f7;"><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">画面名</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">用途</th><th style="padding:10px 12px;text-align:left;border-bottom:2px solid #e2e8f0;">使う人</th></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">通報画面</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">設備トラブルを通報+履歴確認</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">スタッフ</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">管理会社ダッシュボード</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">対応依頼の確認・ステータス更新</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">管理会社</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">マスタ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">アカウント・事業所・管理会社・商品の管理</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">管理者全般</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">通報履歴</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">全通報の確認・検索・CSV出力</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">管理者全般</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">セットアップウィザード</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">新規施設の一括登録</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">システム管理者</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">契約管理</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">管理会社×会社×カテゴリの紐づけ</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">システム管理者</td></tr>
+                    <tr><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">システム設定</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">ロゴ・カテゴリ・データ管理</td><td style="padding:8px 12px;border-bottom:1px solid #f7f7f7;">本社管理者以上（事業所管理者は閲覧のみ）</td></tr>
                     <tr><td style="padding:8px 12px;">商品インポート</td><td style="padding:8px 12px;">Excel/CSVから商品を一括登録</td><td style="padding:8px 12px;">管理会社・管理者</td></tr>
                 </table>
             </div>
@@ -764,7 +766,7 @@
             <div class="doc-card">
                 <h2>4. データ構造</h2>
                 <h3>アカウントデータ</h3>
-<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+<pre style="background:#f7f7f7;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
   "companyCode": "TAMJ",
   "id": "TAMJ-tanaka",               // 会社コード + ログイン名
   "name": "田中 太郎",
@@ -778,7 +780,7 @@
   "isDemoMode": true
 }</pre>
                 <h3 style="margin-top:16px;">通報データ</h3>
-<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+<pre style="background:#f7f7f7;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
   "id": "RPT-XXXXXX",
   "title": "エアコン1号機",
   "itemId": "ITEM-DEMO-003",
@@ -793,7 +795,7 @@
   ]
 }</pre>
                 <h3 style="margin-top:16px;">管理会社データ</h3>
-<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+<pre style="background:#f7f7f7;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
   "id": "PN001",
   "name": "〇〇管理株式会社",
   "partnerCode": "PN001",            // PN + 3桁連番
@@ -805,7 +807,7 @@
   "password": "（初期パスワード）"
 }</pre>
                 <h3 style="margin-top:16px;">商品データ</h3>
-<pre style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
+<pre style="background:#f7f7f7;border:1px solid #e2e8f0;border-radius:8px;padding:16px;font-size:13px;overflow-x:auto;margin-top:8px;">{
   "itemId": "ITEM-DEMO-003",
   "companyCode": "TAMJ",
   "officeCode": "TAMJ-J0001",

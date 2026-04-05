@@ -68,10 +68,10 @@
             font-size: 13px;
         }
         .btn-primary {
-            background: #1e3a5f;
+            background: #111111;
             color: #fff;
         }
-        .btn-primary:hover { background: #2d4a7a; }
+        .btn-primary:hover { background: #111111; }
         .btn-secondary {
             background: #f0f0f0;
             color: #666;
@@ -98,7 +98,7 @@
             padding: 14px;
             border-bottom: 1px solid #f5f5f5;
             font-size: 13px;
-            color: #1e293b;
+            color: #2a2a2a;
         }
         tbody tr:hover { background: #fafafa; }
         .type-badge {
@@ -143,9 +143,11 @@
     <script src="error-handler.js"></script>
     <script src="plan-gate.js"></script>
     <script src="unified-header.js"></script>
-    <meta name="theme-color" content="#1e3a5f">
+    <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="unified-header-mount"></div>
@@ -244,7 +246,7 @@
             html += '<span style="font-size:13px;color:#999;margin-right:8px;">全 ' + totalItems + ' 件</span>';
             html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage-1) + ')" ' + (currentPage<=1?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage<=1?'opacity:0.4;cursor:default;':'') + '">前へ</button>';
             var s=Math.max(1,currentPage-2),e=Math.min(totalPages,s+4); if(e-s<4) s=Math.max(1,e-4);
-            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#2563eb':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#2563eb':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
+            for(var p=s;p<=e;p++) html += '<button onclick="window._pgCb' + containerId + '(' + p + ')" style="padding:6px 12px;border:1px solid ' + (p===currentPage?'#d4380d':'#d1d5db') + ';border-radius:6px;background:' + (p===currentPage?'#d4380d':'#fff') + ';color:' + (p===currentPage?'#fff':'#333') + ';cursor:pointer;font-size:13px;font-weight:' + (p===currentPage?'700':'400') + ';">' + p + '</button>';
             html += '<button onclick="window._pgCb' + containerId + '(' + (currentPage+1) + ')" ' + (currentPage>=totalPages?'disabled':'') + ' style="padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;' + (currentPage>=totalPages?'opacity:0.4;cursor:default;':'') + '">次へ</button></div>';
             container.innerHTML = html; window['_pgCb' + containerId] = onPageChange;
         }
